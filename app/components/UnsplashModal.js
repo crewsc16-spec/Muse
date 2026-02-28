@@ -63,7 +63,7 @@ export default function UnsplashModal({ onSelect, onClose }) {
         </form>
 
         {/* Results */}
-        <div className="flex-1 overflow-y-auto px-4 pb-4">
+        <div className="flex-1 min-h-0 overflow-y-auto px-4 pb-4">
           {error && (
             <p className="text-rose-500 text-sm text-center py-4">{error}</p>
           )}

@@ -37,13 +37,22 @@ export default function Navbar() {
             <>
               <Link
                 href="/daily"
-                className="text-xs text-gray-500 hover:text-[#b88a92] transition-colors font-medium"
+                className="flex items-center gap-1.5 text-sm text-gray-600 hover:text-[#b88a92] transition-colors font-medium bg-white/60 border border-white/40 rounded-full px-3 py-1.5"
               >
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" className="text-[#b88a92] flex-shrink-0">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
                 Daily
               </Link>
-              <span className="hidden sm:block text-xs text-gray-400 max-w-[140px] truncate">
-                {user.email}
-              </span>
+              <Link
+                href="/profile"
+                className="flex items-center gap-1.5 text-sm text-gray-600 hover:text-[#b88a92] transition-colors font-medium bg-white/60 border border-white/40 rounded-full px-3 py-1.5"
+              >
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" className="text-[#b88a92] flex-shrink-0">
+                  <path d="M12 12c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm0 2c-3.33 0-10 1.67-10 5v2h20v-2c0-3.33-6.67-5-10-5z"/>
+                </svg>
+                Profile
+              </Link>
               <button
                 onClick={handleLogout}
                 className="text-xs text-gray-400 hover:text-[#b88a92] transition-colors border border-gray-200 rounded-full px-3 py-1.5 hover:border-[#d4adb6]"
