@@ -56,13 +56,12 @@ export default function DailyPage() {
 
   const { tarot, animal, quote, word, question, numerology } = content;
 
-  // Convert Special:FilePath URL → Wikimedia thumb.php (direct image, no redirect chain)
-  function tarotThumbUrl(rawUrl) {
-    if (!rawUrl) return null;
-    const filename = rawUrl.split('/Special:FilePath/')[1];
-    return `https://commons.wikimedia.org/w/thumb.php?f=${filename}&w=400`;
-  }
-  const tarotImageUrl = tarotThumbUrl(TAROT_IMAGES[tarot.name]);
+  // Route Wikimedia images through our own API proxy (avoids hotlink/referrer blocking)
+  const rawUrl = TAROT_IMAGES[tarot.name];
+  const tarotFilename = rawUrl?.split('/Special:FilePath/')[1];
+  const tarotImageUrl = tarotFilename
+    ? `/api/tarot?file=${encodeURIComponent(tarotFilename)}`
+    : null;
 
   return (
     <main className="min-h-screen pt-8 pb-16">
@@ -92,7 +91,6 @@ export default function DailyPage() {
             <img
               src={tarotImageUrl}
               alt={tarot.name}
-              referrerPolicy="no-referrer"
               className="h-72 w-auto rounded-xl shadow-2xl"
               style={{ maxWidth: '185px' }}
             />
