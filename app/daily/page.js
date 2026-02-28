@@ -80,7 +80,7 @@ export default function DailyPage() {
           </p>
           {content.chartData?.sunSign && (
             <p className="text-xs text-gray-300 mt-1">
-              ✦ Informed by your {content.chartData.sunSign.sign} chart
+              ✦ Personalised by your natal chart
             </p>
           )}
         </div>
