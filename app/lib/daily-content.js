@@ -254,6 +254,18 @@ export const TAROT_CARDS = [
   { name: 'King of Pentacles', keywords: ['abundance', 'security', 'leadership', 'legacy'], description: 'The King sits upon a throne of vines and pentacles, steady and prosperous — the master of the material world, generous with all he has built.', message: 'Lead from a place of abundance today. There is enough — for you and for others.', gradient: ['#14532d', '#a3e635'] },
 ];
 
+// Assign element to Major Arcana cards (Minor Arcana element is derived at runtime from card name)
+const _MA_ELEMENTS = {
+  'The Fool': 'air', 'The Magician': 'air', 'The High Priestess': 'water',
+  'The Empress': 'earth', 'The Emperor': 'fire', 'The Hierophant': 'earth',
+  'The Lovers': 'air', 'The Chariot': 'water', 'Strength': 'fire',
+  'The Hermit': 'earth', 'Wheel of Fortune': 'fire', 'Justice': 'air',
+  'The Hanged Man': 'water', 'Death': 'water', 'Temperance': 'fire',
+  'The Devil': 'earth', 'The Tower': 'fire', 'The Star': 'air',
+  'The Moon': 'water', 'The Sun': 'fire', 'Judgement': 'fire', 'The World': 'earth',
+};
+TAROT_CARDS.forEach(c => { if (_MA_ELEMENTS[c.name]) c.element = _MA_ELEMENTS[c.name]; });
+
 // Rider-Waite deck — Wikimedia Commons (public domain)
 export const TAROT_IMAGES = {
   'The Fool':         'https://commons.wikimedia.org/wiki/Special:FilePath/RWS_Tarot_00_Fool.jpg',
@@ -528,6 +540,16 @@ export const SPIRIT_ANIMALS = [
   },
 ];
 
+// Assign Human Design types to spirit animals
+const _ANIMAL_HD = {
+  Wolf: ['manifestor'], Lion: ['manifestor'], Eagle: ['manifestor'], Tiger: ['manifestor'], Jaguar: ['manifestor'],
+  Horse: ['generator'], Bear: ['generator'], Elephant: ['generator'], Buffalo: ['generator'], Salmon: ['generator'], Moose: ['generator'],
+  Fox: ['manifesting-generator'], Hummingbird: ['manifesting-generator'], Rabbit: ['manifesting-generator'], Dolphin: ['manifesting-generator'], Hawk: ['manifesting-generator'],
+  Owl: ['projector'], Raven: ['projector'], Crow: ['projector'], Lynx: ['projector'], Crane: ['projector'], Snake: ['projector'],
+  Butterfly: ['reflector'], Swan: ['reflector'], Dragonfly: ['reflector'], Deer: ['reflector'], Otter: ['reflector'], Turtle: ['reflector'], Peacock: ['reflector'], Whale: ['reflector'],
+};
+SPIRIT_ANIMALS.forEach(a => { a.hdTypes = _ANIMAL_HD[a.name] ?? []; });
+
 // Vintage natural history illustration queries — consistent engraving/print vibe
 export const ANIMAL_IMAGE_QUERIES = {
   'Wolf':        'wolf vintage natural history illustration engraving',
@@ -765,18 +787,67 @@ export const NUMEROLOGY = [
   },
 ];
 
+// ─── Astrology helpers ────────────────────────────────────────────────────────
+
+function cardElement(card) {
+  if (card.element) return card.element; // Major Arcana
+  if (card.name.includes('Wands'))     return 'fire';
+  if (card.name.includes('Cups'))      return 'water';
+  if (card.name.includes('Swords'))    return 'air';
+  if (card.name.includes('Pentacles')) return 'earth';
+  return null;
+}
+
+// 70% astro-filtered pick, 30% pure random
+function weightedPick(arr, filterFn, seed1, seed2) {
+  if (filterFn && (seed1 % 10) < 7) {
+    const filtered = arr.filter(filterFn);
+    if (filtered.length > 0) return filtered[Math.abs(seed2) % filtered.length];
+  }
+  return arr[Math.abs(seed2) % arr.length];
+}
+
 // ─── Seeding function ─────────────────────────────────────────────────────────
-export function getDailyContent(userId, dateStr) {
+export function getDailyContent(userId, dateStr, chartData = null) {
   function seed(type) {
     return hashCode(userId + dateStr + type);
   }
 
-  const tarot = TAROT_CARDS[seed('tarot') % TAROT_CARDS.length];
-  const animal = SPIRIT_ANIMALS[seed('animal') % SPIRIT_ANIMALS.length];
+  // Tarot: bias toward user's sun + moon + today's transit element
+  const tarot = weightedPick(
+    TAROT_CARDS,
+    chartData ? c => {
+      const el = cardElement(c);
+      return el === chartData.sunElement || el === chartData.moonElement || el === chartData.todayElement;
+    } : null,
+    seed('tarot_astro'), seed('tarot')
+  );
+
+  // Spirit Animal: bias toward HD type (or element-mapped HD type for tropical/sidereal)
+  const animal = weightedPick(
+    SPIRIT_ANIMALS,
+    chartData ? a => {
+      if (chartData.system === 'human-design' && chartData.hdType) {
+        return a.hdTypes.includes(chartData.hdType);
+      }
+      const elToHd = { fire: 'manifestor', earth: 'generator', air: 'projector', water: 'reflector' };
+      return a.hdTypes.includes(elToHd[chartData.sunElement]);
+    } : null,
+    seed('animal_astro'), seed('animal')
+  );
+
+  // Lucky number: bias toward life path (70%)
+  const lifePathNum = chartData?.lifePath;
+  let numerologyNumber;
+  if (lifePathNum && (seed('num_astro') % 10) < 7) {
+    numerologyNumber = lifePathNum > 9 ? (lifePathNum % 9 || 9) : lifePathNum;
+  } else {
+    numerologyNumber = (seed('number') % 9) + 1;
+  }
+
   const quote = quotes[seed('quote') % quotes.length];
   const word = WORDS[seed('word') % WORDS.length];
   const question = QUESTIONS[seed('question') % QUESTIONS.length];
-  const numerologyNumber = (seed('number') % 9) + 1;
   const numerology = NUMEROLOGY.find(n => n.number === numerologyNumber);
 
   return { tarot, animal, quote, word, question, numerology };

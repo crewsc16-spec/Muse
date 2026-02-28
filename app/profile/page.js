@@ -14,6 +14,13 @@ export default function ProfilePage() {
   const [nameSaved, setNameSaved] = useState(false);
   const [activeScheme, setActiveScheme] = useState('blush');
 
+  // Astrology
+  const [birthDate, setBirthDate] = useState('');
+  const [birthTime, setBirthTime] = useState('');
+  const [astroSystem, setAstroSystem] = useState('tropical');
+  const [hdType, setHdType] = useState('');
+  const [astroSaved, setAstroSaved] = useState(false);
+
   // Milestones
   const [milestones, setMilestones] = useState([]);
   const [newLabel, setNewLabel]     = useState('');
@@ -31,6 +38,16 @@ export default function ProfilePage() {
     try {
       const saved = localStorage.getItem('milestones');
       if (saved) setMilestones(JSON.parse(saved));
+    } catch {}
+    try {
+      const bd = localStorage.getItem('birthData');
+      if (bd) {
+        const parsed = JSON.parse(bd);
+        setBirthDate(parsed.date ?? '');
+        setBirthTime(parsed.time ?? '');
+        setAstroSystem(parsed.system ?? 'tropical');
+        setHdType(parsed.hdType ?? '');
+      }
     } catch {}
   }, []);
 
@@ -68,6 +85,13 @@ export default function ProfilePage() {
   function handleSchemeSelect(key) {
     setActiveScheme(key);
     saveScheme(key);
+  }
+
+  // ── Astrology ──
+  function handleSaveAstro() {
+    localStorage.setItem('birthData', JSON.stringify({ date: birthDate, time: birthTime, system: astroSystem, hdType }));
+    setAstroSaved(true);
+    setTimeout(() => setAstroSaved(false), 2000);
   }
 
   // ── Milestones ──
@@ -250,6 +274,90 @@ export default function ProfilePage() {
             </button>
           ))}
         </div>
+      </div>
+
+      {/* ── Astrology ── */}
+      <div className="glass-card rounded-3xl p-6 space-y-5">
+        <div>
+          <h2 className="text-xs font-medium text-gray-400 uppercase tracking-widest">Astrology</h2>
+          <p className="text-xs text-gray-300 mt-1">Your birth data personalises your Daily Oracle pulls.</p>
+        </div>
+
+        {/* Birth Date */}
+        <div className="space-y-2">
+          <label className="block text-xs font-medium text-gray-400 uppercase tracking-widest">Birth Date</label>
+          <input
+            type="date"
+            value={birthDate}
+            onChange={e => setBirthDate(e.target.value)}
+            className="w-full border border-white/50 bg-white/50 rounded-xl px-4 py-2 text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#d4adb6]/40"
+          />
+        </div>
+
+        {/* Birth Time */}
+        <div className="space-y-2">
+          <label className="block text-xs font-medium text-gray-400 uppercase tracking-widest">
+            Birth Time <span className="normal-case font-normal">(optional — improves moon sign)</span>
+          </label>
+          <input
+            type="time"
+            value={birthTime}
+            onChange={e => setBirthTime(e.target.value)}
+            className="w-full border border-white/50 bg-white/50 rounded-xl px-4 py-2 text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#d4adb6]/40"
+          />
+        </div>
+
+        {/* System selector */}
+        <div className="space-y-2">
+          <label className="block text-xs font-medium text-gray-400 uppercase tracking-widest">System</label>
+          <div className="flex gap-2 flex-wrap">
+            {[
+              { value: 'tropical',      label: 'Tropical' },
+              { value: 'sidereal',      label: 'Sidereal / Vedic' },
+              { value: 'human-design',  label: 'Human Design' },
+            ].map(opt => (
+              <button
+                key={opt.value}
+                onClick={() => setAstroSystem(opt.value)}
+                className={`px-4 py-2 rounded-full text-xs font-medium border transition-all ${
+                  astroSystem === opt.value
+                    ? 'btn-gradient text-white border-transparent'
+                    : 'bg-white/50 text-gray-500 border-white/50 hover:bg-white/70'
+                }`}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* HD Type — only shown for Human Design */}
+        {astroSystem === 'human-design' && (
+          <div className="space-y-2">
+            <label className="block text-xs font-medium text-gray-400 uppercase tracking-widest">HD Type</label>
+            <select
+              value={hdType}
+              onChange={e => setHdType(e.target.value)}
+              className="w-full border border-white/50 bg-white/50 rounded-xl px-4 py-2 text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#d4adb6]/40"
+            >
+              <option value="">Select your type…</option>
+              <option value="manifestor">Manifestor</option>
+              <option value="generator">Generator</option>
+              <option value="manifesting-generator">Manifesting Generator</option>
+              <option value="projector">Projector</option>
+              <option value="reflector">Reflector</option>
+            </select>
+          </div>
+        )}
+
+        {/* Save */}
+        <button
+          onClick={handleSaveAstro}
+          disabled={!birthDate}
+          className="btn-gradient text-white px-6 py-2 rounded-full text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+          {astroSaved ? '✓ Saved' : 'Save'}
+        </button>
       </div>
     </div>
   );

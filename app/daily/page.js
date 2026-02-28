@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { createClient } from '@/app/lib/supabase/client';
 import { getDailyContent, TAROT_IMAGES, ANIMAL_IMAGE_QUERIES } from '@/app/lib/daily-content';
+import { computeChart } from '@/app/lib/astrology';
 
 function getTodayStr() {
   const d = new Date();
@@ -19,8 +20,13 @@ export default function DailyPage() {
     supabase.auth.getUser().then(async ({ data: { user } }) => {
       if (user) {
         const dateStr = getTodayStr();
-        const dailyContent = getDailyContent(user.id, dateStr);
-        setContent(dailyContent);
+        let chartData = null;
+        try {
+          const raw = localStorage.getItem('birthData');
+          if (raw) chartData = computeChart(JSON.parse(raw), dateStr);
+        } catch {}
+        const dailyContent = getDailyContent(user.id, dateStr, chartData);
+        setContent({ ...dailyContent, chartData });
 
         // Fetch watercolor illustration for the spirit animal
         try {
@@ -72,14 +78,19 @@ export default function DailyPage() {
           <p className="text-sm text-gray-400">
             {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
           </p>
+          {content.chartData?.sunSign && (
+            <p className="text-xs text-gray-300 mt-1">
+              ✦ Informed by your {content.chartData.sunSign.sign} chart
+            </p>
+          )}
         </div>
 
         {/* 1. Tarot Card */}
         <section
-          className="rounded-3xl text-white shadow-lg overflow-hidden"
+          className="rounded-3xl shadow-lg overflow-hidden"
           style={{
-            backgroundImage: `linear-gradient(160deg, ${tarot.gradient[0]}22, ${tarot.gradient[1]}1a)`,
-            backgroundColor: '#1c1814',
+            backgroundColor: '#fdf8f3',
+            backgroundImage: `radial-gradient(circle at top right, ${tarot.gradient[0]}22, ${tarot.gradient[1]}10 60%)`,
           }}
         >
           {/* Card-specific gradient accent bar */}
@@ -97,23 +108,23 @@ export default function DailyPage() {
           </div>
 
           <div className="p-8 pt-5">
-            <p className="text-xs uppercase tracking-widest text-white/50 mb-2">Tarot Card of the Day</p>
-            <h2 className="font-playfair text-3xl font-bold mb-3">{tarot.name}</h2>
+            <p className="text-xs uppercase tracking-widest text-gray-400 mb-2">Tarot Card of the Day</p>
+            <h2 className="font-playfair text-3xl font-bold text-gray-800 mb-3">{tarot.name}</h2>
             <div className="flex flex-wrap gap-2 mb-5">
               {tarot.keywords.map(k => (
                 <span
                   key={k}
-                  className="text-white/80 text-xs px-3 py-1 rounded-full border"
-                  style={{ borderColor: `${tarot.gradient[0]}60`, background: `${tarot.gradient[0]}25` }}
+                  className="text-gray-700 text-xs px-3 py-1 rounded-full border"
+                  style={{ borderColor: `${tarot.gradient[0]}50`, background: `${tarot.gradient[0]}20` }}
                 >
                   {k}
                 </span>
               ))}
             </div>
-            <p className="text-white/70 text-sm leading-relaxed mb-4">{tarot.description}</p>
-            <div className="border-t border-white/10 pt-4">
-              <p className="text-xs uppercase tracking-widest text-white/40 mb-2">Today's Message</p>
-              <p className="text-white/90 font-medium leading-relaxed">{tarot.message}</p>
+            <p className="text-gray-600 text-sm leading-relaxed mb-4">{tarot.description}</p>
+            <div className="border-t border-gray-200 pt-4">
+              <p className="text-xs uppercase tracking-widest text-gray-300 mb-2">Today's Message</p>
+              <p className="text-gray-700 font-medium leading-relaxed">{tarot.message}</p>
             </div>
           </div>
         </section>
