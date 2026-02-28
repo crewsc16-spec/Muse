@@ -13,6 +13,12 @@ export default function ProfilePage() {
   const [uploadError, setUploadError] = useState('');
   const [nameSaved, setNameSaved] = useState(false);
   const [activeScheme, setActiveScheme] = useState('blush');
+
+  // Milestones
+  const [milestones, setMilestones] = useState([]);
+  const [newLabel, setNewLabel]     = useState('');
+  const [newDate, setNewDate]       = useState('');
+
   const fileInputRef = useRef(null);
 
   useEffect(() => {
@@ -22,8 +28,13 @@ export default function ProfilePage() {
     setDisplayName(localStorage.getItem('displayName') ?? '');
     setAvatarUrl(localStorage.getItem('profilePhotoUrl') ?? '');
     setActiveScheme(getSavedScheme());
+    try {
+      const saved = localStorage.getItem('milestones');
+      if (saved) setMilestones(JSON.parse(saved));
+    } catch {}
   }, []);
 
+  // ── Avatar ──
   async function handleAvatarUpload(e) {
     const file = e.target.files?.[0];
     if (!file || !sb) return;
@@ -32,12 +43,10 @@ export default function ProfilePage() {
       const ext = file.name.split('.').pop().toLowerCase();
       const { data: { user: u } } = await sb.auth.getUser();
       const path = `${u.id}/avatar.${ext}`;
-      // Overwrite any existing avatar
       await sb.storage.from('avatars').remove([path]);
       const { error } = await sb.storage.from('avatars').upload(path, file);
       if (error) throw error;
       const { data } = sb.storage.from('avatars').getPublicUrl(path);
-      // Cache-bust so the browser re-fetches the updated image
       const url = `${data.publicUrl}?t=${Date.now()}`;
       setAvatarUrl(url);
       localStorage.setItem('profilePhotoUrl', url);
@@ -48,25 +57,51 @@ export default function ProfilePage() {
     }
   }
 
+  // ── Display name ──
   function handleSaveName() {
     localStorage.setItem('displayName', displayName.trim());
     setNameSaved(true);
     setTimeout(() => setNameSaved(false), 2000);
   }
 
+  // ── Color scheme ──
   function handleSchemeSelect(key) {
     setActiveScheme(key);
     saveScheme(key);
   }
 
+  // ── Milestones ──
+  function saveMilestones(list) {
+    setMilestones(list);
+    localStorage.setItem('milestones', JSON.stringify(list));
+  }
+
+  function addMilestone() {
+    if (!newLabel.trim() || !newDate) return;
+    const entry = {
+      id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+      label: newLabel.trim(),
+      startDate: new Date(newDate).toISOString(),
+    };
+    saveMilestones([...milestones, entry]);
+    setNewLabel(''); setNewDate('');
+  }
+
+  function removeMilestone(id) {
+    saveMilestones(milestones.filter(m => m.id !== id));
+  }
+
+  // ── Derived ──
   const initials = (displayName.trim() || user?.email || 'U')
-    .split(/[\s@]/)[0]
-    .slice(0, 2)
-    .toUpperCase();
+    .split(/[\s@]/)[0].slice(0, 2).toUpperCase();
 
   const memberSince = user?.created_at
     ? new Date(user.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
     : '—';
+
+  // datetime-local max = now (milestones start in the past)
+  const nowLocal = new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
+    .toISOString().slice(0, 16);
 
   return (
     <div className="space-y-6 max-w-lg mx-auto">
@@ -94,13 +129,7 @@ export default function ProfilePage() {
               </span>
             </div>
           </button>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            className="sr-only"
-            onChange={handleAvatarUpload}
-          />
+          <input ref={fileInputRef} type="file" accept="image/*" className="sr-only" onChange={handleAvatarUpload} />
           <p className="text-xs text-gray-400">Click to upload a photo</p>
           {uploadError && <p className="text-red-400 text-xs text-center">{uploadError}</p>}
         </div>
@@ -112,17 +141,13 @@ export default function ProfilePage() {
           </label>
           <div className="flex gap-2">
             <input
-              type="text"
-              value={displayName}
+              type="text" value={displayName}
               onChange={e => setDisplayName(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && handleSaveName()}
               placeholder="Your name"
               className="flex-1 border border-white/50 bg-white/50 rounded-full px-4 py-2 text-sm text-gray-600 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#d4adb6]/40"
             />
-            <button
-              onClick={handleSaveName}
-              className="btn-gradient text-white px-5 py-2 rounded-full text-sm font-medium"
-            >
+            <button onClick={handleSaveName} className="btn-gradient text-white px-5 py-2 rounded-full text-sm font-medium">
               {nameSaved ? '✓' : 'Save'}
             </button>
           </div>
@@ -141,6 +166,61 @@ export default function ProfilePage() {
         </div>
       </div>
 
+      {/* ── Milestones ── */}
+      <div className="glass-card rounded-3xl p-6 space-y-5">
+        <div>
+          <h2 className="text-xs font-medium text-gray-400 uppercase tracking-widest">Milestones</h2>
+          <p className="text-xs text-gray-300 mt-1">Track days sober, smoke-free, or anything meaningful to you.</p>
+        </div>
+
+        {/* Existing milestones */}
+        {milestones.length > 0 && (
+          <div className="space-y-2">
+            {milestones.map(m => (
+              <div key={m.id} className="flex items-center gap-3 p-3 bg-white/50 rounded-2xl border border-white/40">
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-gray-700 capitalize">{m.label}</p>
+                  <p className="text-xs text-gray-400 mt-0.5">
+                    Since {new Date(m.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                  </p>
+                </div>
+                <button
+                  onClick={() => removeMilestone(m.id)}
+                  className="text-gray-300 hover:text-red-400 transition-colors text-sm px-1 shrink-0">
+                  ✕
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Add form */}
+        <div className="space-y-3 pt-1 border-t border-white/40">
+          <p className="text-xs font-medium text-gray-400 uppercase tracking-widest">Add a Milestone</p>
+          <input
+            type="text" value={newLabel} onChange={e => setNewLabel(e.target.value)}
+            placeholder="e.g. days sober, smoke-free, clean, alcohol-free…"
+            className="w-full border border-white/50 bg-white/50 rounded-full px-4 py-2 text-sm text-gray-600 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#d4adb6]/40"
+          />
+          <div className="flex gap-2">
+            <input
+              type="datetime-local"
+              value={newDate}
+              max={nowLocal}
+              onChange={e => setNewDate(e.target.value)}
+              className="flex-1 border border-white/50 bg-white/50 rounded-xl px-4 py-2 text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#d4adb6]/40"
+            />
+            <button
+              onClick={addMilestone}
+              disabled={!newLabel.trim() || !newDate}
+              className="btn-gradient text-white px-5 py-2 rounded-full text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              Add
+            </button>
+          </div>
+        </div>
+      </div>
+
       {/* ── Color scheme ── */}
       <div className="glass-card rounded-3xl p-6 space-y-4">
         <h2 className="text-xs font-medium text-gray-400 uppercase tracking-widest">Color Scheme</h2>
@@ -155,23 +235,15 @@ export default function ProfilePage() {
                   : 'border-transparent bg-white/40 hover:bg-white/60'
               }`}
             >
-              {/* Color preview swatches */}
               <div className="flex gap-1 shrink-0">
                 {scheme.preview.map((color, i) => (
-                  <div
-                    key={i}
-                    className="w-6 h-6 rounded-full shadow-sm"
-                    style={{ background: color }}
-                  />
+                  <div key={i} className="w-6 h-6 rounded-full shadow-sm" style={{ background: color }} />
                 ))}
               </div>
-
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-gray-700">{scheme.name}</p>
                 <p className="text-xs text-gray-400">{scheme.description}</p>
               </div>
-
-              {/* Active dot */}
               {activeScheme === key && (
                 <div className="w-3 h-3 rounded-full shrink-0" style={{ background: 'var(--accent)' }} />
               )}

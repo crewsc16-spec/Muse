@@ -55,7 +55,14 @@ export default function DailyPage() {
   }
 
   const { tarot, animal, quote, word, question, numerology } = content;
-  const tarotImageUrl = TAROT_IMAGES[tarot.name];
+
+  // Convert Special:FilePath URL → Wikimedia thumb.php (direct image, no redirect chain)
+  function tarotThumbUrl(rawUrl) {
+    if (!rawUrl) return null;
+    const filename = rawUrl.split('/Special:FilePath/')[1];
+    return `https://commons.wikimedia.org/w/thumb.php?f=${filename}&w=400`;
+  }
+  const tarotImageUrl = tarotThumbUrl(TAROT_IMAGES[tarot.name]);
 
   return (
     <main className="min-h-screen pt-8 pb-16">
@@ -71,7 +78,10 @@ export default function DailyPage() {
         {/* 1. Tarot Card */}
         <section
           className="rounded-3xl text-white shadow-lg overflow-hidden"
-          style={{ background: 'linear-gradient(160deg, #16112b, #1e1840)' }}
+          style={{
+            backgroundImage: `linear-gradient(160deg, ${tarot.gradient[0]}22, ${tarot.gradient[1]}1a)`,
+            backgroundColor: '#1c1814',
+          }}
         >
           {/* Card-specific gradient accent bar */}
           <div className="h-1" style={{ background: `linear-gradient(90deg, ${tarot.gradient[0]}, ${tarot.gradient[1]})` }} />
@@ -82,6 +92,7 @@ export default function DailyPage() {
             <img
               src={tarotImageUrl}
               alt={tarot.name}
+              referrerPolicy="no-referrer"
               className="h-72 w-auto rounded-xl shadow-2xl"
               style={{ maxWidth: '185px' }}
             />

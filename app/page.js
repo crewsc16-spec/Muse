@@ -35,6 +35,18 @@ const TYPES = [
   { value: 'affirmation', label: 'Affirmation' },
 ];
 
+// Milestone counter helper
+function computeDuration(startDate, now) {
+  const diffMs = Math.max(0, now - new Date(startDate));
+  const totalMinutes = Math.floor(diffMs / 60000);
+  const years   = Math.floor(totalMinutes / 525960);
+  const months  = Math.floor((totalMinutes % 525960) / 43830);
+  const days    = Math.floor((totalMinutes % 43830) / 1440);
+  const hours   = Math.floor((totalMinutes % 1440) / 60);
+  const minutes = totalMinutes % 60;
+  return { years, months, days, hours, minutes };
+}
+
 // Image size → aspect ratio (S=short landscape, M=standard, L=tall portrait)
 const IMG_ASPECTS = { sm: 'aspect-[5/3]', md: 'aspect-[4/3]', lg: 'aspect-[3/4]' };
 
@@ -118,14 +130,16 @@ function InlinePhotoSearch({ onSelect, sb }) {
           {error && <p className="text-red-400 text-xs">{error}</p>}
           {photos.length > 0 && (
             <>
-              <div className="grid grid-cols-2 gap-2 rounded-xl">
-                {photos.map(photo => (
-                  <button key={photo.id} onClick={() => onSelect(photo)}
-                    className="relative aspect-square rounded-xl overflow-hidden group focus:outline-none focus:ring-2 focus:ring-[#c4929a]">
-                    <Image src={photo.thumb} alt={photo.alt} fill className="object-cover group-hover:scale-105 transition-transform duration-200" sizes="(max-width: 640px) 50vw, 200px" />
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/15 transition-colors" />
-                  </button>
-                ))}
+              <div className="max-h-48 overflow-y-auto rounded-xl">
+                <div className="grid grid-cols-3 gap-1.5">
+                  {photos.map(photo => (
+                    <button key={photo.id} onClick={() => onSelect(photo)}
+                      className="relative aspect-square rounded-lg overflow-hidden group focus:outline-none focus:ring-2 focus:ring-[#c4929a]">
+                      <Image src={photo.thumb} alt={photo.alt} fill className="object-cover group-hover:scale-105 transition-transform duration-200" sizes="100px" />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/15 transition-colors" />
+                    </button>
+                  ))}
+                </div>
               </div>
               <p className="text-xs text-gray-400 text-right">
                 Photos from <a href="https://unsplash.com" target="_blank" rel="noopener noreferrer" className="underline">Unsplash</a>
@@ -233,13 +247,21 @@ export default function Home() {
   const [expandedId, setExpandedId] = useState(null);
   const [itemSizes, setItemSizes] = useState({});
 
+  // Milestones
+  const [milestones, setMilestones] = useState([]);
+  const [now, setNow] = useState(() => new Date());
+
   const today = new Date().toISOString().split('T')[0];
 
   useEffect(() => {
     try {
-      const saved = localStorage.getItem('boardSizes');
-      if (saved) setItemSizes(JSON.parse(saved));
+      const savedSizes = localStorage.getItem('boardSizes');
+      if (savedSizes) setItemSizes(JSON.parse(savedSizes));
+      const savedMilestones = localStorage.getItem('milestones');
+      if (savedMilestones) setMilestones(JSON.parse(savedMilestones));
     } catch {}
+    const ticker = setInterval(() => setNow(new Date()), 30000);
+    return () => clearInterval(ticker);
   }, []);
 
   useEffect(() => {
@@ -410,6 +432,39 @@ export default function Home() {
         <p className="text-sm font-medium" style={{ color: '#b88a92' }}>{todayFormatted}</p>
         <h1 className="font-playfair text-4xl text-gray-700 mt-1">{greeting()}</h1>
       </div>
+
+      {/* ── Milestones ── */}
+      {milestones.length > 0 && (
+        <div className="space-y-3">
+          {milestones.map(m => {
+            const { years, months, days, hours, minutes } = computeDuration(m.startDate, now);
+            const allUnits = [
+              { value: years,   label: 'yr' },
+              { value: months,  label: 'mo' },
+              { value: days,    label: 'd'  },
+              { value: hours,   label: 'h'  },
+              { value: minutes, label: 'm'  },
+            ];
+            const firstNZ = allUnits.findIndex(u => u.value > 0);
+            const display = firstNZ === -1 ? [{ value: 0, label: 'm' }] : allUnits.slice(firstNZ);
+            return (
+              <div key={m.id} className="glass-card rounded-3xl px-6 py-5">
+                <p className="text-xs font-medium uppercase tracking-widest mb-3 capitalize" style={{ color: 'var(--accent)' }}>
+                  {m.label}
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {display.map(u => (
+                    <div key={u.label} className="flex flex-col items-center min-w-[52px] bg-white/60 rounded-2xl px-3 py-2 shadow-sm">
+                      <span className="font-playfair text-2xl text-gray-700 leading-none">{u.value}</span>
+                      <span className="text-xs text-gray-400 mt-1">{u.label}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       {/* ── Today's Entry — combined mood + board piece ── */}
       <div className="glass-card rounded-3xl p-6 space-y-5">
