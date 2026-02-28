@@ -908,13 +908,17 @@ export function getDailyContent(userId, dateStr, chartData = null) {
     seed('question_astro'), seed('question')
   );
 
-  // Lucky number: bias toward life path (70%)
-  const lifePathNum = chartData?.lifePath;
+  // Lucky number: always changes daily; life path adds personal resonance (70% weight)
+  const lifePathNum = chartData?.lifePath
+    ? (chartData.lifePath > 9 ? (chartData.lifePath % 9 || 9) : chartData.lifePath)
+    : null;
+  const numSeed = seed('number');
   let numerologyNumber;
   if (lifePathNum && (seed('num_astro') % 10) < 7) {
-    numerologyNumber = lifePathNum > 9 ? (lifePathNum % 9 || 9) : lifePathNum;
+    // Life-path-anchored: combine life path with daily seed so it shifts every day
+    numerologyNumber = ((lifePathNum - 1 + numSeed) % 9) + 1;
   } else {
-    numerologyNumber = (seed('number') % 9) + 1;
+    numerologyNumber = (numSeed % 9) + 1;
   }
 
   const numerology = NUMEROLOGY.find(n => n.number === numerologyNumber);
