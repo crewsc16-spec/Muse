@@ -550,6 +550,52 @@ const _ANIMAL_HD = {
 };
 SPIRIT_ANIMALS.forEach(a => { a.hdTypes = _ANIMAL_HD[a.name] ?? []; });
 
+// ─── Quote category → element mappings ───────────────────────────────────────
+const _ELEMENT_QUOTE_CATS = {
+  fire:  ['motivation', 'career', 'creativity'],
+  earth: ['health', 'nature', 'career'],
+  air:   ['growth', 'creativity', 'travel'],
+  water: ['love', 'spirituality', 'growth'],
+};
+const _HD_QUOTE_CATS = {
+  'manifestor':            ['motivation', 'career'],
+  'generator':             ['health', 'career', 'motivation'],
+  'manifesting-generator': ['creativity', 'motivation'],
+  'projector':             ['growth', 'spirituality'],
+  'reflector':             ['spirituality', 'nature', 'love'],
+};
+
+// ─── Word → element mappings ─────────────────────────────────────────────────
+const _WORD_ELEMENTS = {
+  'Sonder':'air','Hiraeth':'water','Fernweh':'fire','Meraki':'fire','Wanderlust':'fire',
+  'Eudaimonia':'air','Hygge':'earth','Lagom':'earth','Serendipity':'air','Ephemeral':'air',
+  'Solitude':'water','Sanguine':'fire','Mellifluous':'air','Petrichor':'earth','Liminal':'water',
+  'Veridical':'air','Susurrus':'water','Iridescent':'air','Crepuscular':'water','Reverie':'water',
+  'Incandescent':'fire','Vellichor':'water','Alchemy':'fire','Luminous':'fire','Numinous':'water',
+  'Equanimity':'air','Vesper':'water','Pulchritude':'earth','Halcyon':'earth','Apricity':'earth',
+  'Ineffable':'air','Resilience':'earth','Solastalgia':'water','Ephemera':'air','Syzygy':'air',
+  'Denouement':'water','Euphoria':'fire','Serenity':'water','Catharsis':'water','Labyrinthine':'air',
+  'Elysian':'fire','Acumen':'fire','Awe':'water','Bespoke':'earth','Candor':'air',
+  'Diaphanous':'air','Enthrall':'fire','Flummox':'air','Gossamer':'air','Jubilant':'fire',
+  'Kinship':'water','Lacuna':'air','Mnemonic':'air','Nascent':'earth','Opulent':'earth',
+  'Palimpsest':'air','Quixotic':'fire','Revenant':'water','Sempiternal':'air','Tranquil':'water',
+  'Umbra':'water','Verdant':'earth','Wabi-Sabi':'earth','Xenial':'earth','Yugen':'water',
+  'Zephyr':'air','Aureate':'fire','Brimborion':'earth','Callipygian':'earth','Defenestration':'fire',
+  'Effulgent':'fire','Flibbertigibbet':'air','Galvanize':'fire','Hapax Legomenon':'air',
+};
+WORDS.forEach(w => { w.element = _WORD_ELEMENTS[w.word] ?? null; });
+
+// ─── Question → element (by index, 0–59) ─────────────────────────────────────
+// fire=action/courage, earth=values/legacy, air=mind/belief, water=emotion/depth
+const _QUESTION_ELEMENTS = [
+  'fire', 'water','water','air',  'air',  'earth','air',  'fire', 'earth','fire',  // 0–9
+  'water','air',  'earth','earth','fire', 'air',  'earth','air',  'water','earth', // 10–19
+  'water','earth','water','air',  'water','air',  'fire', 'fire', 'air',  'water', // 20–29
+  'air',  'air',  'fire', 'fire', 'air',  'fire', 'water','water','fire', 'earth', // 30–39
+  'fire', 'air',  'air',  'water','water','water','earth','water','fire', 'air',   // 40–49
+  'water','water','water','earth','water','fire', 'fire', 'earth','water','earth', // 50–59
+];
+
 // Vintage natural history illustration queries — consistent engraving/print vibe
 export const ANIMAL_IMAGE_QUERIES = {
   'Wolf':        'wolf vintage natural history illustration engraving',
@@ -823,17 +869,40 @@ export function getDailyContent(userId, dateStr, chartData = null) {
     seed('tarot_astro'), seed('tarot')
   );
 
-  // Spirit Animal: bias toward HD type (or element-mapped HD type for tropical/sidereal)
+  // Spirit Animal: HD type takes priority; element-mapped HD as fallback
+  // (astrology and HD are complementary — element guides everything else, HD type guides the animal)
   const animal = weightedPick(
     SPIRIT_ANIMALS,
     chartData ? a => {
-      if (chartData.system === 'human-design' && chartData.hdType) {
-        return a.hdTypes.includes(chartData.hdType);
-      }
+      if (chartData.hdType) return a.hdTypes.includes(chartData.hdType);
       const elToHd = { fire: 'manifestor', earth: 'generator', air: 'projector', water: 'reflector' };
       return a.hdTypes.includes(elToHd[chartData.sunElement]);
     } : null,
     seed('animal_astro'), seed('animal')
+  );
+
+  // Quote: bias toward element-matched or HD-matched categories
+  const activeCats = chartData?.hdType
+    ? (_HD_QUOTE_CATS[chartData.hdType] ?? [])
+    : (_ELEMENT_QUOTE_CATS[chartData?.sunElement] ?? []);
+  const quote = weightedPick(
+    quotes,
+    activeCats.length ? q => activeCats.includes(q.category) : null,
+    seed('quote_astro'), seed('quote')
+  );
+
+  // Word: bias toward element-matched words
+  const word = weightedPick(
+    WORDS,
+    chartData?.sunElement ? w => w.element === chartData.sunElement : null,
+    seed('word_astro'), seed('word')
+  );
+
+  // Question: bias toward element-matched questions
+  const question = weightedPick(
+    QUESTIONS,
+    chartData?.sunElement ? q => _QUESTION_ELEMENTS[QUESTIONS.indexOf(q)] === chartData.sunElement : null,
+    seed('question_astro'), seed('question')
   );
 
   // Lucky number: bias toward life path (70%)
@@ -845,9 +914,6 @@ export function getDailyContent(userId, dateStr, chartData = null) {
     numerologyNumber = (seed('number') % 9) + 1;
   }
 
-  const quote = quotes[seed('quote') % quotes.length];
-  const word = WORDS[seed('word') % WORDS.length];
-  const question = QUESTIONS[seed('question') % QUESTIONS.length];
   const numerology = NUMEROLOGY.find(n => n.number === numerologyNumber);
 
   return { tarot, animal, quote, word, question, numerology };

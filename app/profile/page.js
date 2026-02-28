@@ -309,12 +309,11 @@ export default function ProfilePage() {
 
         {/* System selector */}
         <div className="space-y-2">
-          <label className="block text-xs font-medium text-gray-400 uppercase tracking-widest">System</label>
+          <label className="block text-xs font-medium text-gray-400 uppercase tracking-widest">Astrology System</label>
           <div className="flex gap-2 flex-wrap">
             {[
-              { value: 'tropical',      label: 'Tropical' },
-              { value: 'sidereal',      label: 'Sidereal / Vedic' },
-              { value: 'human-design',  label: 'Human Design' },
+              { value: 'tropical', label: 'Tropical' },
+              { value: 'sidereal', label: 'Sidereal / Vedic' },
             ].map(opt => (
               <button
                 key={opt.value}
@@ -331,24 +330,25 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* HD Type — only shown for Human Design */}
-        {astroSystem === 'human-design' && (
-          <div className="space-y-2">
-            <label className="block text-xs font-medium text-gray-400 uppercase tracking-widest">HD Type</label>
-            <select
-              value={hdType}
-              onChange={e => setHdType(e.target.value)}
-              className="w-full border border-white/50 bg-white/50 rounded-xl px-4 py-2 text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#d4adb6]/40"
-            >
-              <option value="">Select your type…</option>
-              <option value="manifestor">Manifestor</option>
-              <option value="generator">Generator</option>
-              <option value="manifesting-generator">Manifesting Generator</option>
-              <option value="projector">Projector</option>
-              <option value="reflector">Reflector</option>
-            </select>
-          </div>
-        )}
+        {/* HD Type — always optional, works alongside astrology */}
+        <div className="space-y-2">
+          <label className="block text-xs font-medium text-gray-400 uppercase tracking-widest">
+            Human Design Type <span className="normal-case font-normal">(optional)</span>
+          </label>
+          <select
+            value={hdType}
+            onChange={e => setHdType(e.target.value)}
+            className="w-full border border-white/50 bg-white/50 rounded-xl px-4 py-2 text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#d4adb6]/40"
+          >
+            <option value="">None</option>
+            <option value="manifestor">Manifestor</option>
+            <option value="generator">Generator</option>
+            <option value="manifesting-generator">Manifesting Generator</option>
+            <option value="projector">Projector</option>
+            <option value="reflector">Reflector</option>
+          </select>
+          <p className="text-xs text-gray-300">Not redundant — your astrology guides tarot, words & questions; your HD type guides your spirit animal.</p>
+        </div>
 
         {/* Save */}
         <button

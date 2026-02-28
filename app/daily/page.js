@@ -79,9 +79,10 @@ export default function DailyPage() {
             {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
           </p>
           {content.chartData?.sunSign && (
-            <p className="text-xs text-gray-300 mt-1">
-              ✦ Personalised by your natal chart
-            </p>
+            <div className="mt-2 space-y-0.5">
+              <p className="text-xs text-gray-300">✦ Personalised by your natal chart</p>
+              <p className="text-xs text-gray-300/60">Guided by your chart — with space left for your higher power.</p>
+            </div>
           )}
         </div>
 
