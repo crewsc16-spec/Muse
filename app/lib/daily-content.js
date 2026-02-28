@@ -564,6 +564,23 @@ const _HD_QUOTE_CATS = {
   'projector':             ['growth', 'spirituality'],
   'reflector':             ['spirituality', 'nature', 'love'],
 };
+const _PROFILE_ANIMALS = {
+  1: ['Bear','Elephant','Owl'],
+  2: ['Deer','Hawk','Otter'],
+  3: ['Snake','Butterfly','Salmon'],
+  4: ['Wolf','Dolphin','Horse'],
+  5: ['Lion','Eagle','Tiger'],
+  6: ['Crane','Swan','Whale'],
+};
+const _AUTHORITY_QUOTE_CATS = {
+  emotional:          ['growth','spirituality','love'],
+  sacral:             ['health','motivation','career'],
+  splenic:            ['health','spirituality','nature'],
+  ego:                ['career','motivation'],
+  'self-projected':   ['growth','creativity'],
+  mental:             ['growth','travel','creativity'],
+  lunar:              ['spirituality','nature','love'],
+};
 
 
 // ─── Question → element (by index, 0–59) ─────────────────────────────────────
@@ -893,6 +910,7 @@ export function getDailyContent(userId, dateStr, chartData = null) {
     if (primary   && a.hdTypes.includes(_EL_TO_HD[primary]))             s += 3; // today's cosmic element → HD
     if (secondary && a.hdTypes.includes(_EL_TO_HD[secondary]))           s += 1; // secondary cosmic element
     if (chartData.sunElement && a.hdTypes.includes(_EL_TO_HD[chartData.sunElement])) s += 2; // natal sun
+    if (chartData.hdProfileLine1 && (_PROFILE_ANIMALS[chartData.hdProfileLine1] ?? []).includes(a.name)) s += 3; // profile line affinity
     return s;
   }, seed('animal'));
 
@@ -908,6 +926,8 @@ export function getDailyContent(userId, dateStr, chartData = null) {
     if (primaryCats.includes(q.category)) s += 4; // today's cosmic element
     if (secCats.includes(q.category))     s += 2; // secondary element
     if (natalCats.includes(q.category))   s += 1; // natal resonance
+    const authCats = chartData.hdAuthority ? (_AUTHORITY_QUOTE_CATS[chartData.hdAuthority] ?? []) : [];
+    if (authCats.includes(q.category))    s += 2; // authority resonance
     return s;
   }, seed('quote'));
 

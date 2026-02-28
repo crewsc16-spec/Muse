@@ -3,6 +3,23 @@
 import { useState, useEffect, useRef } from 'react';
 import { createClient } from '@/app/lib/supabase/client';
 import { COLOR_SCHEMES, getSavedScheme, saveScheme } from '@/app/lib/color-schemes';
+import { calculateHDChart } from '@/app/lib/hd-chart';
+
+const PROFILE_LINE_NAMES = {
+  1: 'Investigator', 2: 'Hermit', 3: 'Martyr',
+  4: 'Opportunist',  5: 'Heretic', 6: 'Role Model',
+};
+
+function utcLabel(offset) {
+  const sign = offset >= 0 ? '+' : '-';
+  const abs  = Math.abs(offset);
+  const h    = Math.floor(abs);
+  const m    = (abs % 1) === 0.5 ? '30' : '00';
+  return `UTC${sign}${String(h).padStart(2, '0')}:${m}`;
+}
+
+const UTC_OPTIONS = [];
+for (let v = -12; v <= 14; v += 0.5) UTC_OPTIONS.push(v);
 
 export default function ProfilePage() {
   const [user, setUser]           = useState(null);
@@ -17,8 +34,9 @@ export default function ProfilePage() {
   // Astrology
   const [birthDate, setBirthDate] = useState('');
   const [birthTime, setBirthTime] = useState('');
+  const [utcOffset, setUtcOffset] = useState(0);
   const [astroSystem, setAstroSystem] = useState('tropical');
-  const [hdType, setHdType] = useState('');
+  const [hdCalc, setHdCalc] = useState(null);
   const [astroSaved, setAstroSaved] = useState(false);
 
   // Milestones
@@ -45,8 +63,16 @@ export default function ProfilePage() {
         const parsed = JSON.parse(bd);
         setBirthDate(parsed.date ?? '');
         setBirthTime(parsed.time ?? '');
+        setUtcOffset(parsed.utcOffset ?? 0);
         setAstroSystem(parsed.system ?? 'tropical');
-        setHdType(parsed.hdType ?? '');
+        if (parsed.hdCalculated) {
+          setHdCalc({
+            type:         parsed.hdType,
+            profile:      parsed.hdProfile,
+            profileLine1: parsed.hdProfileLine1,
+            profileLine2: parsed.hdProfileLine2,
+          });
+        }
       }
     } catch {}
   }, []);
@@ -89,7 +115,31 @@ export default function ProfilePage() {
 
   // ── Astrology ──
   function handleSaveAstro() {
-    localStorage.setItem('birthData', JSON.stringify({ date: birthDate, time: birthTime, system: astroSystem, hdType }));
+    const base = { date: birthDate, time: birthTime, utcOffset, system: astroSystem };
+    let hdFields = {};
+    if (birthDate && birthTime && utcOffset != null) {
+      try {
+        const result = calculateHDChart(birthDate, birthTime, utcOffset);
+        hdFields = {
+          hdType:            result.type,
+          hdProfile:         result.profile,
+          hdProfileLine1:    result.profileLine1,
+          hdProfileLine2:    result.profileLine2,
+          hdAuthority:       result.authority,
+          hdDefinedCenters:  result.definedCenters,
+          hdDefinedChannels: result.definedChannels,
+          hdAllGates:        result.allGates,
+          hdCalculated:      true,
+        };
+        setHdCalc({
+          type:         result.type,
+          profile:      result.profile,
+          profileLine1: result.profileLine1,
+          profileLine2: result.profileLine2,
+        });
+      } catch {}
+    }
+    localStorage.setItem('birthData', JSON.stringify({ ...base, ...hdFields }));
     setAstroSaved(true);
     setTimeout(() => setAstroSaved(false), 2000);
   }
@@ -307,6 +357,22 @@ export default function ProfilePage() {
           />
         </div>
 
+        {/* Birth Timezone */}
+        <div className="space-y-2">
+          <label className="block text-xs font-medium text-gray-400 uppercase tracking-widest">
+            Birth Timezone (UTC±)
+          </label>
+          <select
+            value={utcOffset}
+            onChange={e => setUtcOffset(Number(e.target.value))}
+            className="w-full border border-white/50 bg-white/50 rounded-xl px-4 py-2 text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#d4adb6]/40"
+          >
+            {UTC_OPTIONS.map(v => (
+              <option key={v} value={v}>{utcLabel(v)}</option>
+            ))}
+          </select>
+        </div>
+
         {/* System selector */}
         <div className="space-y-2">
           <label className="block text-xs font-medium text-gray-400 uppercase tracking-widest">Astrology System</label>
@@ -330,26 +396,6 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* HD Type — always optional, works alongside astrology */}
-        <div className="space-y-2">
-          <label className="block text-xs font-medium text-gray-400 uppercase tracking-widest">
-            Human Design Type <span className="normal-case font-normal">(optional)</span>
-          </label>
-          <select
-            value={hdType}
-            onChange={e => setHdType(e.target.value)}
-            className="w-full border border-white/50 bg-white/50 rounded-xl px-4 py-2 text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#d4adb6]/40"
-          >
-            <option value="">None</option>
-            <option value="manifestor">Manifestor</option>
-            <option value="generator">Generator</option>
-            <option value="manifesting-generator">Manifesting Generator</option>
-            <option value="projector">Projector</option>
-            <option value="reflector">Reflector</option>
-          </select>
-          <p className="text-xs text-gray-300">Not redundant — your astrology guides tarot, words & questions; your HD type guides your spirit animal.</p>
-        </div>
-
         {/* Save */}
         <button
           onClick={handleSaveAstro}
@@ -358,6 +404,25 @@ export default function ProfilePage() {
         >
           {astroSaved ? '✓ Saved' : 'Save'}
         </button>
+
+        {/* HD results — shown after successful calculation */}
+        {birthDate && !birthTime && (
+          <p className="text-xs text-gray-300">Add birth time for HD chart calculation</p>
+        )}
+        {hdCalc && (
+          <div className="space-y-3 pt-3 border-t border-white/40">
+            <div className="flex justify-between items-center">
+              <span className="text-xs text-gray-400">Human Design Type</span>
+              <span className="text-sm text-gray-600 capitalize">{hdCalc.type.replace(/-/g, ' ')}</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-xs text-gray-400">Profile</span>
+              <span className="text-sm text-gray-600">
+                {hdCalc.profile} — {PROFILE_LINE_NAMES[hdCalc.profileLine1]} / {PROFILE_LINE_NAMES[hdCalc.profileLine2]}
+              </span>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

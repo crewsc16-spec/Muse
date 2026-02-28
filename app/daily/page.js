@@ -100,6 +100,11 @@ export default function DailyPage() {
                   ✶ {content.chartData.dayRuler.planet} day
                 </span>
               )}
+              {content.chartData?.hdType && content.chartData?.hdProfile && (
+                <span className="text-xs text-gray-400">
+                  ✦ {content.chartData.hdType.replace(/-/g, ' ')} {content.chartData.hdProfile}
+                </span>
+              )}
             </div>
           )}
         </div>

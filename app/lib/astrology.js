@@ -142,6 +142,15 @@ export function computeChart(birthData, todayStr) {
   if (dayRuler?.element)        weights[dayRuler.element]        += 1; // planetary day tone
   if (season?.element)          weights[season.element]          += 1; // seasonal backdrop
 
+  // HD center → element mapping (adds at most ~2 pts per element, keeps transit dominance)
+  const _CENTER_EL = {
+    Head: 'air', Ajna: 'air', Throat: 'air', G: 'fire', Will: 'fire',
+    Sacral: 'earth', Root: 'earth', SolarPlexus: 'water', Spleen: 'water',
+  };
+  (birthData.hdDefinedCenters ?? []).forEach(c => {
+    if (_CENTER_EL[c]) weights[_CENTER_EL[c]] += 1;
+  });
+
   // Ranked array of elements — most cosmically active today listed first
   const dailyBlend = Object.entries(weights)
     .sort((a, b) => b[1] - a[1])
@@ -155,7 +164,14 @@ export function computeChart(birthData, todayStr) {
     moonElement: moonSign?.element ?? null,
     sunModality: sunSign?.modality ?? null,
     lifePath,
-    hdType:  birthData.hdType  ?? null,
+    hdType:           birthData.hdType            ?? null,
+    hdProfile:        birthData.hdProfile         ?? null,
+    hdProfileLine1:   birthData.hdProfileLine1    ?? null,
+    hdProfileLine2:   birthData.hdProfileLine2    ?? null,
+    hdAuthority:      birthData.hdAuthority       ?? null,
+    hdDefinedCenters: birthData.hdDefinedCenters  ?? [],
+    hdDefinedChannels:birthData.hdDefinedChannels ?? [],
+    hdAllGates:       birthData.hdAllGates        ?? [],
     system:  birthData.system,
 
     // Today's cosmic weather
