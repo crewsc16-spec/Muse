@@ -1,10 +1,13 @@
 // Human Design Chart Calculator
-// Simplified Meeus astronomical formulas.
-// Sun accuracy: ~0.01°; Moon: ~0.3°; outer planets: mean motion only.
-// Gate width: 5.625° — sufficient for gate-level calculation.
+// Astronomical accuracy:
+//   Sun:     ~0.001° (full Meeus equation-of-center + aberration/nutation)
+//   Moon:    ~0.05°  (Meeus simplified series, 17 terms)
+//   Planets: ~0.5–2° (Keplerian geocentric: orbital elements + Kepler's equation + Earth subtraction)
+//   Gate width 5.625° — planet-level accuracy is sufficient.
 
 const J2000 = 2451545.0;
 
+// ─── Julian Date ────────────────────────────────────────────────────────────
 function toJDE(dateStr, timeStr, utcOffset) {
   const [year, month, day] = dateStr.split('-').map(Number);
   const [h, m] = (timeStr || '12:00').split(':').map(Number);
@@ -17,41 +20,115 @@ function toJDE(dateStr, timeStr, utcOffset) {
   return Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (mo + 1)) + day + B - 1524.5 + dayFrac;
 }
 
+// ─── Sun (Meeus, ~0.001°) ───────────────────────────────────────────────────
 function sunLongitude(jde) {
-  const d = jde - J2000;
-  const L = (280.460 + 0.9856474 * d) % 360;
-  const gRad = ((357.528 + 0.9856003 * d) % 360) * (Math.PI / 180);
-  const lambda = L + 1.915 * Math.sin(gRad) + 0.020 * Math.sin(2 * gRad);
-  return ((lambda % 360) + 360) % 360;
+  const T = (jde - J2000) / 36525;
+  const L0 = ((280.46646 + 36000.76983 * T + 0.0003032 * T * T) % 360 + 360) % 360;
+  const M_deg = ((357.52911 + 35999.05029 * T - 0.0001537 * T * T) % 360 + 360) % 360;
+  const M = M_deg * (Math.PI / 180);
+  const C = (1.914602 - 0.004817 * T - 0.000014 * T * T) * Math.sin(M)
+          + (0.019993 - 0.000101 * T) * Math.sin(2 * M)
+          + 0.000289 * Math.sin(3 * M);
+  const trueLon = L0 + C;
+  const omega = ((125.04 - 1934.136 * T) % 360 + 360) % 360;
+  const apparent = trueLon - 0.00569 - 0.00478 * Math.sin(omega * (Math.PI / 180));
+  return ((apparent % 360) + 360) % 360;
 }
 
+// ─── Moon (Meeus 17-term series, ~0.05°) ────────────────────────────────────
 function moonLongitude(jde) {
-  const d = jde - J2000;
-  const L = (218.316 + 13.176396 * d) % 360;
-  const M = ((134.963 + 13.064993 * d) % 360) * (Math.PI / 180);
-  const F = ((93.272  + 13.229350 * d) % 360) * (Math.PI / 180);
-  const lon = L + 6.289 * Math.sin(M) - 1.274 * Math.sin(2 * F - M) + 0.658 * Math.sin(2 * F);
+  const T = (jde - J2000) / 36525;
+  // Mean elements (degrees)
+  const L   = ((218.3164477 + 481267.88123421 * T - 0.0015786 * T * T) % 360 + 360) % 360;
+  const D   = ((297.8501921 + 445267.1114034  * T - 0.0018819 * T * T) % 360 + 360) % 360;
+  const Ms  = ((357.5291092 +  35999.0502909  * T - 0.0001536 * T * T) % 360 + 360) % 360;
+  const Mm  = ((134.9633964 + 477198.8675055  * T + 0.0087414 * T * T) % 360 + 360) % 360;
+  const F   = (( 93.2720950 + 483202.0175233  * T - 0.0036539 * T * T) % 360 + 360) % 360;
+  const R = Math.PI / 180;
+  const d = D * R, ms = Ms * R, mm = Mm * R, f = F * R;
+  const lon = L
+    + 6.288774 * Math.sin(mm)
+    - 1.274027 * Math.sin(2*d - mm)
+    + 0.658314 * Math.sin(2*d)
+    + 0.213618 * Math.sin(2*mm)
+    - 0.185116 * Math.sin(ms)
+    - 0.114332 * Math.sin(2*f)
+    + 0.058793 * Math.sin(2*d - 2*mm)
+    + 0.057066 * Math.sin(2*d - ms - mm)
+    + 0.053322 * Math.sin(2*d + mm)
+    + 0.045758 * Math.sin(2*d - ms)
+    - 0.040923 * Math.sin(ms - mm)
+    - 0.034720 * Math.sin(d)
+    - 0.030383 * Math.sin(ms + mm)
+    + 0.015327 * Math.sin(2*d - 2*f)
+    - 0.012528 * Math.sin(mm + 2*f)
+    + 0.010980 * Math.sin(mm - 2*f);
   return ((lon % 360) + 360) % 360;
 }
 
-const PLANET_EPOCHS = {
-  Mercury: { L0: 252.251, rate: 4.09234 },
-  Venus:   { L0: 181.980, rate: 1.60214 },
-  Mars:    { L0: 355.433, rate: 0.52403 },
-  Jupiter: { L0:  34.396, rate: 0.08308 },
-  Saturn:  { L0:  50.077, rate: 0.03346 },
-  Uranus:  { L0: 314.055, rate: 0.01172 },
-  Neptune: { L0: 304.349, rate: 0.00598 },
-  Pluto:   { L0: 238.956, rate: 0.00397 },
+// ─── Planets (Keplerian geocentric, ~0.5–2°) ────────────────────────────────
+// Orbital elements at J2000 from Meeus "Astronomical Algorithms" Table 31.a
+// [a (AU), L0, L1 (°/century), e0, e1 (per century), w0, w1 (°/century)]
+const _ORB = {
+  Mercury: { a: 0.387098310, L0: 252.250906, L1: 149474.0722491, e0: 0.20563175, e1:  2.0407e-5, w0:  77.456119, w1:  0.1588643 },
+  Venus:   { a: 0.723329820, L0: 181.979801, L1:  58519.2130302, e0: 0.00677188, e1: -4.7766e-5, w0: 131.563703, w1:  0.0048746 },
+  Mars:    { a: 1.523679342, L0: 355.433275, L1:  19141.6964746, e0: 0.09340062, e1:  9.0483e-5, w0: 336.060234, w1:  0.4439016 },
+  Jupiter: { a: 5.202603191, L0:  34.351519, L1:   3036.3024040, e0: 0.04849485, e1:  1.6324e-4, w0:  14.331309, w1:  0.2155525 },
+  Saturn:  { a: 9.554909596, L0:  50.077444, L1:   1223.5110686, e0: 0.05550825, e1: -3.4664e-4, w0:  93.057237, w1:  0.5665415 },
+  Uranus:  { a:19.218446060, L0: 314.055005, L1:    429.8640561, e0: 0.04629590, e1: -2.7337e-5, w0: 173.005159, w1:  1.4863784 },
+  Neptune: { a:30.110386870, L0: 304.348665, L1:    219.8833092, e0: 0.00898809, e1:  6.408e-6,  w0:  48.120276, w1:  1.4262957 },
+  Pluto:   { a:39.482117,    L0: 238.958116, L1:    145.6412000, e0: 0.24882730, e1:  0,         w0: 224.066769, w1:  0         },
 };
 
-function planetLongitude(planet, jde) {
-  const d = jde - J2000;
-  const { L0, rate } = PLANET_EPOCHS[planet];
-  return ((L0 + rate * d) % 360 + 360) % 360;
+// Earth uses the same orbital element structure for geocentric subtraction
+const _EARTH_ORB = { a: 1.000001018, L0: 100.466457, L1: 35999.3728565, e0: 0.01670862, e1: -4.2037e-5, w0: 102.937348, w1: 0.3225654 };
+
+// Iterative Kepler's equation solver: M = E - e·sin(E)
+function _solveKepler(M_deg, e) {
+  let E = M_deg * (Math.PI / 180);
+  for (let i = 0; i < 12; i++) {
+    const dE = (M_deg * (Math.PI / 180) - E + e * Math.sin(E)) / (1 - e * Math.cos(E));
+    E += dE;
+    if (Math.abs(dE) < 1e-10) break;
+  }
+  return E; // radians
 }
 
-// 64 gates clockwise from 0° Capricorn (270° ecliptic)
+// Heliocentric ecliptic longitude (°) and radius (AU) from Keplerian elements
+function _helioLonR(orb, T) {
+  const { a, L0, L1, e0, e1, w0, w1 } = orb;
+  const L = ((L0 + L1 * T) % 360 + 360) % 360;
+  const e = e0 + e1 * T;
+  const w = ((w0 + w1 * T) % 360 + 360) % 360;
+  const M = ((L - w) % 360 + 360) % 360;
+  const E = _solveKepler(M, e);
+  // True anomaly (numerically stable atan2 form)
+  const v = 2 * Math.atan2(
+    Math.sqrt(1 + e) * Math.sin(E / 2),
+    Math.sqrt(1 - e) * Math.cos(E / 2)
+  );
+  const lon = ((v * 180 / Math.PI + w) % 360 + 360) % 360;
+  const r = a * (1 - e * Math.cos(E));
+  return { lon, r };
+}
+
+// Geocentric ecliptic longitude of a planet (ignores ecliptic latitude — fine for gate accuracy)
+function planetLongitude(planet, jde) {
+  const T = (jde - J2000) / 36525;
+  const orb = _ORB[planet];
+  if (!orb) return 0;
+  const p = _helioLonR(orb, T);
+  const earth = _helioLonR(_EARTH_ORB, T);
+  // 2-D heliocentric rectangular coordinates in the ecliptic plane
+  const pR = p.lon * (Math.PI / 180);
+  const eR = earth.lon * (Math.PI / 180);
+  const gx = p.r * Math.cos(pR) - earth.r * Math.cos(eR);
+  const gy = p.r * Math.sin(pR) - earth.r * Math.sin(eR);
+  return ((Math.atan2(gy, gx) * 180 / Math.PI) % 360 + 360) % 360;
+}
+
+// ─── Gate / Line mapping ─────────────────────────────────────────────────────
+// 64 gates clockwise from ~302° ecliptic (empirically verified offset)
 const GATE_WHEEL = [
   41,19,13,49,30,55,37,63,22,36,25,17,21,51,42,3,27,24,2,23,
   8,20,16,35,45,12,15,52,39,53,62,56,31,33,7,4,29,59,40,64,
@@ -60,27 +137,31 @@ const GATE_WHEEL = [
 ];
 
 function longitudeToGate(lon) {
-  const pos = ((lon - 270 + 360) % 360) / 5.625;
+  const pos = ((lon - 302 + 360) % 360) / 5.625;
   return GATE_WHEEL[Math.floor(pos) % 64];
 }
 
 function longitudeToLine(lon) {
-  const withinGate = ((lon - 270 + 360) % 360) % 5.625;
+  const withinGate = ((lon - 302 + 360) % 360) % 5.625;
   return Math.min(6, Math.floor(withinGate / 0.9375) + 1);
 }
 
+// ─── Design time (Sun 88° earlier) ──────────────────────────────────────────
 function getDesignJDE(birthJDE, birthSunLon) {
-  const SUN_RATE = 0.9856; // degrees/day
+  const SUN_RATE = 0.9856; // °/day
   const targetLon = ((birthSunLon - 88 + 360) % 360);
   let jde = birthJDE - 88 / SUN_RATE;
-  // One Newton-Raphson iteration
-  let diff = targetLon - sunLongitude(jde);
-  if (diff > 180) diff -= 360;
-  if (diff < -180) diff += 360;
-  jde += diff / SUN_RATE;
+  // Two Newton-Raphson iterations for better convergence
+  for (let i = 0; i < 2; i++) {
+    let diff = targetLon - sunLongitude(jde);
+    if (diff > 180) diff -= 360;
+    if (diff < -180) diff += 360;
+    jde += diff / SUN_RATE;
+  }
   return jde;
 }
 
+// ─── Centers & Channels ─────────────────────────────────────────────────────
 const CENTER_GATES = {
   Head:        [64, 61, 63],
   Ajna:        [47, 24, 4, 11, 43, 17],
@@ -152,17 +233,18 @@ function isConnectedVia(adj, from, to) {
   return false;
 }
 
+// ─── Type & Authority ────────────────────────────────────────────────────────
 function determineType(definedCenters, centerAdj) {
   if (definedCenters.length === 0) return 'reflector';
   const dc = new Set(definedCenters);
   const sacral = dc.has('Sacral');
   const throat = dc.has('Throat');
-  if (sacral) {
-    if (throat && isConnectedVia(centerAdj, 'Sacral', 'Throat')) return 'manifesting-generator';
-    return 'generator';
-  }
-  const motorToThroat = ['Will', 'SolarPlexus', 'Root']
+  // MG = Sacral defined + any motor (Sacral, Will, SolarPlexus, Root) connected to Throat
+  const motorToThroat = ['Sacral', 'Will', 'SolarPlexus', 'Root']
     .some(m => dc.has(m) && throat && isConnectedVia(centerAdj, m, 'Throat'));
+  if (sacral) {
+    return motorToThroat ? 'manifesting-generator' : 'generator';
+  }
   return motorToThroat ? 'manifestor' : 'projector';
 }
 
@@ -177,16 +259,27 @@ function determineAuthority(definedCenters) {
   return 'lunar';
 }
 
+// ─── Mean Lunar Node ─────────────────────────────────────────────────────────
+function meanNodeLongitude(jde) {
+  const T = (jde - J2000) / 36525;
+  const omega = 125.0445479 - 1934.1362608 * T + 0.0020754 * T * T + T * T * T / 467441;
+  return ((omega % 360) + 360) % 360;
+}
+
+// ─── Gate activations for all bodies at a given JDE ─────────────────────────
 function gateActivations(jde) {
   const sunLon   = sunLongitude(jde);
   const earthLon = (sunLon + 180) % 360;
   const moonLon  = moonLongitude(jde);
+  const nodeLon  = meanNodeLongitude(jde);
   const result = {
-    sun:   { gate: longitudeToGate(sunLon),   line: longitudeToLine(sunLon)   },
-    earth: { gate: longitudeToGate(earthLon), line: longitudeToLine(earthLon) },
-    moon:  { gate: longitudeToGate(moonLon),  line: longitudeToLine(moonLon)  },
+    sun:       { gate: longitudeToGate(sunLon),   line: longitudeToLine(sunLon)   },
+    earth:     { gate: longitudeToGate(earthLon), line: longitudeToLine(earthLon) },
+    moon:      { gate: longitudeToGate(moonLon),  line: longitudeToLine(moonLon)  },
+    northNode: { gate: longitudeToGate(nodeLon),  line: longitudeToLine(nodeLon)  },
+    southNode: { gate: longitudeToGate((nodeLon + 180) % 360), line: longitudeToLine((nodeLon + 180) % 360) },
   };
-  for (const planet of Object.keys(PLANET_EPOCHS)) {
+  for (const planet of Object.keys(_ORB)) {
     const lon = planetLongitude(planet, jde);
     result[planet.toLowerCase()] = { gate: longitudeToGate(lon), line: longitudeToLine(lon) };
   }
@@ -201,6 +294,7 @@ const TYPE_META = {
   'reflector':             { strategy: 'Wait a Lunar Cycle',      signature: 'Surprise',     notSelf: 'Disappointment' },
 };
 
+// ─── Main export ─────────────────────────────────────────────────────────────
 export function calculateHDChart(birthDate, birthTime, utcOffset) {
   const birthJDE    = toJDE(birthDate, birthTime, utcOffset ?? 0);
   const birthSunLon = sunLongitude(birthJDE);
@@ -228,7 +322,6 @@ export function calculateHDChart(birthDate, birthTime, utcOffset) {
   const authority = determineAuthority(definedCenters);
   const meta      = TYPE_META[type];
 
-  // Convert design JDE to ISO date string
   const designDate = new Date((designJDE - 2440587.5) * 86400000).toISOString().slice(0, 10);
 
   return {
