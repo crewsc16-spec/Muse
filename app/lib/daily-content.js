@@ -845,14 +845,21 @@ function cardElement(card) {
   return null;
 }
 
-// 70% astro-filtered pick, 30% pure random
-function weightedPick(arr, filterFn, seed1, seed2) {
-  if (filterFn && (seed1 % 10) < 7) {
-    const filtered = arr.filter(filterFn);
-    if (filtered.length > 0) return filtered[Math.abs(seed2) % filtered.length];
+// Soft-weighted pick: every item is always eligible; matching factors raise probability.
+// Uses a scored selection — no hard exclusions, just graduated influence.
+// Base score 1 means even the least-resonant item can appear (space for your higher power).
+function scoredPick(arr, scoreFn, seed) {
+  const scores = arr.map((item, i) => Math.max(1, scoreFn(item, i)));
+  const total   = scores.reduce((a, b) => a + b, 0);
+  let   target  = seed % total;
+  for (let i = 0; i < arr.length; i++) {
+    target -= scores[i];
+    if (target < 0) return arr[i];
   }
-  return arr[Math.abs(seed2) % arr.length];
+  return arr[arr.length - 1];
 }
+
+const _EL_TO_HD = { fire: 'manifestor', earth: 'generator', air: 'projector', water: 'reflector' };
 
 // ─── Seeding function ─────────────────────────────────────────────────────────
 export function getDailyContent(userId, dateStr, chartData = null) {
@@ -860,62 +867,81 @@ export function getDailyContent(userId, dateStr, chartData = null) {
     return hashCode(userId + dateStr + type);
   }
 
-  // dailyBlend[0] is today's most cosmically active element — driven by transiting moon,
-  // lunar phase, day ruler, and season (changes daily). Natal chart adds personal resonance.
-  const primaryEl = chartData?.dailyBlend?.[0] ?? null;
-  const blendTop2 = chartData?.dailyBlend?.slice(0, 2) ?? [];
+  const blend    = chartData?.dailyBlend ?? [];   // ranked elements, most cosmic-active first
+  const primary  = blend[0] ?? null;              // today's dominant element
+  const secondary = blend[1] ?? null;
 
-  // Tarot: bias toward cards matching today's top 2 cosmically active elements
-  const tarot = weightedPick(
-    TAROT_CARDS,
-    blendTop2.length ? c => blendTop2.includes(cardElement(c)) : null,
-    seed('tarot_astro'), seed('tarot')
-  );
+  // ── Tarot ──────────────────────────────────────────────────────────────────
+  // All 78 cards eligible. Cards matching today's cosmic elements score higher.
+  const tarot = scoredPick(TAROT_CARDS, (c) => {
+    const el = cardElement(c);
+    let s = 1;
+    if (!el || !chartData) return s;
+    if (el === primary)               s += 4; // today's dominant cosmic element
+    if (el === secondary)             s += 2; // today's secondary element
+    if (el === chartData.sunElement)  s += 2; // natal sun resonance
+    if (el === chartData.moonElement) s += 1; // natal moon undertone
+    return s;
+  }, seed('tarot'));
 
-  // Spirit Animal: HD type takes priority; today's primary element as fallback
-  // (astrology and HD are complementary — element guides tarot/word/quote/question, HD guides the animal)
-  const animal = weightedPick(
-    SPIRIT_ANIMALS,
-    chartData ? a => {
-      if (chartData.hdType) return a.hdTypes.includes(chartData.hdType);
-      const elToHd = { fire: 'manifestor', earth: 'generator', air: 'projector', water: 'reflector' };
-      return a.hdTypes.includes(elToHd[primaryEl]);
-    } : null,
-    seed('animal_astro'), seed('animal')
-  );
+  // ── Spirit Animal ──────────────────────────────────────────────────────────
+  // All 30 animals eligible. HD type and cosmic element both raise scores.
+  const animal = scoredPick(SPIRIT_ANIMALS, (a) => {
+    let s = 1;
+    if (!chartData) return s;
+    if (chartData.hdType && a.hdTypes.includes(chartData.hdType))        s += 5; // explicit HD match
+    if (primary   && a.hdTypes.includes(_EL_TO_HD[primary]))             s += 3; // today's cosmic element → HD
+    if (secondary && a.hdTypes.includes(_EL_TO_HD[secondary]))           s += 1; // secondary cosmic element
+    if (chartData.sunElement && a.hdTypes.includes(_EL_TO_HD[chartData.sunElement])) s += 2; // natal sun
+    return s;
+  }, seed('animal'));
 
-  // Quote: HD type takes priority; today's primary element as fallback
-  const activeCats = chartData?.hdType
-    ? (_HD_QUOTE_CATS[chartData.hdType] ?? [])
-    : (_ELEMENT_QUOTE_CATS[primaryEl] ?? []);
-  const quote = weightedPick(
-    quotes,
-    activeCats.length ? q => activeCats.includes(q.category) : null,
-    seed('quote_astro'), seed('quote')
-  );
+  // ── Quote ──────────────────────────────────────────────────────────────────
+  const quote = scoredPick(quotes, (q) => {
+    let s = 1;
+    if (!chartData) return s;
+    const hdCats      = chartData.hdType ? (_HD_QUOTE_CATS[chartData.hdType] ?? []) : [];
+    const primaryCats = _ELEMENT_QUOTE_CATS[primary]              ?? [];
+    const secCats     = _ELEMENT_QUOTE_CATS[secondary]            ?? [];
+    const natalCats   = _ELEMENT_QUOTE_CATS[chartData.sunElement] ?? [];
+    if (hdCats.includes(q.category))      s += 4; // HD type
+    if (primaryCats.includes(q.category)) s += 4; // today's cosmic element
+    if (secCats.includes(q.category))     s += 2; // secondary element
+    if (natalCats.includes(q.category))   s += 1; // natal resonance
+    return s;
+  }, seed('quote'));
 
-  // Word: bias toward today's primary cosmically active element
-  const word = weightedPick(
-    WORDS,
-    primaryEl ? w => w.element === primaryEl : null,
-    seed('word_astro'), seed('word')
-  );
+  // ── Word ───────────────────────────────────────────────────────────────────
+  const word = scoredPick(WORDS, (w) => {
+    let s = 1;
+    if (!chartData || !w.element) return s;
+    if (w.element === primary)               s += 4;
+    if (w.element === secondary)             s += 2;
+    if (w.element === chartData.sunElement)  s += 2;
+    if (w.element === chartData.moonElement) s += 1;
+    return s;
+  }, seed('word'));
 
-  // Question: bias toward today's primary cosmically active element
-  const question = weightedPick(
-    QUESTIONS,
-    primaryEl ? q => _QUESTION_ELEMENTS[QUESTIONS.indexOf(q)] === primaryEl : null,
-    seed('question_astro'), seed('question')
-  );
+  // ── Question ───────────────────────────────────────────────────────────────
+  const question = scoredPick(QUESTIONS, (q, i) => {
+    let s = 1;
+    const qEl = _QUESTION_ELEMENTS[i];
+    if (!chartData || !qEl) return s;
+    if (qEl === primary)               s += 4;
+    if (qEl === secondary)             s += 2;
+    if (qEl === chartData.sunElement)  s += 2;
+    if (qEl === chartData.moonElement) s += 1;
+    return s;
+  }, seed('question'));
 
-  // Lucky number: always changes daily; life path adds personal resonance (70% weight)
+  // ── Lucky number ───────────────────────────────────────────────────────────
+  // Always changes daily; life path adds personal resonance
   const lifePathNum = chartData?.lifePath
     ? (chartData.lifePath > 9 ? (chartData.lifePath % 9 || 9) : chartData.lifePath)
     : null;
   const numSeed = seed('number');
   let numerologyNumber;
   if (lifePathNum && (seed('num_astro') % 10) < 7) {
-    // Life-path-anchored: combine life path with daily seed so it shifts every day
     numerologyNumber = ((lifePathNum - 1 + numSeed) % 9) + 1;
   } else {
     numerologyNumber = (numSeed % 9) + 1;
