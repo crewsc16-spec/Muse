@@ -565,25 +565,6 @@ const _HD_QUOTE_CATS = {
   'reflector':             ['spirituality', 'nature', 'love'],
 };
 
-// ─── Word → element mappings ─────────────────────────────────────────────────
-const _WORD_ELEMENTS = {
-  'Sonder':'air','Hiraeth':'water','Fernweh':'fire','Meraki':'fire','Wanderlust':'fire',
-  'Eudaimonia':'air','Hygge':'earth','Lagom':'earth','Serendipity':'air','Ephemeral':'air',
-  'Solitude':'water','Sanguine':'fire','Mellifluous':'air','Petrichor':'earth','Liminal':'water',
-  'Veridical':'air','Susurrus':'water','Iridescent':'air','Crepuscular':'water','Reverie':'water',
-  'Incandescent':'fire','Vellichor':'water','Alchemy':'fire','Luminous':'fire','Numinous':'water',
-  'Equanimity':'air','Vesper':'water','Pulchritude':'earth','Halcyon':'earth','Apricity':'earth',
-  'Ineffable':'air','Resilience':'earth','Solastalgia':'water','Ephemera':'air','Syzygy':'air',
-  'Denouement':'water','Euphoria':'fire','Serenity':'water','Catharsis':'water','Labyrinthine':'air',
-  'Elysian':'fire','Acumen':'fire','Awe':'water','Bespoke':'earth','Candor':'air',
-  'Diaphanous':'air','Enthrall':'fire','Flummox':'air','Gossamer':'air','Jubilant':'fire',
-  'Kinship':'water','Lacuna':'air','Mnemonic':'air','Nascent':'earth','Opulent':'earth',
-  'Palimpsest':'air','Quixotic':'fire','Revenant':'water','Sempiternal':'air','Tranquil':'water',
-  'Umbra':'water','Verdant':'earth','Wabi-Sabi':'earth','Xenial':'earth','Yugen':'water',
-  'Zephyr':'air','Aureate':'fire','Brimborion':'earth','Callipygian':'earth','Defenestration':'fire',
-  'Effulgent':'fire','Flibbertigibbet':'air','Galvanize':'fire','Hapax Legomenon':'air',
-};
-WORDS.forEach(w => { w.element = _WORD_ELEMENTS[w.word] ?? null; });
 
 // ─── Question → element (by index, 0–59) ─────────────────────────────────────
 // fire=action/courage, earth=values/legacy, air=mind/belief, water=emotion/depth
@@ -710,6 +691,26 @@ export const WORDS = [
   { word: 'Galvanize', pronunciation: '/ˈɡælvənʌɪz/', partOfSpeech: 'verb', definition: 'Shock or excite someone into taking action; stimulate by or as if by an electric current.', origin: 'After Luigi Galvani, Italian physicist who discovered bioelectricity.', example: 'The speech galvanized the crowd into action before the last note had faded.' },
   { word: 'Hapax Legomenon', pronunciation: '/ˌhapaks lɪˈɡɒmɪnɒn/', partOfSpeech: 'noun', definition: 'A word or form of which only one instance of use is recorded.', origin: 'Greek, "said only once."', example: 'The word appeared only once in the ancient text, making it a hapax legomenon that scholars still debate.' },
 ];
+
+// ─── Word → element mappings (must come after WORDS declaration) ──────────────
+const _WORD_ELEMENTS = {
+  'Sonder':'air','Hiraeth':'water','Fernweh':'fire','Meraki':'fire','Wanderlust':'fire',
+  'Eudaimonia':'air','Hygge':'earth','Lagom':'earth','Serendipity':'air','Ephemeral':'air',
+  'Solitude':'water','Sanguine':'fire','Mellifluous':'air','Petrichor':'earth','Liminal':'water',
+  'Veridical':'air','Susurrus':'water','Iridescent':'air','Crepuscular':'water','Reverie':'water',
+  'Incandescent':'fire','Vellichor':'water','Alchemy':'fire','Luminous':'fire','Numinous':'water',
+  'Equanimity':'air','Vesper':'water','Pulchritude':'earth','Halcyon':'earth','Apricity':'earth',
+  'Ineffable':'air','Resilience':'earth','Solastalgia':'water','Ephemera':'air','Syzygy':'air',
+  'Denouement':'water','Euphoria':'fire','Serenity':'water','Catharsis':'water','Labyrinthine':'air',
+  'Elysian':'fire','Acumen':'fire','Awe':'water','Bespoke':'earth','Candor':'air',
+  'Diaphanous':'air','Enthrall':'fire','Flummox':'air','Gossamer':'air','Jubilant':'fire',
+  'Kinship':'water','Lacuna':'air','Mnemonic':'air','Nascent':'earth','Opulent':'earth',
+  'Palimpsest':'air','Quixotic':'fire','Revenant':'water','Sempiternal':'air','Tranquil':'water',
+  'Umbra':'water','Verdant':'earth','Wabi-Sabi':'earth','Xenial':'earth','Yugen':'water',
+  'Zephyr':'air','Aureate':'fire','Brimborion':'earth','Callipygian':'earth','Defenestration':'fire',
+  'Effulgent':'fire','Flibbertigibbet':'air','Galvanize':'fire','Hapax Legomenon':'air',
+};
+WORDS.forEach(w => { w.element = _WORD_ELEMENTS[w.word] ?? null; });
 
 // ─── Questions: 60 ───────────────────────────────────────────────────────────
 export const QUESTIONS = [
