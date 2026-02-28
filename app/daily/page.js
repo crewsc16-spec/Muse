@@ -84,6 +84,24 @@ export default function DailyPage() {
               <p className="text-xs text-gray-300/60">Guided by your chart — with space left for your higher power.</p>
             </div>
           )}
+          {/* Cosmic weather strip — changes daily based on transits */}
+          {content.chartData?.lunarPhase && (
+            <div className="mt-3 flex flex-wrap justify-center gap-x-4 gap-y-1">
+              <span className="text-xs text-gray-400">
+                {content.chartData.lunarPhase.emoji} {content.chartData.lunarPhase.name}
+              </span>
+              {content.chartData.transitMoonSign && (
+                <span className="text-xs text-gray-400">
+                  🌙 Moon in {content.chartData.transitMoonSign.sign}
+                </span>
+              )}
+              {content.chartData.dayRuler && (
+                <span className="text-xs text-gray-400">
+                  ✶ {content.chartData.dayRuler.planet} day
+                </span>
+              )}
+            </div>
+          )}
         </div>
 
         {/* 1. Tarot Card */}

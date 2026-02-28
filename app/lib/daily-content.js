@@ -859,49 +859,51 @@ export function getDailyContent(userId, dateStr, chartData = null) {
     return hashCode(userId + dateStr + type);
   }
 
-  // Tarot: bias toward user's sun + moon + today's transit element
+  // dailyBlend[0] is today's most cosmically active element — driven by transiting moon,
+  // lunar phase, day ruler, and season (changes daily). Natal chart adds personal resonance.
+  const primaryEl = chartData?.dailyBlend?.[0] ?? null;
+  const blendTop2 = chartData?.dailyBlend?.slice(0, 2) ?? [];
+
+  // Tarot: bias toward cards matching today's top 2 cosmically active elements
   const tarot = weightedPick(
     TAROT_CARDS,
-    chartData ? c => {
-      const el = cardElement(c);
-      return el === chartData.sunElement || el === chartData.moonElement || el === chartData.todayElement;
-    } : null,
+    blendTop2.length ? c => blendTop2.includes(cardElement(c)) : null,
     seed('tarot_astro'), seed('tarot')
   );
 
-  // Spirit Animal: HD type takes priority; element-mapped HD as fallback
-  // (astrology and HD are complementary — element guides everything else, HD type guides the animal)
+  // Spirit Animal: HD type takes priority; today's primary element as fallback
+  // (astrology and HD are complementary — element guides tarot/word/quote/question, HD guides the animal)
   const animal = weightedPick(
     SPIRIT_ANIMALS,
     chartData ? a => {
       if (chartData.hdType) return a.hdTypes.includes(chartData.hdType);
       const elToHd = { fire: 'manifestor', earth: 'generator', air: 'projector', water: 'reflector' };
-      return a.hdTypes.includes(elToHd[chartData.sunElement]);
+      return a.hdTypes.includes(elToHd[primaryEl]);
     } : null,
     seed('animal_astro'), seed('animal')
   );
 
-  // Quote: bias toward element-matched or HD-matched categories
+  // Quote: HD type takes priority; today's primary element as fallback
   const activeCats = chartData?.hdType
     ? (_HD_QUOTE_CATS[chartData.hdType] ?? [])
-    : (_ELEMENT_QUOTE_CATS[chartData?.sunElement] ?? []);
+    : (_ELEMENT_QUOTE_CATS[primaryEl] ?? []);
   const quote = weightedPick(
     quotes,
     activeCats.length ? q => activeCats.includes(q.category) : null,
     seed('quote_astro'), seed('quote')
   );
 
-  // Word: bias toward element-matched words
+  // Word: bias toward today's primary cosmically active element
   const word = weightedPick(
     WORDS,
-    chartData?.sunElement ? w => w.element === chartData.sunElement : null,
+    primaryEl ? w => w.element === primaryEl : null,
     seed('word_astro'), seed('word')
   );
 
-  // Question: bias toward element-matched questions
+  // Question: bias toward today's primary cosmically active element
   const question = weightedPick(
     QUESTIONS,
-    chartData?.sunElement ? q => _QUESTION_ELEMENTS[QUESTIONS.indexOf(q)] === chartData.sunElement : null,
+    primaryEl ? q => _QUESTION_ELEMENTS[QUESTIONS.indexOf(q)] === primaryEl : null,
     seed('question_astro'), seed('question')
   );
 
