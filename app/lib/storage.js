@@ -25,7 +25,7 @@ export async function saveMoodEntry(supabase, entry) {
 export async function getVisionItems(supabase) {
   const { data, error } = await supabase
     .from('vision_items')
-    .select('*, mood_entries(id, mood, notes)')
+    .select('*, mood_entries(id, mood, notes, date)')
     .order('created_at', { ascending: false });
   if (error) throw error;
   return data ?? [];
@@ -43,7 +43,7 @@ export async function saveVisionItem(supabase, item) {
       image_url: item.image_url ?? null,
       mood_entry_id: item.mood_entry_id ?? null,
     })
-    .select('*, mood_entries(id, mood, notes)');
+    .select('*, mood_entries(id, mood, notes, date)');
   if (error) throw error;
   return data?.[0];
 }
@@ -53,7 +53,7 @@ export async function updateVisionItem(supabase, id, updates) {
     .from('vision_items')
     .update(updates)
     .eq('id', id)
-    .select('*, mood_entries(id, mood, notes)');
+    .select('*, mood_entries(id, mood, notes, date)');
   if (error) throw error;
   return data?.[0];
 }
