@@ -88,6 +88,90 @@ const PLANET_DESC = {
   earth:     { title: 'Earth ⊕', body: 'In Human Design, the Earth gate is the unconscious grounding complement to the conscious Sun. Where the Sun represents your purpose and your light, the Earth shows how that purpose becomes rooted in physical reality. It is the energetic foundation that stabilizes and grounds your solar expression.' },
 };
 
+// ─── Sun in sign descriptions ─────────────────────────────────────────────────
+const SUN_IN_SIGN = {
+  Aries:       `Your Sun in Aries places your identity at the very threshold of becoming. You are a pioneer — someone who exists most fully at the beginning of things, where no path has been worn yet. You are here to be bold, to act first, and to show others what becomes possible when you stop waiting for permission.`,
+  Taurus:      `Your Sun in Taurus grounds your core self in the realm of the body, the senses, and the earth. You are here to build something lasting — to inhabit your life fully and with deep pleasure. Your power comes not from speed but from steadiness: the slow, certain accumulation of beauty, presence, and things made to endure.`,
+  Gemini:      `Your Sun in Gemini places your identity at the crossroads of ideas, language, and the electric joy of connection. You are here to learn, to share, and to move between worlds — bringing people and concepts into conversation. Your intelligence is quicksilver: it finds itself through articulation, curiosity, and the endless delight of a mind that never stops.`,
+  Cancer:      `Your Sun in Cancer anchors your identity in the realm of feeling, memory, and belonging. You are here to create nourishment — for yourself and for those who find shelter in your presence. Your power flows from your sensitivity: the way you feel deeply, remember everything, and hold the people you love with an almost oceanic care.`,
+  Leo:         `Your Sun in Leo places your identity at the heart of creative self-expression and the warm, radiant power of being truly seen. You are here to shine — not out of ego, but because your light genuinely illuminates others. Your gift is generosity: the way you love fully, lead with warmth, and make everyone around you feel like the most important person in the room.`,
+  Virgo:       `Your Sun in Virgo places your identity in the quiet, precise, devoted service of bringing things into their right form. You are here to see what others miss, to improve what is broken, and to give your gifts with integrity and intelligence. Your power lives in the details — in the way you care enough to do it right, every single time.`,
+  Libra:       `Your Sun in Libra grounds your identity in beauty, relationship, and the search for genuine harmony. You are here to create balance — not by avoiding tension but by learning to hold all sides of it with grace. Your gift is the capacity to truly see the other, to weigh with fairness, and to build things that are beautiful and just at once.`,
+  Scorpio:     `Your Sun in Scorpio places your identity in the realm of depth, transformation, and what is most essentially real beneath the surface. You are here to go where most won't — into the territory of feeling, truth, and power — and to emerge changed. Your gift is the fierce, penetrating intelligence that can see through anything false and love what it finds.`,
+  Sagittarius: `Your Sun in Sagittarius places your identity at the intersection of adventure, philosophy, and the search for meaning larger than any single life. You are here to expand — in mind, in spirit, in the width of your experience. Your gift is irrepressible optimism and the contagious conviction that life is abundant and the journey is always worth it.`,
+  Capricorn:   `Your Sun in Capricorn places your identity in the long game — in the slow building of something real, worthy, and lasting. You are here to master: to understand that the summit requires the climb, and that the climb itself is the point. Your gift is the willingness to do what is necessary, for as long as it takes, without losing sight of what you are building toward.`,
+  Aquarius:    `Your Sun in Aquarius places your identity at the edge of the possible — in the revolutionary, the innovative, and the genuinely ahead-of-its-time. You are here to see what others cannot yet see, and to help the collective move toward it. Your gift is the brilliant, slightly detached perspective of someone who loves humanity even when — especially when — it hasn't caught up to your vision.`,
+  Pisces:      `Your Sun in Pisces places your identity in the realm of the mystical, the compassionate, and the boundless. You are here to dissolve what is separate and touch what is universal. Your gift is a porousness that lets you feel the whole world — to create, to heal, to dream, and to remind everyone around you that reality is far more mysterious and beautiful than it appears.`,
+};
+
+// ─── Moon in sign descriptions ────────────────────────────────────────────────
+const MOON_IN_SIGN = {
+  Aries:       `Your Moon in Aries gives your emotional interior the quality of fire — immediate, direct, and intensely personal. You feel things fast and fully, and you need space to act on what you feel without delay or explanation. Your emotional nourishment comes from movement, independence, and the freedom to be exactly where you are without apology.`,
+  Taurus:      `Your Moon in Taurus gives your emotional world a quality of deep, sensory rootedness. You find safety in the familiar, the beautiful, and the pleasures of a body that is well-tended. Your inner life requires stability — consistent rhythms, physical comfort, and relationships that feel as reliable as the earth beneath your feet.`,
+  Gemini:      `Your Moon in Gemini gives your emotional life the quality of quicksilver curiosity. You process feeling through language — talking, writing, and the relief of naming what you experience. You need mental stimulation and variety to feel alive inside; stagnation and silence are often harder for you than almost anything else.`,
+  Cancer:      `Your Moon in Cancer places you in your element — the Moon rules Cancer, and here she is fully at home. Your emotional world is vast, rich, and long-memoried. You feel everything deeply and you need genuine belonging: spaces and people where you don't have to explain yourself, because they already know you completely.`,
+  Leo:         `Your Moon in Leo gives your emotional interior a quality of warmth, drama, and the deep need to be truly seen and celebrated. You feel most at home when you are fully expressed and when those you love reflect your light back with genuine appreciation. You are generous with your heart — and you need that generosity returned in kind.`,
+  Virgo:       `Your Moon in Virgo gives your inner life a quality of quiet, precise attentiveness. You feel most safe when things are in order — when the body is tended, the environment is clean, and the details of daily life are handled with care. Your emotional nourishment lives in usefulness: the deep satisfaction of being genuinely needed and doing your work well.`,
+  Libra:       `Your Moon in Libra gives your emotional life an orientation toward harmony, beauty, and genuine connection. You feel most at home in beautiful environments and in relationships where balance is mutual and real. Conflict disturbs you at a cellular level; your soul requires peace — and you are learning that peace built on honesty is the only kind that lasts.`,
+  Scorpio:     `Your Moon in Scorpio places your emotional life in deep water. You feel with enormous intensity and almost nothing reaches you at the surface — you always want to go further, to know more, to touch the real. Your inner nourishment comes from depth, loyalty, and relationships where nothing is hidden — where you are known completely and loved for it.`,
+  Sagittarius: `Your Moon in Sagittarius gives your emotional life a quality of freedom and philosophical expansiveness. You need space — physical, intellectual, and spiritual — to feel truly alive inside yourself. Your soul is nourished by adventure, by meaning, and by the sense that the world is vast and you are free within it.`,
+  Capricorn:   `Your Moon in Capricorn gives your inner life a serious, structured quality. You were shaped early by responsibility, and you find deep emotional safety in competence — in knowing that you can handle what comes. You are learning that strength doesn't require you to need nothing: that asking for care is not weakness but the truest kind of courage.`,
+  Aquarius:    `Your Moon in Aquarius gives your emotional interior an airy, slightly detached quality. You process feeling through thought, through ideas, through the communal rather than the intimate. You need freedom to be strange, to be different, to belong to the collective in ways that don't require you to lose yourself in anyone.`,
+  Pisces:      `Your Moon in Pisces gives your emotional life a quality of oceanic depth and near-mystical sensitivity. You feel everything — your own feelings, others' feelings, the feeling-tone of a room, a moment, a piece of music. Your soul needs beauty, solitude, and the freedom to float between worlds without being asked to explain what you feel or why.`,
+};
+
+// ─── Sign qualities for dynamic planet+sign descriptions ─────────────────────
+const SIGN_Q = {
+  Aries:       { themes: 'bold, pioneering, and self-determining',          domain: 'initiative, courage, and the fresh start' },
+  Taurus:      { themes: 'patient, sensory, and deeply grounded',           domain: 'beauty, steadiness, and the long build' },
+  Gemini:      { themes: 'curious, communicative, and brilliantly agile',   domain: 'ideas, language, and the joy of connection' },
+  Cancer:      { themes: 'feeling-rich, protective, and long-memoried',     domain: 'nourishment, belonging, and emotional depth' },
+  Leo:         { themes: 'radiant, generous, and powerfully expressive',    domain: 'creativity, visibility, and the warmth of the heart' },
+  Virgo:       { themes: 'precise, devoted, and genuinely discerning',      domain: 'service, refinement, and the craft of doing things well' },
+  Libra:       { themes: 'harmonious, just, and beautifully relational',    domain: 'balance, beauty, and genuine partnership' },
+  Scorpio:     { themes: 'deep, penetrating, and completely committed',     domain: 'transformation, power, and what is most essentially real' },
+  Sagittarius: { themes: 'free, visionary, and hungry for meaning',         domain: 'adventure, philosophy, and the breadth of experience' },
+  Capricorn:   { themes: 'disciplined, patient, and building toward mastery', domain: 'structure, long-term achievement, and earned authority' },
+  Aquarius:    { themes: 'original, independent, and ahead of its time',   domain: 'innovation, collective vision, and the future not yet arrived' },
+  Pisces:      { themes: 'compassionate, porous, and profoundly feeling',   domain: 'mysticism, imagination, and the love that has no edges' },
+};
+
+// ─── Planet+sign body text generator ─────────────────────────────────────────
+function planetSignBody(body, sign) {
+  if (!sign) return PLANET_DESC[body]?.body ?? '';
+  const q = SIGN_Q[sign.name];
+  if (!q) return PLANET_DESC[body]?.body ?? '';
+  if (body === 'sun')  return SUN_IN_SIGN[sign.name]  ?? PLANET_DESC.sun.body;
+  if (body === 'moon') return MOON_IN_SIGN[sign.name] ?? PLANET_DESC.moon.body;
+  const { themes, domain } = q;
+  switch (body) {
+    case 'mercury':
+      return `Your Mercury in ${sign.name} gives your mind a ${themes} quality. Your intelligence is most alive when engaging with the domain of ${domain} — this is the lens through which you naturally think, communicate, and make meaning. The signature of ${sign.name} is present in how your words land, what your curiosity reaches for, and the way your mind moves through the world.`;
+    case 'venus':
+      return `Your Venus in ${sign.name} brings a ${themes} quality to love, beauty, and desire. In ${sign.name}'s domain of ${domain}, your heart opens most fully. You love, attract, and experience beauty through these qualities — your relationships carry this signature, and what you find most genuinely valuable in life reflects it.`;
+    case 'mars':
+      return `Your Mars in ${sign.name} gives your drive, desire, and life force a ${themes} quality. You act, pursue, and assert yourself through the lens of ${domain}. This is how your energy moves — where you direct your will, what you instinctively fight for, and the way you go after what genuinely matters to you.`;
+    case 'jupiter':
+      return `Your Jupiter in ${sign.name} expands you through the domain of ${domain}. The abundance and growth that Jupiter offers flows most readily when you are engaged with what ${sign.name} values: being ${themes}. This is where your natural luck lives — a generational gift that grows most abundantly when consciously engaged.`;
+    case 'saturn':
+      return `Your Saturn in ${sign.name} places your most important lessons and your greatest eventual mastery in the domain of ${domain}. Saturn asks you to go slowly, carefully, and to build something real here — through the ${themes} qualities of ${sign.name}. This is where the long, patient work yields the most enduring strength.`;
+    case 'uranus':
+      return `Your Uranus in ${sign.name} — shared with your generation — brings awakening and disruption to the domain of ${domain}. The collective drive to break open what has become too rigid runs through the ${themes} quality of ${sign.name}. In your personal chart, this marks where the revolutionary impulse moves through you most naturally.`;
+    case 'neptune':
+      return `Your Neptune in ${sign.name} — a generational placement — brings spiritual longing and visionary imagination to the domain of ${domain}. The dreams and ideals of your cohort all run through ${sign.name}'s ${themes} quality. In your chart, this colors where the boundaries between yourself and the larger world feel most permeable.`;
+    case 'pluto':
+      return `Your Pluto in ${sign.name} — a generational placement — brings transformation and the forces that move beneath the surface to the domain of ${domain}. The shadow work and collective rebirth of your generation all run through ${sign.name}'s ${themes} quality. This marks where the most total and irreversible change is possible — and necessary.`;
+    case 'northNode':
+      return `Your North Node in ${sign.name} points your soul's evolutionary direction toward the domain of ${domain}. The ${themes} qualities of ${sign.name} are not where you are most comfortable — they are where you are most called. Growing toward this placement brings a sense of rightness and deep fulfillment that no amount of staying in familiar patterns can provide.`;
+    case 'southNode':
+      return `Your South Node in ${sign.name} describes your karmic past — the strengths and comfort zones you carry forward. ${cap(sign.name)}'s gifts of being ${themes} are deeply ingrained in you. The invitation is not to abandon these abilities, but to bring them as resources as you grow toward the unfamiliar territory your North Node points to.`;
+    case 'earth':
+      return `Your Earth gate in ${sign.name} is the unconscious grounding that stabilizes your conscious Sun. While your Sun seeks to radiate and express, your Earth provides the root — the domain of ${domain} that anchors your solar purpose in physical reality. ${cap(sign.name)}'s quality of ${themes} is the ground you stand on as you live your purpose.`;
+    default:
+      return PLANET_DESC[body]?.body ?? '';
+  }
+}
+
 // ─── Aspect descriptions ──────────────────────────────────────────────────────
 const ASPECT_DESC = {
   Conjunction: { symbol: '☌', color: '#f59e0b', body: 'A conjunction occurs when two planets occupy nearly the same degree of the zodiac, merging their energies into a unified force. This is the most powerful and intimate aspect — the two planets cannot be separated; they intensify, color, and reinforce one another. Conjunctions can be powerfully creative or intensely overwhelming, depending on the planets involved.' },
@@ -96,6 +180,63 @@ const ASPECT_DESC = {
   Trine:       { symbol: '△', color: '#60a5fa', body: 'A trine forms when two planets are 120 degrees apart, creating a flow of natural ease and harmonious alignment. It represents innate talent — areas where things come effortlessly, where gifts feel natural, where energy moves without resistance. Trines are the blessings in a chart; their gifts are most fully realized when actively engaged rather than taken for granted.' },
   Opposition:  { symbol: '☍', color: '#c084fc', body: 'An opposition forms when two planets sit directly across the zodiac from one another, creating a polarity of competing energies that each carry a truth. It represents the tension between two forces seeking integration — the invitation is to hold both rather than collapsing into one. Oppositions often manifest through relationships, where we encounter our own disowned qualities mirrored in others.' },
 };
+
+// ─── Aspect planet-pair specific body text ────────────────────────────────────
+const PLANET_KEYWORDS = {
+  sun:       'your identity and conscious purpose',
+  moon:      'your emotional life and inner world',
+  mercury:   'your mind and communication',
+  venus:     'your heart, values, and capacity for love',
+  mars:      'your drive, desire, and life force',
+  jupiter:   'your expansion and sense of abundance',
+  saturn:    'your discipline, limitation, and long-arc mastery',
+  uranus:    'your impulse toward freedom and awakening',
+  neptune:   'your spiritual sensitivity and imagination',
+  pluto:     'your relationship with power and transformation',
+  northNode: 'your evolutionary direction and soul growth',
+  southNode: 'your karmic past and comfortable patterns',
+  earth:     'your grounding and physical embodiment',
+};
+const ASPECT_SPECIFIC = {
+  Conjunction: (p1, p2) => `In your chart, ${PLANET_KEYWORDS[p1]} and ${PLANET_KEYWORDS[p2]} are merged into a single unified force. These two dimensions of your experience cannot be separated — they operate together, intensifying and coloring one another in everything you do. This conjunction is one of the most defining signatures in your chart.`,
+  Trine:       (p1, p2) => `In your chart, ${PLANET_KEYWORDS[p1]} flows naturally and harmoniously with ${PLANET_KEYWORDS[p2]}. This is an innate gift — a place where two major forces align without friction, supporting each other effortlessly. The more consciously you engage this trine, the more abundantly its ease and talent flows.`,
+  Sextile:     (p1, p2) => `In your chart, ${PLANET_KEYWORDS[p1]} and ${PLANET_KEYWORDS[p2]} are in natural affinity. When you consciously bring these two energies into conversation, they create graceful, mutually supporting momentum. This sextile rewards initiative — the more you engage it, the more it opens for you.`,
+  Square:      (p1, p2) => `In your chart, ${PLANET_KEYWORDS[p1]} and ${PLANET_KEYWORDS[p2]} are in dynamic tension — pulling in fundamentally different directions. This friction is not a flaw; it is one of the most powerful growth drivers in your chart. The challenge is to integrate both rather than collapsing into one side, and the reward for doing so is extraordinary.`,
+  Opposition:  (p1, p2) => `In your chart, ${PLANET_KEYWORDS[p1]} and ${PLANET_KEYWORDS[p2]} face each other across the polarity of your chart, each carrying a truth the other cannot fully hold. The deepest invitation is to hold both without collapsing into either. This opposition often expresses through relationships, where you encounter one side mirrored in others.`,
+};
+
+// ─── Gate context prefix by planet + personality/design ──────────────────────
+const GATE_PLANET_CONTEXT = {
+  Sun:          { personality: 'This is your Personality Sun gate — the most conscious expression of who you are in this lifetime. You identify with and deliberately radiate this energy into the world.', design: 'This is your Design Sun gate — the unconscious foundation of who you are. Others often see this energy in you before you see it in yourself; it is the signature you carry without trying.' },
+  Earth:        { personality: 'Your Personality Earth gate is your conscious grounding point — the energy that stabilizes and roots your solar purpose into physical form.', design: 'Your Design Earth gate is the unconscious anchor beneath your Design Sun — the ground your deepest self stands on.' },
+  Moon:         { personality: 'This is your Personality Moon gate — it colors your conscious emotional life and what you need to feel at home in yourself.', design: 'Your Design Moon gate describes your unconscious emotional patterns — the feeling-tones that arise instinctively, often without your awareness.' },
+  Mercury:      { personality: 'Your Personality Mercury gate shapes the way your conscious mind naturally thinks, communicates, and makes sense of the world.', design: 'Your Design Mercury gate describes your unconscious way of processing information — the mental patterns you fall into before your mind has a chance to notice.' },
+  Venus:        { personality: 'Your Personality Venus gate colors your conscious experience of beauty, love, and what you find most desirable and valuable.', design: 'Your Design Venus gate describes your unconscious aesthetic and relational patterns — what draws you before you have decided to be drawn.' },
+  Mars:         { personality: 'Your Personality Mars gate shapes how you consciously direct your drive and desire — how you pursue what you want with intention.', design: 'Your Design Mars gate describes your unconscious motor — the instinctive force that moves you before your mind has had a chance to weigh in.' },
+  Jupiter:      { personality: 'Your Personality Jupiter gate marks where you consciously experience expansion, growth, and good fortune in your life.', design: 'Your Design Jupiter gate describes your unconscious gifts — areas of natural blessing woven into your design from before your birth.' },
+  Saturn:       { personality: 'Your Personality Saturn gate describes where you are consciously working through your most important lessons of discipline and mastery.', design: 'Your Design Saturn gate marks your unconscious area of deep learning — karmic territory you carry in your bones rather than your awareness.' },
+  Uranus:       { personality: 'Your Personality Uranus gate describes how the energy of awakening and disruption expresses consciously through you and your generation.', design: 'Your Design Uranus gate marks the unconscious disruption you carry — the place where the unexpected moves through you rather than being chosen by you.' },
+  Neptune:      { personality: 'Your Personality Neptune gate describes where dreams, spiritual longing, and dissolution express consciously in your life.', design: 'Your Design Neptune gate marks your unconscious spiritual sensitivity — the place where the mystical moves through you without being planned.' },
+  Pluto:        { personality: 'Your Personality Pluto gate describes how the forces of transformation express consciously through your design and your generation.', design: 'Your Design Pluto gate marks the unconscious transformational forces in your chart — the depths that move in you rather than being chosen by you.' },
+  'North Node': { personality: 'Your Personality North Node gate marks your conscious evolutionary direction — the growth edge you are actively aware of and working toward.', design: 'Your Design North Node gate describes the unconscious soul direction woven into your body\'s design — a north star you carry instinctively.' },
+  'South Node': { personality: 'Your Personality South Node gate describes the conscious tendencies and comfort zones you carry from your karmic past.', design: 'Your Design South Node gate describes the unconscious karmic patterns in your body — the deep past you embody without always recognizing it.' },
+};
+function gateContextPrefix(context) {
+  if (!context) return '';
+  const isTransit = context.startsWith('Transit');
+  if (isTransit) {
+    const planet = context.replace('Transit ', '');
+    return `${planet} is currently transiting through this gate, activating this frequency in the collective field — and in your own energy if this gate is part of your defined channels.\n\n`;
+  }
+  const isPersonality = context.startsWith('Personality');
+  const isDesign = context.startsWith('Design');
+  if (!isPersonality && !isDesign) return '';
+  const planet = context.split(' · ')[0].split(' ').slice(1).join(' '); // "Personality North Node · Line 3" → "North Node"
+  const contextObj = GATE_PLANET_CONTEXT[planet];
+  if (!contextObj) return '';
+  const prefix = isPersonality ? contextObj.personality : contextObj.design;
+  return prefix ? prefix + '\n\n' : '';
+}
 
 // ─── Center descriptions ──────────────────────────────────────────────────────
 const CENTER_DESC = {
@@ -424,33 +565,37 @@ export default function CosmicPage() {
 
   // ── Detail openers ─────────────────────────────────────────────────────────
   function openPlanet(body, sign) {
-    const d = PLANET_DESC[body];
-    if (!d) return;
+    if (!PLANET_DESC[body]) return;
     setDetail({
-      title: d.title,
-      subtitle: sign ? `${sign.symbol} ${sign.name} ${sign.degree}° · ${cap(sign.element)} · ${cap(sign.modality)}` : undefined,
+      title: sign ? `${PLANET_LBL[body]} in ${sign.name}` : PLANET_DESC[body].title,
+      subtitle: sign ? `${sign.symbol} ${sign.degree}° · ${cap(sign.element)} · ${cap(sign.modality)}` : undefined,
       tags: sign ? [cap(sign.element), cap(sign.modality)] : [],
-      body: d.body,
+      body: planetSignBody(body, sign),
     });
   }
   function openAspect(asp) {
     const d = ASPECT_DESC[asp.name];
     if (!d) return;
+    const specific = ASPECT_SPECIFIC[asp.name]?.(asp.planet1, asp.planet2) ?? '';
+    const isTransit = asp.transit != null;
     setDetail({
       symbol: d.symbol,
       color: d.color,
-      title: asp.name,
-      subtitle: `${PLANET_LBL[asp.planet1]} ${asp.name} ${PLANET_LBL[asp.planet2]} · ${asp.orb}° orb`,
-      body: d.body,
+      title: isTransit
+        ? `Transit ${PLANET_LBL[asp.transit]} ${asp.name} Natal ${PLANET_LBL[asp.natal]}`
+        : `${PLANET_LBL[asp.planet1]} ${asp.name} ${PLANET_LBL[asp.planet2]}`,
+      subtitle: `${asp.orb}° orb`,
+      body: (specific ? specific + '\n\n' : '') + d.body,
     });
   }
   function openGate(gate, line, context) {
     const d = GATE_DESC[gate];
     if (!d) return;
+    const prefix = gateContextPrefix(context);
     setDetail({
       title: `Gate ${gate} · ${d[0]}`,
       subtitle: context ?? (line ? `Line ${line}` : undefined),
-      body: d[1],
+      body: prefix + d[1],
     });
   }
   function openCenter(key, isDefined) {
@@ -474,14 +619,27 @@ export default function CosmicPage() {
     });
   }
   function openTransitPlanet(body, gate, line) {
-    const d = PLANET_DESC[body];
+    if (!PLANET_DESC[body]) return;
     const sign = lonToSign(gateLineToLon(gate, line));
-    if (!d) return;
+    const natalHits = [];
+    if (hdData?.personality) {
+      for (const [planet, { gate: ng }] of Object.entries(hdData.personality)) {
+        if (ng === gate) natalHits.push(`natal ${PLANET_LBL[planet]}`);
+      }
+    }
+    if (hdData?.design) {
+      for (const [planet, { gate: ng }] of Object.entries(hdData.design)) {
+        if (ng === gate) natalHits.push(`design ${PLANET_LBL[planet]}`);
+      }
+    }
+    const natalCtx = natalHits.length > 0
+      ? `Transit ${PLANET_LBL[body]} is currently activating Gate ${gate} — the same gate as your ${natalHits.join(' and ')} in your natal chart. This energy is alive in both the collective field and your own design right now.\n\n`
+      : `Transit ${PLANET_LBL[body]} is currently in Gate ${gate}.${line} in the collective field.\n\n`;
     setDetail({
-      title: d.title,
-      subtitle: `Currently in ${sign.symbol} ${sign.name} · Gate ${gate}.${line}`,
+      title: `Transit ${PLANET_LBL[body]} in ${sign.name}`,
+      subtitle: `Gate ${gate}.${line} · ${sign.symbol} ${sign.degree}°`,
       tags: ['Transit', cap(sign.element)],
-      body: d.body,
+      body: natalCtx + planetSignBody(body, sign),
     });
   }
 
