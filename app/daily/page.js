@@ -87,6 +87,24 @@ function TodaysVibe({ chartData, dateStr }) {
   );
 }
 
+function SaveButton({ itemKey, saved, saving, onClick }) {
+  const isSaved  = saved[itemKey];
+  const isSaving = saving[itemKey];
+  return (
+    <button
+      onClick={onClick}
+      disabled={isSaved || isSaving}
+      className={`text-xs px-3 py-1 rounded-full transition-all disabled:cursor-default ${
+        isSaved
+          ? 'bg-green-50 text-green-500 border border-green-200'
+          : 'bg-white/60 border border-white/50 text-gray-400 hover:text-gray-600 hover:bg-white/80'
+      }`}
+    >
+      {isSaved ? 'Saved' : isSaving ? 'Saving…' : 'Save to board'}
+    </button>
+  );
+}
+
 function getTodayStr() {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -97,14 +115,16 @@ export default function DailyPage() {
   const [loading, setLoading] = useState(true);
   const [animalImage, setAnimalImage] = useState(null);
   const [answer, setAnswer] = useState('');
-  const [saving, setSaving] = useState(false);
-  const [saved, setSaved] = useState(false);
+  const [reflectionSaving, setReflectionSaving] = useState(false);
+  const [reflectionSaved, setReflectionSaved]   = useState(false);
+  const [saved, setSaved]   = useState({});
+  const [saving, setSaving] = useState({});
 
   const dateStr = getTodayStr();
 
   useEffect(() => {
     setAnswer(localStorage.getItem(`daily-reflection-${dateStr}`) ?? '');
-    setSaved(localStorage.getItem(`daily-reflection-saved-${dateStr}`) === 'true');
+    setReflectionSaved(localStorage.getItem(`daily-reflection-saved-${dateStr}`) === 'true');
 
     const supabase = createClient();
     supabase.auth.getUser().then(async ({ data: { user } }) => {
@@ -137,7 +157,7 @@ export default function DailyPage() {
 
   async function handleSaveToBoard() {
     if (!answer.trim() || !content?.question) return;
-    setSaving(true);
+    setReflectionSaving(true);
     try {
       const supabase = createClient();
       await saveVisionItem(supabase, {
@@ -146,11 +166,25 @@ export default function DailyPage() {
         content: `${content.question}\n\n${answer.trim()}`,
       });
       localStorage.setItem(`daily-reflection-saved-${dateStr}`, 'true');
-      setSaved(true);
+      setReflectionSaved(true);
     } catch (err) {
       console.error('[save reflection]', err);
     } finally {
-      setSaving(false);
+      setReflectionSaving(false);
+    }
+  }
+
+  async function handleSave(key, visionItem) {
+    if (saved[key] || saving[key]) return;
+    setSaving(prev => ({ ...prev, [key]: true }));
+    try {
+      const sb = createClient();
+      await saveVisionItem(sb, visionItem);
+      setSaved(prev => ({ ...prev, [key]: true }));
+    } catch (e) {
+      console.error('Save failed', e);
+    } finally {
+      setSaving(prev => ({ ...prev, [key]: false }));
     }
   }
 
@@ -267,6 +301,14 @@ export default function DailyPage() {
               <p className="text-xs uppercase tracking-widest text-gray-300 mb-2">Today's Message</p>
               <p className="text-gray-700 font-medium leading-relaxed">{tarot.message}</p>
             </div>
+            <div className="flex justify-end mt-4">
+              <SaveButton
+                itemKey="tarot"
+                saved={saved}
+                saving={saving}
+                onClick={() => handleSave('tarot', { type: 'image', category: 'personal', content: tarot.name, image_url: tarotImageUrl })}
+              />
+            </div>
           </div>
         </section>
 
@@ -291,6 +333,17 @@ export default function DailyPage() {
               <p className="text-xs uppercase tracking-widest text-rose-400 mb-1">Guidance</p>
               <p className="text-gray-700 text-sm leading-relaxed italic">{animal.message}</p>
             </div>
+            <div className="flex justify-end mt-4">
+              <SaveButton
+                itemKey="animal"
+                saved={saved}
+                saving={saving}
+                onClick={() => handleSave('animal', animalImage
+                  ? { type: 'image', category: 'personal', content: animal.name, image_url: animalImage.regular }
+                  : { type: 'affirmation', category: 'personal', content: `${animal.name} — ${animal.message}` }
+                )}
+              />
+            </div>
           </div>
         </section>
 
@@ -303,6 +356,14 @@ export default function DailyPage() {
             </p>
             <footer className="text-sm text-gray-400">— {quote.author}</footer>
           </blockquote>
+          <div className="flex justify-end mt-4">
+            <SaveButton
+              itemKey="quote"
+              saved={saved}
+              saving={saving}
+              onClick={() => handleSave('quote', { type: 'quote', category: 'personal', content: `"${quote.text}" — ${quote.author}` })}
+            />
+          </div>
         </section>
 
         {/* 4. Word of the Day */}
@@ -328,12 +389,28 @@ export default function DailyPage() {
               <p className="text-gray-600 text-sm italic leading-relaxed">{word.example}</p>
             </div>
           )}
+          <div className="flex justify-end mt-4">
+            <SaveButton
+              itemKey="word"
+              saved={saved}
+              saving={saving}
+              onClick={() => handleSave('word', { type: 'affirmation', category: 'personal', content: `${word.word}: ${word.definition}` })}
+            />
+          </div>
         </section>
 
         {/* 5. Philosophical Question */}
         <section className="glass-card rounded-3xl p-8">
           <p className="text-xs uppercase tracking-widest text-gray-400 mb-5 text-center">Today&apos;s Question</p>
           <p className="font-playfair text-xl text-gray-800 italic leading-relaxed text-center mb-6">{question}</p>
+          <div className="flex justify-end mb-4">
+            <SaveButton
+              itemKey="question"
+              saved={saved}
+              saving={saving}
+              onClick={() => handleSave('question', { type: 'affirmation', category: 'personal', content: question })}
+            />
+          </div>
           <textarea
             value={answer}
             onChange={e => handleAnswerChange(e.target.value)}
@@ -346,12 +423,12 @@ export default function DailyPage() {
             {answer.trim() && (
               <button
                 onClick={handleSaveToBoard}
-                disabled={saving || saved}
+                disabled={reflectionSaving || reflectionSaved}
                 className={`text-xs px-4 py-2 rounded-full font-medium transition-all ${
-                  saved ? 'bg-green-100 text-green-600' : 'btn-gradient text-white hover:opacity-90 disabled:opacity-60'
+                  reflectionSaved ? 'bg-green-100 text-green-600' : 'btn-gradient text-white hover:opacity-90 disabled:opacity-60'
                 }`}
               >
-                {saved ? 'Saved to board ✓' : saving ? 'Saving…' : 'Save to Board'}
+                {reflectionSaved ? 'Saved to board ✓' : reflectionSaving ? 'Saving…' : 'Save to Board'}
               </button>
             )}
           </div>
@@ -379,6 +456,14 @@ export default function DailyPage() {
           <div className="border-t border-white/50 pt-4">
             <p className="text-xs uppercase tracking-widest text-gray-400 mb-2">Today's Guidance</p>
             <p className="text-gray-700 text-sm leading-relaxed">{numerology.advice}</p>
+          </div>
+          <div className="flex justify-end mt-4">
+            <SaveButton
+              itemKey="numerology"
+              saved={saved}
+              saving={saving}
+              onClick={() => handleSave('numerology', { type: 'affirmation', category: 'personal', content: `${numerology.number} — ${numerology.advice}` })}
+            />
           </div>
         </section>
       </div>
