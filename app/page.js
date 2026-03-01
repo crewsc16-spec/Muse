@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { getLunarPhase } from './lib/astrology';
 import { getQuotes } from './lib/quotes';
@@ -84,15 +85,16 @@ const FEATURES = [
 // ─── Main Page ─────────────────────────────────────────────────────────────────
 
 export default function HomePage() {
+  const router = useRouter();
   const [name, setName]     = useState('');
   const [phase, setPhase]   = useState(null);
   const [quote, setQuote]   = useState(null);
   const today = new Date().toISOString().split('T')[0];
 
   useEffect(() => {
-    // Name: read from Supabase first, fall back to localStorage cache
     const supabase = createClient();
     supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) { router.replace('/login'); return; }
       const dn = user?.user_metadata?.displayName ?? localStorage.getItem('displayName') ?? '';
       if (dn) setName(dn.split(' ')[0]);
     });
