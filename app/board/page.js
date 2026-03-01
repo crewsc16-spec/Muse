@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { createClient } from '../lib/supabase/client';
@@ -9,6 +9,7 @@ import {
   getVisionItems, saveVisionItem, deleteVisionItem,
   getGoals, addGoal, deleteGoal, getTodayCompletions, toggleGoalCompletion,
   uploadVisionImage,
+  getCycleEntries, saveCycleEntry, deleteCycleEntry,
 } from '../lib/storage';
 import { getQuotes, QUOTE_CATEGORIES } from '../lib/quotes';
 import { getLunarPhase } from '../lib/astrology';
@@ -266,7 +267,7 @@ function InlineQuoteSearch({ onSelect }) {
 }
 
 // ── Mood Trend Chart ──
-function MoodTrendChart({ entries }) {
+function MoodTrendChart({ entries, cycleEntries = [] }) {
   const [range, setRange] = useState('30');
   const [hovered, setHovered] = useState(null);
 
@@ -279,11 +280,58 @@ function MoodTrendChart({ entries }) {
   });
 
   const showMoonRow = range === '7' || filtered.length <= 10;
+  const hasPeriodData = cycleEntries.some(e => e.flow != null);
+  const extraBottom = hasPeriodData ? 12 : 0;
   const W = 320;
-  const H = showMoonRow ? 130 : 110;
-  const pad = { top: 10, right: 12, bottom: showMoonRow ? 42 : 28, left: 30 };
+  const H = (showMoonRow ? 130 : 110) + extraBottom;
+  const pad = { top: 10, right: 12, bottom: (showMoonRow ? 42 : 28) + extraBottom, left: 30 };
   const cW = W - pad.left - pad.right;
   const cH = H - pad.top - pad.bottom;
+
+  // Period data
+  const periodDates = new Set(cycleEntries.filter(e => e.flow != null).map(e => e.date));
+
+  // Map any date → chart x via linear interpolation over filtered date range
+  const dateToX = filtered.length >= 2 ? (() => {
+    const t0 = new Date(filtered[0].date + 'T00:00:00').getTime();
+    const t1 = new Date(filtered[filtered.length - 1].date + 'T00:00:00').getTime();
+    const tRange = t1 - t0;
+    return tRange > 0 ? (dateStr) => {
+      const t = new Date(dateStr + 'T00:00:00').getTime();
+      const frac = (t - t0) / tRange;
+      return (frac >= 0 && frac <= 1) ? frac * cW : null;
+    } : () => null;
+  })() : () => null;
+
+  // Period marker x positions
+  const periodMarkXs = [...periodDates].map(d => dateToX(d)).filter(x => x !== null);
+
+  // Prediction band
+  let nextPeriodBand = null;
+  if (hasPeriodData && filtered.length >= 2) {
+    const sortedP = [...periodDates].sort();
+    const pStarts = [];
+    sortedP.forEach((d, i) => {
+      if (i === 0 || (new Date(d + 'T00:00:00') - new Date(sortedP[i - 1] + 'T00:00:00')) / 86400000 > 2) {
+        pStarts.push(d);
+      }
+    });
+    if (pStarts.length >= 2) {
+      const gaps = pStarts.slice(1).map((s, i) =>
+        Math.round((new Date(s + 'T00:00:00') - new Date(pStarts[i] + 'T00:00:00')) / 86400000)
+      );
+      const avgGap = Math.round(gaps.reduce((a, b) => a + b, 0) / gaps.length);
+      const nextStart = new Date(pStarts[pStarts.length - 1] + 'T00:00:00');
+      nextStart.setDate(nextStart.getDate() + avgGap);
+      const nextEnd = new Date(nextStart);
+      nextEnd.setDate(nextEnd.getDate() + 4);
+      const x1 = dateToX(nextStart.toISOString().split('T')[0]);
+      const x2 = dateToX(nextEnd.toISOString().split('T')[0]);
+      if (x1 !== null || x2 !== null) {
+        nextPeriodBand = { x1: Math.max(0, x1 ?? 0), x2: Math.min(cW, x2 ?? cW) };
+      }
+    }
+  }
 
   const xScale = i => filtered.length === 1 ? cW / 2 : (i / (filtered.length - 1)) * cW;
   const yScale = v => cH - ((v - 1) / 4) * cH;
@@ -316,8 +364,6 @@ function MoodTrendChart({ entries }) {
     if (range === '7') return d.toLocaleDateString('en-US', { weekday: 'short' });
     return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   }
-
-  const hovEntry = hovered !== null ? pts[hovered]?.entry : null;
 
   return (
     <div className="glass-card rounded-3xl p-6">
@@ -378,6 +424,12 @@ function MoodTrendChart({ entries }) {
               <line key={v} x1={0} y1={yScale(v)} x2={cW} y2={yScale(v)}
                 stroke="#ecdde2" strokeWidth="0.5" strokeDasharray="3,3" />
             ))}
+            {/* Prediction band */}
+            {nextPeriodBand && (
+              <rect x={nextPeriodBand.x1} y={0}
+                width={Math.max(1, nextPeriodBand.x2 - nextPeriodBand.x1)}
+                height={cH} fill="#fda4af" fillOpacity={0.15} rx={2} />
+            )}
             {/* Gradient fill */}
             <path d={fillPath} fill="url(#moodFill)" />
             {/* Line */}
@@ -401,7 +453,7 @@ function MoodTrendChart({ entries }) {
                 {yLabels[v]}
               </text>
             ))}
-            {/* Moon phase row — shown when ≤ 14 entries */}
+            {/* Moon phase row */}
             {showMoonRow && pts.map((pt, i) => (
               <MoonSVGShape key={i} dateStr={pt.entry.date} cx={pt.x} cy={cH + 10} r={5} />
             ))}
@@ -411,6 +463,10 @@ function MoodTrendChart({ entries }) {
                 fontSize="7.5" fill="#c4b4b8" fontFamily="sans-serif">
                 {formatXLabel(filtered[i].date)}
               </text>
+            ))}
+            {/* Period day markers */}
+            {periodMarkXs.map((x, i) => (
+              <circle key={`pd-${i}`} cx={x} cy={cH + (showMoonRow ? 38 : 25)} r={3} fill="#fb7185" />
             ))}
           </g>
         </svg>
@@ -441,6 +497,12 @@ export default function Home() {
   const [goals, setGoals]     = useState([]);
   const [completions, setCompletions] = useState(new Set());
   const [newGoalText, setNewGoalText] = useState('');
+
+  // Cycle tracker
+  const [cycleOpen, setCycleOpen]       = useState(false);
+  const [flow, setFlow]                 = useState(null);
+  const [symptoms, setSymptoms]         = useState([]);
+  const [cycleEntries, setCycleEntries] = useState([]);
 
   // Board interaction
   const [expandedId, setExpandedId] = useState(null);
@@ -483,20 +545,28 @@ export default function Home() {
   }, []);
 
   async function loadAll(supabase) {
-    const [moodData, boardData, goalsData, completionData] = await Promise.all([
+    const [moodData, boardData, goalsData, completionData, cycleData] = await Promise.all([
       getMoodEntries(supabase),
       getVisionItems(supabase),
       getGoals(supabase),
       getTodayCompletions(supabase, today),
+      getCycleEntries(supabase),
     ]);
     setEntries(moodData);
     setItems(boardData);
     setGoals(goalsData);
     setCompletions(completionData);
+    setCycleEntries(cycleData);
     const todayEntry = moodData.find(e => e.date === today);
     if (todayEntry) {
       setSelectedMood(todayEntry.mood);
       setNotes(todayEntry.notes || '');
+    }
+    const todayCycle = cycleData.find(e => e.date === today);
+    if (todayCycle) {
+      setFlow(todayCycle.flow ?? null);
+      setSymptoms(todayCycle.symptoms ?? []);
+      setCycleOpen(true);
     }
   }
 
@@ -525,8 +595,18 @@ export default function Home() {
         setItems(prev => [item, ...prev]);
       }
 
+      // 3. Save or delete cycle entry
+      if (cycleOpen && (flow || symptoms.length > 0)) {
+        await saveCycleEntry(sb, { date: today, flow, symptoms });
+        const freshCycle = await getCycleEntries(sb);
+        setCycleEntries(freshCycle);
+      } else if (!cycleOpen) {
+        await deleteCycleEntry(sb, today);
+      }
+
       setContent(''); setImageUrl(''); setShowBoardPiece(false);
       setNotes(''); setSelectedMood(null);
+      setFlow(null); setSymptoms([]); setCycleOpen(false);
       setMoodSaved(true);
       setTimeout(() => setMoodSaved(false), 2500);
     } finally {
@@ -578,6 +658,42 @@ export default function Home() {
       return next;
     });
   }
+
+  // Cycle analytics
+  const cycleStats = useMemo(() => {
+    const periodArr = cycleEntries.filter(e => e.flow != null).map(e => e.date).sort();
+    if (periodArr.length === 0) return null;
+    const pStarts = [];
+    periodArr.forEach((d, i) => {
+      if (i === 0 || (new Date(d + 'T00:00:00') - new Date(periodArr[i - 1] + 'T00:00:00')) / 86400000 > 2) {
+        pStarts.push(d);
+      }
+    });
+    const avgCycleLength = pStarts.length >= 2
+      ? Math.round(pStarts.slice(1).reduce((sum, s, i) =>
+          sum + (new Date(s + 'T00:00:00') - new Date(pStarts[i] + 'T00:00:00')) / 86400000, 0
+        ) / (pStarts.length - 1))
+      : 28;
+    const lastStartDate = new Date(pStarts[pStarts.length - 1] + 'T00:00:00');
+    const nextPeriod = new Date(lastStartDate);
+    nextPeriod.setDate(nextPeriod.getDate() + avgCycleLength);
+    const nextPeriodDate = nextPeriod.toISOString().split('T')[0];
+    const dayOfCycle = Math.max(1, Math.min(avgCycleLength,
+      Math.round((new Date(today + 'T00:00:00') - lastStartDate) / 86400000) + 1
+    ));
+    let phase;
+    if (dayOfCycle <= 5) phase = { name: 'Menstrual', emoji: '🌑', cls: 'bg-rose-200 text-rose-700' };
+    else if (dayOfCycle <= 11) phase = { name: 'Follicular', emoji: '🌱', cls: 'bg-green-100 text-green-700' };
+    else if (dayOfCycle <= 16) phase = { name: 'Ovulatory', emoji: '🌕', cls: 'bg-amber-100 text-amber-700' };
+    else phase = { name: 'Luteal', emoji: '🌙', cls: 'bg-violet-100 text-violet-700' };
+    const periodDateSet = new Set(periodArr);
+    const moodOnPeriod  = entries.filter(e => periodDateSet.has(e.date));
+    const moodOffPeriod = entries.filter(e => !periodDateSet.has(e.date));
+    const avgOn  = moodOnPeriod.length  > 0 ? moodOnPeriod.reduce((s, e)  => s + e.mood, 0) / moodOnPeriod.length  : null;
+    const avgOff = moodOffPeriod.length > 0 ? moodOffPeriod.reduce((s, e) => s + e.mood, 0) / moodOffPeriod.length : null;
+    const daysUntilNext = Math.round((nextPeriod - new Date(today + 'T00:00:00')) / 86400000);
+    return { phase, dayOfCycle, avgCycleLength, cycleCount: Math.max(0, pStarts.length - 1), nextPeriodDate, daysUntilNext, avgOn, avgOff };
+  }, [cycleEntries, entries, today]);
 
   // Board: vision items (some linked to mood entries) + pure mood entries
   const linkedMoodIds = new Set(items.filter(i => i.mood_entry_id).map(i => i.mood_entry_id));
@@ -705,6 +821,54 @@ export default function Home() {
           className="w-full border border-white/50 bg-white/50 rounded-2xl p-4 text-gray-600 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#d4adb6]/40 focus:border-transparent"
         />
 
+        {/* Cycle Tracker */}
+        <div>
+          <button
+            onClick={() => setCycleOpen(!cycleOpen)}
+            className="flex items-center gap-2 text-sm font-medium transition-colors"
+            style={{ color: cycleOpen ? '#b88a92' : '#c4b4b8' }}
+          >
+            <span className="text-lg leading-none">{cycleOpen ? '−' : '+'}</span>
+            Cycle Tracker
+          </button>
+          {cycleOpen && (
+            <div className="mt-4 space-y-4 pl-1">
+              <div>
+                <p className="text-xs text-gray-400 mb-2">Period flow</p>
+                <div className="flex gap-2">
+                  {[['None', null], ['Light', 'light'], ['Medium', 'medium'], ['Heavy', 'heavy']].map(([label, val]) => (
+                    <button key={label} onClick={() => setFlow(val)}
+                      className={`flex-1 py-1.5 rounded-full text-xs font-medium transition-all border ${
+                        val !== null && flow === val
+                          ? 'bg-rose-200 border-rose-400 text-rose-700'
+                          : 'bg-white/60 border-white/50 text-gray-400 hover:bg-white/80'
+                      }`}>
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <p className="text-xs text-gray-400 mb-2">Symptoms</p>
+                <div className="flex flex-wrap gap-2">
+                  {['Cramps', 'Bloating', 'Fatigue', 'Mood swings', 'Headache', 'Tender breasts', 'Back pain', 'Acne'].map(s => (
+                    <button key={s}
+                      onClick={() => setSymptoms(prev => prev.includes(s) ? prev.filter(x => x !== s) : [...prev, s])}
+                      className={`px-3 py-1 rounded-full text-xs font-medium transition-all border ${
+                        symptoms.includes(s)
+                          ? 'bg-rose-100 text-rose-600 border-rose-200'
+                          : 'bg-white/60 text-gray-400 border-white/50 hover:bg-white/80'
+                      }`}>
+                      {s}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <p className="text-xs text-gray-300">🔒 Stored securely, never shared.</p>
+            </div>
+          )}
+        </div>
+
         {/* Board piece toggle */}
         <button
           onClick={() => setShowBoardPiece(!showBoardPiece)}
@@ -831,7 +995,48 @@ export default function Home() {
       </div>
 
       {/* ── Mood Trend ── */}
-      {entries.length > 0 && <MoodTrendChart entries={entries} />}
+      {entries.length > 0 && <MoodTrendChart entries={entries} cycleEntries={cycleEntries} />}
+
+      {/* ── Cycle Insights ── */}
+      {cycleStats && (
+        <div className="glass-card rounded-3xl p-6 space-y-4">
+          <h2 className="text-xs font-medium text-gray-400 uppercase tracking-widest">Your Cycle</h2>
+          <div className="flex items-center gap-3 flex-wrap">
+            <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium ${cycleStats.phase.cls}`}>
+              {cycleStats.phase.emoji} {cycleStats.phase.name} · Day {cycleStats.dayOfCycle}
+            </span>
+          </div>
+          <div className="space-y-1">
+            <p className="text-sm text-gray-600">
+              Next period: ~{new Date(cycleStats.nextPeriodDate + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+              {cycleStats.daysUntilNext > 0 && <span className="text-gray-400 text-xs ml-1">(in {cycleStats.daysUntilNext} days)</span>}
+              {cycleStats.daysUntilNext <= 0 && <span className="text-gray-400 text-xs ml-1">(any day now)</span>}
+            </p>
+            <p className="text-xs text-gray-400">
+              Avg cycle: {cycleStats.avgCycleLength} days
+              {cycleStats.cycleCount > 0 && <> · based on {cycleStats.cycleCount} cycle{cycleStats.cycleCount !== 1 ? 's' : ''}</>}
+            </p>
+          </div>
+          {cycleStats.avgOn !== null && cycleStats.avgOff !== null && (
+            <div className="pt-3 border-t border-white/40 space-y-2">
+              <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Mood &amp; Cycle</p>
+              <div className="flex gap-4 text-xs text-gray-500">
+                <span>Period days avg: <strong>{cycleStats.avgOn.toFixed(1)}</strong></span>
+                <span>Other days avg: <strong>{cycleStats.avgOff.toFixed(1)}</strong></span>
+              </div>
+              <p className="text-sm text-gray-500 italic">
+                {(() => {
+                  const diff = cycleStats.avgOff - cycleStats.avgOn;
+                  if (diff >= 1.0) return 'Your mood lifts noticeably after your period ends.';
+                  if (diff >= 0.5) return 'Your mood tends to be a bit higher outside your period.';
+                  if (diff >= -0.5) return 'Your mood stays pretty consistent throughout your cycle.';
+                  return 'You actually seem to feel your best during your period — honor that.';
+                })()}
+              </p>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* ── Board ── */}
       <div>

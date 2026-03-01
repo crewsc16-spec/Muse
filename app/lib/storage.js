@@ -110,6 +110,35 @@ export async function deleteJournalEntry(supabase, id) {
   if (error) throw error;
 }
 
+// ── Cycle entries ──
+
+export async function getCycleEntries(supabase) {
+  const { data } = await supabase
+    .from('cycle_entries')
+    .select('id,date,flow,symptoms')
+    .order('date', { ascending: false });
+  return data ?? [];
+}
+
+export async function saveCycleEntry(supabase, { date, flow, symptoms }) {
+  const { data: { user } } = await supabase.auth.getUser();
+  const { data } = await supabase
+    .from('cycle_entries')
+    .upsert(
+      { user_id: user.id, date, flow: flow ?? null, symptoms: symptoms ?? [],
+        updated_at: new Date().toISOString() },
+      { onConflict: 'user_id,date' }
+    )
+    .select();
+  return data;
+}
+
+export async function deleteCycleEntry(supabase, date) {
+  const { data: { user } } = await supabase.auth.getUser();
+  await supabase.from('cycle_entries').delete()
+    .eq('user_id', user.id).eq('date', date);
+}
+
 // ── Daily goals ──
 
 export async function getGoals(supabase) {
