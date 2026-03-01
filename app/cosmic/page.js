@@ -867,12 +867,22 @@ export default function CosmicPage() {
       lines.push(rxList.length > 0 ? rxList.join(', ') : 'None');
     }
 
-    // Minor aspects
+    // Natal aspects — major first, then minor
+    const MAJOR_NAMES = new Set(['Conjunction','Sextile','Square','Trine','Opposition']);
     const MINOR_NAMES = new Set(['Semisextile','Semisquare','Sesquiquadrate','Quincunx']);
+    const majorAspects = natalAspects.filter(a => MAJOR_NAMES.has(a.name));
     const minorAspects = natalAspects.filter(a => MINOR_NAMES.has(a.name));
+    if (majorAspects.length > 0) {
+      lines.push('');
+      lines.push('## Major Natal Aspects');
+      lines.push('(Conjunctions/Trines/Sextiles = flowing; Squares/Oppositions = tension/growth challenge)');
+      for (const a of majorAspects) {
+        lines.push(`${PLANET_LBL[a.planet1] ?? a.planet1} ${a.symbol} ${PLANET_LBL[a.planet2] ?? a.planet2} (${a.name}, orb ${a.orb}°)`);
+      }
+    }
     if (minorAspects.length > 0) {
       lines.push('');
-      lines.push('## Minor Aspects');
+      lines.push('## Minor Natal Aspects');
       for (const a of minorAspects) {
         lines.push(`${PLANET_LBL[a.planet1] ?? a.planet1} ${a.symbol} ${PLANET_LBL[a.planet2] ?? a.planet2} (${a.name}, orb ${a.orb}°)`);
       }
