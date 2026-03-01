@@ -25,7 +25,11 @@ export async function proxy(request) {
     }
   );
 
-  const { data: { user } } = await supabase.auth.getUser();
+  // getSession reads from cookies locally (no network call) — more reliable
+  // on the edge than getUser() which validates against Supabase servers.
+  // Individual pages still call getUser() for secure data access.
+  const { data: { session } } = await supabase.auth.getSession();
+  const user = session?.user ?? null;
 
   const { pathname } = request.nextUrl;
   const protectedRoutes = ['/journal', '/vision-board', '/daily', '/profile', '/quizzes', '/board'];
