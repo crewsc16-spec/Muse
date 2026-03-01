@@ -862,14 +862,14 @@ export default function Home() {
                   {/* Delete */}
                   <button
                     onClick={() => item._kind === 'mood' ? handleDeleteMoodEntry(item.date) : handleDeleteItem(item.id)}
-                    className="absolute top-2 right-2 z-10 w-7 h-7 md:w-6 md:h-6 flex items-center justify-center rounded-full bg-black/30 md:opacity-0 md:group-hover:opacity-100 text-white hover:bg-red-400/60 active:bg-red-400/60 transition-all text-xs">
+                    className={`absolute top-2 right-2 z-10 w-7 h-7 md:w-6 md:h-6 flex items-center justify-center rounded-full bg-black/30 text-white hover:bg-red-400/60 active:bg-red-400/60 transition-all text-xs ${isExpanded ? 'opacity-100' : 'opacity-0 pointer-events-none'} md:pointer-events-auto md:opacity-0 md:group-hover:opacity-100`}>
                     ✕
                   </button>
 
                   {/* Resize toggle */}
                   <button
                     onClick={e => { e.stopPropagation(); setItemSize(itemKey, isWide ? 'normal' : 'wide'); }}
-                    className="absolute top-2 right-10 md:right-9 z-10 w-7 h-7 md:w-6 md:h-6 flex items-center justify-center rounded-full bg-black/30 md:opacity-0 md:group-hover:opacity-100 text-white hover:bg-black/40 active:bg-black/40 transition-all text-xs"
+                    className={`absolute top-2 right-10 md:right-9 z-10 w-7 h-7 md:w-6 md:h-6 flex items-center justify-center rounded-full bg-black/30 text-white hover:bg-black/40 active:bg-black/40 transition-all text-xs ${isExpanded ? 'opacity-100' : 'opacity-0 pointer-events-none'} md:pointer-events-auto md:opacity-0 md:group-hover:opacity-100`}
                     title={isWide ? 'Make smaller' : 'Make wider'}>
                     {isWide ? '⊟' : '⊞'}
                   </button>
