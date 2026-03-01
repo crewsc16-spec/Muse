@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { track } from '@vercel/analytics';
 
 export default function InstallBanner() {
   const [show, setShow] = useState(false);
@@ -11,7 +12,17 @@ export default function InstallBanner() {
     const isStandalone =
       window.navigator.standalone === true ||
       window.matchMedia('(display-mode: standalone)').matches;
-    if (isStandalone) return;
+
+    if (isStandalone) {
+      // Track that this session is running from home screen (once per session)
+      if (!sessionStorage.getItem('pwa-tracked')) {
+        const ua = navigator.userAgent;
+        const os = /iphone|ipad|ipod/i.test(ua) ? 'ios' : /android/i.test(ua) ? 'android' : 'desktop';
+        track('pwa_opened', { os });
+        sessionStorage.setItem('pwa-tracked', '1');
+      }
+      return;
+    }
 
     // Don't show if already dismissed
     if (localStorage.getItem('pwa-banner-dismissed')) return;
