@@ -126,15 +126,18 @@ export default function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
   const [user, setUser] = useState(null);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     const supabase = createClient();
     supabase.auth.getUser().then(({ data: { user } }) => {
       setUser(user);
+      setReady(true);
       if (user) syncMetaToLocalStorage(user.user_metadata);
     });
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setUser(session?.user ?? null);
+      setReady(true);
       if (event === 'SIGNED_IN' && session?.user) {
         syncMetaToLocalStorage(session.user.user_metadata);
       }
@@ -199,7 +202,7 @@ export default function Navbar() {
                 Log out
               </button>
             </>
-          ) : (
+          ) : ready ? (
             <div className="flex items-center gap-2">
               <Link href="/login" className="text-xs text-gray-400 hover:text-rose-400 transition-colors">
                 Sign in
@@ -208,7 +211,7 @@ export default function Navbar() {
                 Sign up
               </Link>
             </div>
-          )}
+          ) : null}
         </div>
       </nav>
 
