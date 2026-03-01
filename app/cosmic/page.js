@@ -563,6 +563,9 @@ export default function CosmicPage() {
   const [tab,          setTab]          = useState('overview');
   const [displayName,  setDisplayName]  = useState('');
   const [detail,       setDetail]       = useState(null);
+  const [chatQuestion, setChatQuestion] = useState('');
+  const [chatResponse, setChatResponse] = useState('');
+  const [chatLoading,  setChatLoading]  = useState(false);
   const [today] = useState(() => new Date().toISOString().slice(0,10));
 
   useEffect(() => {
@@ -686,6 +689,109 @@ export default function CosmicPage() {
       tags: ['Transit', cap(sign.element)],
       body: natalCtx + planetSignBody(body, sign),
     });
+  }
+
+  // ── Chart summary for AI chat ───────────────────────────────────────────────
+  function buildChartSummary() {
+    const lines = [];
+    lines.push(`Name: ${displayName || 'Unknown'}`);
+    lines.push(`Birth: ${birthData?.date ?? '?'} at ${birthData?.time ?? '?'}`);
+    lines.push('');
+
+    if (hdData) {
+      lines.push('Human Design');
+      lines.push(`Type: ${hdData.type?.replace(/-/g,' ')} | Profile: ${hdData.profile} | Authority: ${hdData.authority}`);
+      lines.push(`Strategy: ${hdData.strategy ?? '—'} | Signature: ${hdData.signature ?? '—'} | Not-Self: ${hdData.notSelf ?? '—'}`);
+      if (hdData.definedChannels?.length) {
+        const chs = hdData.definedChannels.map(([g1,g2]) => {
+          const k = [g1,g2].sort((a,b)=>a-b).join('-');
+          const label = CHANNEL_NAMES?.[k]?.split('—')[0]?.trim() ?? '';
+          return label ? `${g1}–${g2} (${label})` : `${g1}–${g2}`;
+        }).join(', ');
+        lines.push(`Defined Channels: ${chs}`);
+      }
+      if (hdData.centers) {
+        const def = Object.entries(hdData.centers).filter(([,v])=>v).map(([k])=>k).join(', ');
+        const undef = Object.entries(hdData.centers).filter(([,v])=>!v).map(([k])=>k).join(', ');
+        if (def)   lines.push(`Defined Centers: ${def}`);
+        if (undef) lines.push(`Undefined Centers: ${undef}`);
+      }
+      if (hdData.personality) {
+        lines.push('');
+        lines.push('Personality (Conscious) Activations:');
+        for (const [body, { gate, line }] of Object.entries(hdData.personality)) {
+          lines.push(`  ${PLANET_LBL[body] ?? body}: Gate ${gate}, Line ${line}`);
+        }
+      }
+      if (hdData.design) {
+        lines.push('');
+        lines.push('Design (Unconscious) Activations:');
+        for (const [body, { gate, line }] of Object.entries(hdData.design)) {
+          lines.push(`  ${PLANET_LBL[body] ?? body}: Gate ${gate}, Line ${line}`);
+        }
+      }
+      lines.push('');
+    }
+
+    lines.push('Astrology');
+    const astroPlanets = ['sun','moon','mercury','venus','mars','jupiter','saturn','uranus','neptune','pluto','northNode'];
+    for (const body of astroPlanets) {
+      if (natalLons[body] != null) {
+        const s = lonToSign(natalLons[body]);
+        lines.push(`${PLANET_LBL[body] ?? body} in ${s.name} (${s.degree}°)`);
+      }
+    }
+    lines.push('');
+
+    lines.push('Numerology');
+    const nums = [];
+    if (lifePath)    nums.push(`Life Path: ${lifePath}`);
+    if (personalYr)  nums.push(`Personal Year: ${personalYr}`);
+    if (birthdayNum) nums.push(`Birthday: ${birthdayNum}`);
+    if (expressNum)  nums.push(`Expression: ${expressNum}`);
+    lines.push(nums.join(' | '));
+    lines.push('');
+
+    if (transitData?.personality) {
+      lines.push(`Today's Transits (${today})`);
+      for (const [body, { gate, line }] of Object.entries(transitData.personality)) {
+        const natalHits = [];
+        if (hdData?.personality) for (const [p,{gate:ng}] of Object.entries(hdData.personality)) { if (ng===gate) natalHits.push(`Personality ${PLANET_LBL[p]??p}`); }
+        if (hdData?.design)      for (const [p,{gate:ng}] of Object.entries(hdData.design))      { if (ng===gate) natalHits.push(`Design ${PLANET_LBL[p]??p}`); }
+        const hit = natalHits.length ? ` ← hits natal ${natalHits.join(', ')}` : '';
+        lines.push(`  Transit ${PLANET_LBL[body] ?? body}: Gate ${gate}.${line}${hit}`);
+      }
+    }
+
+    return lines.join('\n');
+  }
+
+  async function askChart() {
+    const q = chatQuestion.trim();
+    if (!q || chatLoading) return;
+    setChatResponse('');
+    setChatLoading(true);
+    try {
+      const res = await fetch('/api/cosmic-chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question: q, chartSummary: buildChartSummary() }),
+      });
+      if (!res.ok) { setChatResponse('Something went wrong. Please try again.'); return; }
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let text = '';
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        text += decoder.decode(value, { stream: true });
+        setChatResponse(text);
+      }
+    } catch {
+      setChatResponse('Something went wrong. Please try again.');
+    } finally {
+      setChatLoading(false);
+    }
   }
 
   const TABS = [
@@ -1257,6 +1363,42 @@ export default function CosmicPage() {
           })()}
         </div>
       )}
+
+      {/* ════ CHART CHAT ════ */}
+      <div className="glass-card rounded-3xl p-6 space-y-4">
+        <div>
+          <h2 className="font-playfair text-xl text-gray-700">Ask your chart anything</h2>
+          <p className="text-xs text-gray-400 mt-0.5">Claude reads your full chart data and answers personally.</p>
+        </div>
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={chatQuestion}
+            onChange={e => setChatQuestion(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && askChart()}
+            placeholder="e.g. Why do I feel drained by social situations?"
+            className="flex-1 bg-white/60 border border-white/50 rounded-2xl px-4 py-2.5 text-sm text-gray-700 placeholder-gray-300 focus:outline-none focus:ring-1 focus:ring-rose-200"
+            disabled={chatLoading}
+          />
+          <button
+            onClick={askChart}
+            disabled={chatLoading || !chatQuestion.trim()}
+            className="btn-gradient text-white text-sm font-medium px-5 py-2.5 rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed shrink-0 flex items-center gap-1.5"
+          >
+            {chatLoading ? (
+              <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/>
+              </svg>
+            ) : 'Ask →'}
+          </button>
+        </div>
+        {chatResponse && (
+          <div className="bg-white/40 rounded-2xl p-4 border border-white/40">
+            <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-wrap">{chatResponse}</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
