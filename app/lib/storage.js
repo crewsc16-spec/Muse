@@ -73,6 +73,43 @@ export async function uploadVisionImage(supabase, file) {
   return data.publicUrl;
 }
 
+// ── Journal entries ──
+
+export async function getJournalEntries(supabase) {
+  const { data, error } = await supabase
+    .from('journal_entries')
+    .select('*')
+    .order('date', { ascending: false })
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return data ?? [];
+}
+
+export async function createJournalEntry(supabase, { date, content, prompt }) {
+  const { data: { user } } = await supabase.auth.getUser();
+  const { data, error } = await supabase
+    .from('journal_entries')
+    .insert({ user_id: user.id, date, content, prompt: prompt ?? null })
+    .select();
+  if (error) throw error;
+  return data?.[0];
+}
+
+export async function updateJournalEntry(supabase, id, { content }) {
+  const { data, error } = await supabase
+    .from('journal_entries')
+    .update({ content, updated_at: new Date().toISOString() })
+    .eq('id', id)
+    .select();
+  if (error) throw error;
+  return data?.[0];
+}
+
+export async function deleteJournalEntry(supabase, id) {
+  const { error } = await supabase.from('journal_entries').delete().eq('id', id);
+  if (error) throw error;
+}
+
 // ── Daily goals ──
 
 export async function getGoals(supabase) {

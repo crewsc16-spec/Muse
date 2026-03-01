@@ -51,6 +51,20 @@ const NAV_ITEMS = [
     ),
   },
   {
+    href: '/journal',
+    label: 'Journal',
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M18 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2zM9 7h6v2H9V7zm0 4h6v2H9v-2zm0 4h4v2H9v-2z"/>
+      </svg>
+    ),
+    iconSm: (
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" className="flex-shrink-0">
+        <path d="M18 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2zM9 7h6v2H9V7zm0 4h6v2H9v-2zm0 4h4v2H9v-2z"/>
+      </svg>
+    ),
+  },
+  {
     href: '/daily',
     label: 'Daily',
     icon: (
@@ -210,12 +224,13 @@ export default function Navbar() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex-1 flex flex-col items-center justify-center gap-0.5 py-2.5 transition-colors ${
+                  className={`flex-1 flex flex-col items-center justify-center gap-1 py-2.5 transition-colors ${
                     active ? 'text-[#b88a92]' : 'text-gray-400'
                   }`}
+                  title={item.label}
                 >
                   {item.icon}
-                  <span className="text-[10px] font-medium leading-none">{item.label}</span>
+                  <span className={`w-1.5 h-1.5 rounded-full transition-opacity ${active ? 'bg-[#b88a92] opacity-100' : 'opacity-0'}`} />
                 </Link>
               );
             })}

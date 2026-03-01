@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { createClient } from '@/app/lib/supabase/client';
 import { getDailyContent, TAROT_IMAGES, ANIMAL_IMAGE_QUERIES } from '@/app/lib/daily-content';
 import { computeChart, getLunarPhase } from '@/app/lib/astrology';
-import { saveVisionItem } from '@/app/lib/storage';
+import { saveVisionItem, getJournalEntries, createJournalEntry, updateJournalEntry } from '@/app/lib/storage';
 
 const VIBE_DATA = {
   fire: {
@@ -119,10 +119,13 @@ export default function DailyPage() {
   const [reflectionSaved, setReflectionSaved]   = useState(false);
   const [saved, setSaved]   = useState({});
   const [saving, setSaving] = useState({});
+  const [journalEntryId, setJournalEntryId] = useState(null);
+  const journalSaveTimer = useRef(null);
 
   const dateStr = getTodayStr();
 
   useEffect(() => {
+    // localStorage fallback — will be overridden if Supabase entry found
     setAnswer(localStorage.getItem(`daily-reflection-${dateStr}`) ?? '');
     setReflectionSaved(localStorage.getItem(`daily-reflection-saved-${dateStr}`) === 'true');
 
@@ -138,6 +141,18 @@ export default function DailyPage() {
         } catch {}
         const dailyContent = getDailyContent(user.id, dateStr, chartData);
         setContent({ ...dailyContent, chartData });
+
+        // Load today's journal entry (overrides localStorage)
+        try {
+          const entries = await getJournalEntries(supabase);
+          const todayEntry = entries.find(e => e.date === dateStr);
+          if (todayEntry) {
+            setAnswer(todayEntry.content);
+            setJournalEntryId(todayEntry.id);
+          }
+        } catch (e) {
+          console.error('[daily] load journal', e);
+        }
 
         // Spirit animal image — cached by date so it stays consistent all day
         const imgCacheKey = `daily-animal-image-${dateStr}`;
@@ -171,6 +186,26 @@ export default function DailyPage() {
   function handleAnswerChange(val) {
     setAnswer(val);
     localStorage.setItem(`daily-reflection-${dateStr}`, val);
+    // Debounce auto-save to Supabase
+    clearTimeout(journalSaveTimer.current);
+    if (!val.trim()) return;
+    journalSaveTimer.current = setTimeout(async () => {
+      try {
+        const supabase = createClient();
+        if (journalEntryId) {
+          await updateJournalEntry(supabase, journalEntryId, { content: val });
+        } else {
+          const entry = await createJournalEntry(supabase, {
+            date: dateStr,
+            content: val,
+            prompt: content?.question ?? null,
+          });
+          if (entry) setJournalEntryId(entry.id);
+        }
+      } catch (e) {
+        console.error('[daily] journal save', e);
+      }
+    }, 1500);
   }
 
   async function handleSaveToBoard() {
