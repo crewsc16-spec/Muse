@@ -57,9 +57,27 @@ export default function Navbar() {
           Muse
         </Link>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           {user ? (
             <>
+              <Link
+                href="/"
+                className="flex items-center gap-1.5 text-sm text-gray-600 hover:text-[#b88a92] transition-colors font-medium bg-white/60 border border-white/40 rounded-full px-3 py-1.5"
+              >
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" className="text-[#b88a92] flex-shrink-0">
+                  <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+                </svg>
+                Home
+              </Link>
+              <Link
+                href="/board"
+                className="flex items-center gap-1.5 text-sm text-gray-600 hover:text-[#b88a92] transition-colors font-medium bg-white/60 border border-white/40 rounded-full px-3 py-1.5"
+              >
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" className="text-[#b88a92] flex-shrink-0">
+                  <path d="M3 3h8v8H3zm10 0h8v8h-8zM3 13h8v8H3zm13 0a4 4 0 1 1 0 8 4 4 0 0 1 0-8z"/>
+                </svg>
+                Board
+              </Link>
               <Link
                 href="/daily"
                 className="flex items-center gap-1.5 text-sm text-gray-600 hover:text-[#b88a92] transition-colors font-medium bg-white/60 border border-white/40 rounded-full px-3 py-1.5"
