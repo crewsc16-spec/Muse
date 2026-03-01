@@ -138,13 +138,30 @@ export default function DailyPage() {
         const dailyContent = getDailyContent(user.id, dateStr, chartData);
         setContent({ ...dailyContent, chartData });
 
-        // Fetch watercolor illustration for the spirit animal
-        try {
-          const query = ANIMAL_IMAGE_QUERIES[dailyContent.animal.name] ?? `${dailyContent.animal.name} watercolor art`;
-          const res = await fetch(`/api/unsplash?query=${encodeURIComponent(query)}&orientation=squarish`);
-          const data = await res.json();
-          if (data.photos?.length) setAnimalImage(data.photos[0]);
-        } catch {}
+        // Spirit animal image — cached by date so it stays consistent all day
+        const imgCacheKey = `daily-animal-image-${dateStr}`;
+
+        // Evict any cached images from previous days
+        for (const key of Object.keys(localStorage)) {
+          if (key.startsWith('daily-animal-image-') && key !== imgCacheKey) {
+            localStorage.removeItem(key);
+          }
+        }
+
+        const cached = localStorage.getItem(imgCacheKey);
+        if (cached) {
+          try { setAnimalImage(JSON.parse(cached)); } catch {}
+        } else {
+          try {
+            const query = ANIMAL_IMAGE_QUERIES[dailyContent.animal.name] ?? `${dailyContent.animal.name} watercolor art`;
+            const res = await fetch(`/api/unsplash?query=${encodeURIComponent(query)}&orientation=squarish`);
+            const data = await res.json();
+            if (data.photos?.length) {
+              setAnimalImage(data.photos[0]);
+              localStorage.setItem(imgCacheKey, JSON.stringify(data.photos[0]));
+            }
+          } catch {}
+        }
       }
       setLoading(false);
     });
