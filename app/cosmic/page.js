@@ -1022,25 +1022,34 @@ export default function CosmicPage() {
             {chatAsked && <p className="text-xs text-gray-400 italic">"{chatAsked}"</p>}
             <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-wrap">{chatResponse}</p>
             {!chatLoading && (
-              <div className="flex items-center gap-2 pt-1">
-                <button
-                  onClick={async () => {
-                    if (chatSaved) return;
-                    try {
-                      const supabase = createClient();
-                      const today = new Date().toISOString().slice(0, 10);
-                      await createJournalEntry(supabase, {
-                        date: today,
-                        content: `**Q:** ${chatAsked}\n\n${chatResponse}`,
-                        prompt: 'Chart Insight',
-                      });
-                      setChatSaved(true);
-                    } catch { /* silent */ }
-                  }}
-                  className={`text-xs font-medium px-3 py-1.5 rounded-full transition-all ${chatSaved ? 'bg-emerald-50 text-emerald-500 border border-emerald-200/50' : 'bg-white/60 text-gray-500 border border-white/50 hover:bg-white/80 hover:text-violet-500'}`}
-                >
-                  {chatSaved ? '✓ Saved to journal' : '↓ Save to journal'}
-                </button>
+              <div className="flex items-center justify-between pt-1 gap-2">
+                {chatSaved ? (
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-medium px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-500 border border-emerald-200/50">✓ Saved to journal</span>
+                    <a
+                      href="/journal"
+                      className="text-xs font-medium px-3 py-1.5 rounded-full bg-white/60 text-violet-500 border border-violet-200/50 hover:bg-violet-50 transition-all"
+                    >View →</a>
+                  </div>
+                ) : (
+                  <button
+                    onClick={async () => {
+                      try {
+                        const supabase = createClient();
+                        const today = new Date().toISOString().slice(0, 10);
+                        await createJournalEntry(supabase, {
+                          date: today,
+                          content: `**Q:** ${chatAsked}\n\n${chatResponse}`,
+                          prompt: 'Chart Insight',
+                        });
+                        setChatSaved(true);
+                      } catch { /* silent */ }
+                    }}
+                    className="text-xs font-medium px-3 py-1.5 rounded-full bg-white/60 text-gray-500 border border-white/50 hover:bg-white/80 hover:text-violet-500 transition-all"
+                  >
+                    ↓ Save to journal
+                  </button>
+                )}
                 <button
                   onClick={() => { setChatResponse(''); setChatAsked(''); setChatSaved(false); }}
                   className="text-xs font-medium px-3 py-1.5 rounded-full bg-white/60 text-gray-400 border border-white/50 hover:bg-white/80 hover:text-gray-600 transition-all"
@@ -1620,35 +1629,181 @@ export default function CosmicPage() {
       {/* ════ SYNTHESIS ════ */}
       {tab === 'synthesis' && (
         <div className="space-y-4">
-          {hdData && lifePath && sunSign ? (
-            <div className="glass-card rounded-3xl p-6 space-y-4">
-              <h2 className="font-playfair text-xl text-gray-700">Cross-System Synthesis</h2>
-              <p className="text-xs text-gray-400">Where your astrology, numerology, and Human Design weave together.</p>
-              <div className="space-y-3">
-                <div className="bg-white/50 rounded-2xl p-4 border border-white/40 space-y-1">
-                  <p className="text-xs font-medium text-gray-400 uppercase tracking-widest">Life Path + Profile</p>
+          {hdData && lifePath && sunSign ? (() => {
+            // ── helpers ──────────────────────────────────────────────────────
+            const elDesc = {
+              fire:  'radiant, initiating vitality that moves before it thinks',
+              earth: 'grounded, embodying steadiness that builds before it speaks',
+              air:   'connecting, articulating intelligence that understands before it feels',
+              water: 'feeling, receptive depth that knows before it sees',
+            };
+            const typeGift = {
+              'generator':             'life force that is activated through response',
+              'manifesting-generator': 'multi-passionate life force that responds and then moves fast',
+              'projector':             'penetrating wisdom that sees others more clearly than they see themselves',
+              'manifestor':            'initiating force that impacts simply by moving through the world',
+              'reflector':             'lunar mirror that reflects the health and truth of its environment',
+            };
+            const typeStrategy = {
+              'generator':             (lp) => `As a Generator in a Personal Year ${lp}, the year\'s themes will show up as things that either light up your sacral or leave it flat — trust the gut yes and let it filter everything the year brings.`,
+              'manifesting-generator': (lp) => `As a Manifesting Generator in a Personal Year ${lp}, respond first — then move at your own pace. This year\'s energy is yours to multitask and make your own.`,
+              'projector':             (lp) => `As a Projector in a Personal Year ${lp}, this year\'s gifts arrive through recognition and invitation — watch for the specific people who call you into the year\'s themes.`,
+              'manifestor':            (lp) => `As a Manifestor in a Personal Year ${lp}, you have a clear field to initiate into — inform those around you as you move, and watch what you set in motion now.`,
+              'reflector':             (lp) => `As a Reflector in a Personal Year ${lp}, sample this year\'s themes across each 29-day lunar cycle before committing — you\'ll sense its truth differently as the moon moves through each gate.`,
+            };
+            const lpSoulThread = lifePath <= 3
+              ? 'emergence, authentic expression, and the courage to take up space'
+              : lifePath <= 6
+              ? 'building lasting foundations, serving with devotion, and learning to love fully'
+              : lifePath <= 9
+              ? 'deep seeking, releasing what no longer belongs, and wisdom earned through experience'
+              : 'mastery, spiritual mission, and service at the level of the collective';
+            const moonAuthority = (() => {
+              if (hdData.authority === 'emotional') return `Your ${moonSign?.name ?? ''} moon and Emotional Authority share the same teacher: time. Both ask you to feel the full arc before acting — the wave, not the peak.`;
+              if (hdData.authority === 'sacral')    return `Your ${moonSign?.name ?? ''} moon colors the emotional texture of your experience, but your Sacral Authority grounds your decisions in something even more immediate — the body\'s instant yes or no.`;
+              if (hdData.authority === 'splenic')   return `Your ${moonSign?.name ?? ''} moon gives your inner world richness and depth; your Splenic Authority adds a quiet, first-moment knowing that speaks underneath the feelings — one voice, one time, always in the now.`;
+              return `Your ${moonSign?.name ?? ''} moon shapes what you feel; your ${hdData.authority} authority shapes how you decide. The invitation is to let the feeling inform, and the authority guide.`;
+            })();
+            const sunTypeBody = (() => {
+              const el = sunSign.element;
+              if (hdData.type === 'generator' || hdData.type === 'manifesting-generator') {
+                return el === 'fire'  ? `Your ${sunSign.name} fire and Generator sacral are a powerful pairing — both want to burn, but the sacral\'s yes is what gives the flame its direction. When your gut lights up, you move with a force that\'s hard to ignore.`
+                  : el === 'earth' ? `Your ${sunSign.name} groundedness and Generator design create a potent steadiness — you respond with the body and follow through with consistency. You build things that last.`
+                  : el === 'air'   ? `Your ${sunSign.name} mind is brilliant at seeing what to respond to. The challenge — and the gift — is letting the sacral\'s embodied yes confirm what the mind already suspects.`
+                  : `Your ${sunSign.name} sensitivity makes your sacral responses even more nuanced — you feel the yes in your whole body, not just your gut. That depth of response is a gift.`;
+              }
+              if (hdData.type === 'projector') {
+                return el === 'fire'  ? `Your ${sunSign.name} fire gives your Projector perception an inspired, visionary edge — you don\'t just see others clearly, you see what they could become. The art is waiting for the invitation before sharing that vision.`
+                  : el === 'earth' ? `Your ${sunSign.name} groundedness gives your Projector guidance a practical, embodied quality — your insights land because they are both penetrating and real.`
+                  : el === 'air'   ? `Your ${sunSign.name} mind and Projector perception are a natural pair — you process, connect, and articulate what others cannot yet see in themselves.`
+                  : `Your ${sunSign.name} empathy deepens your Projector sight — you guide others not just from observation, but from genuine feeling for who they are.`;
+              }
+              if (hdData.type === 'manifestor') {
+                return `Your ${sunSign.name} ${el} energy is the fuel behind your Manifestor impact. You initiate with ${el === 'fire' ? 'radiant force' : el === 'earth' ? 'grounded conviction' : el === 'air' ? 'clear vision' : 'felt knowing'} — inform those around you before you move, and your impact flows without resistance.`;
+              }
+              return `The ${el} ${sunSign.modality} energy of ${sunSign.name} moves through your ${hdData.type.replace(/-/g, ' ')} design in a way that is entirely your own — ${elDesc[el]}, expressed through a ${hdData.profile} life story.`;
+            })();
+            const lpProfileBody = (() => {
+              const p1name = PROFILE[hdData.profileLine1]?.split(' — ')[0] ?? `Line ${hdData.profileLine1}`;
+              const p2name = PROFILE[hdData.profileLine2]?.split(' — ')[0] ?? `Line ${hdData.profileLine2}`;
+              const lpTitle = LIFE_PATH[lifePath]?.title ?? `Life Path ${lifePath}`;
+              return `Your Life Path ${lifePath} — ${lpTitle} — is the soul-level thread woven through every chapter of your life. Your ${hdData.profile} Profile (${p1name} / ${p2name}) is the story structure through which that thread expresses itself: ${p1name.toLowerCase()} meets ${p2name.toLowerCase()}, creating a life arc shaped by ${lpSoulThread}.`;
+            })();
+
+            return (
+              <>
+                {/* ── Soul Signature banner ── */}
+                <div className="glass-card rounded-3xl p-6 sm:p-8 space-y-4" style={{ borderLeft: '3px solid #b88a92' }}>
+                  <div>
+                    <p className="text-xs font-medium text-gray-400 uppercase tracking-widest mb-1">Your Soul Signature</p>
+                    <h2 className="font-playfair text-2xl text-gray-700">
+                      {cap(hdData.type.replace(/-/g, ' '))} · {sunSign.name} Sun · Life Path {lifePath}
+                    </h2>
+                  </div>
                   <p className="text-sm text-gray-600 leading-relaxed">
-                    Your Life Path {lifePath} ({LIFE_PATH[lifePath]?.title}) and your {hdData.profile} profile ({PROFILE[hdData.profileLine1]?.split('—')[0].trim()} / {PROFILE[hdData.profileLine2]?.split('—')[0].trim()}) describe a soul journey of{' '}
-                    {lifePath<=3?'emergence, expression, and finding your voice':lifePath<=6?'building, serving, and learning to love fully':lifePath<=9?'deep seeking, releasing, and wisdom earned through experience':'mastery, mission, and service at the highest level'}.
+                    You carry a <span className="font-medium text-gray-700">{typeGift[hdData.type] ?? hdData.type}</span>, fueled by{' '}
+                    <span className="font-medium text-gray-700">{sunSign.name} {sunSign.element} energy</span> — {elDesc[sunSign.element]}.{' '}
+                    Threaded through everything is a <span className="font-medium text-gray-700">Life Path {lifePath}</span> calling toward {lpSoulThread}.{' '}
+                    Your <span className="font-medium text-gray-700">{hdData.profile} Profile</span> is the story structure through which all of it moves into the world.
                   </p>
+                  {expressNum && (
+                    <p className="text-xs text-gray-400 leading-relaxed border-t border-white/40 pt-3">
+                      Expression Number {expressNum} — <span className="text-gray-500">{EXPRESSION_NUM[expressNum]?.title}</span> — is the voice through which all of this reaches others.
+                    </p>
+                  )}
                 </div>
-                <div className="bg-white/50 rounded-2xl p-4 border border-white/40 space-y-1">
-                  <p className="text-xs font-medium text-gray-400 uppercase tracking-widest">Moon Sign + Authority</p>
-                  <p className="text-sm text-gray-600 leading-relaxed">
-                    Your moon in {moonSign?.name} gives your emotional interior a {moonSign?.element} quality. Combined with your {hdData.authority} authority, your inner truth emerges{' '}
-                    {hdData.authority==='emotional'?'through the full arc of your emotional wave — never in the peak or the valley, but in the stillness between':hdData.authority==='sacral'?'in the immediate gut response that your body knows before your mind catches up':hdData.authority==='splenic'?'in the quiet first-moment knowing that speaks once and never repeats itself':'through conversation, discernment, and moving through different environments'}.
-                  </p>
+
+                {/* ── Pairwise cards ── */}
+                <div className="glass-card rounded-3xl p-6 space-y-4">
+                  <h2 className="font-playfair text-xl text-gray-700">Cross-System Synthesis</h2>
+                  <p className="text-xs text-gray-400">Where your astrology, numerology, and Human Design weave together.</p>
+                  <div className="space-y-3">
+
+                    <div className="bg-white/50 rounded-2xl p-4 border border-white/40 space-y-1">
+                      <p className="text-xs font-medium text-gray-400 uppercase tracking-widest">Sun Sign + HD Type</p>
+                      <p className="text-sm text-gray-600 leading-relaxed">{sunTypeBody}</p>
+                    </div>
+
+                    {moonSign && (
+                      <div className="bg-white/50 rounded-2xl p-4 border border-white/40 space-y-1">
+                        <p className="text-xs font-medium text-gray-400 uppercase tracking-widest">Moon Sign + Authority</p>
+                        <p className="text-sm text-gray-600 leading-relaxed">{moonAuthority}</p>
+                      </div>
+                    )}
+
+                    <div className="bg-white/50 rounded-2xl p-4 border border-white/40 space-y-1">
+                      <p className="text-xs font-medium text-gray-400 uppercase tracking-widest">Life Path {lifePath} + {hdData.profile} Profile</p>
+                      <p className="text-sm text-gray-600 leading-relaxed">{lpProfileBody}</p>
+                    </div>
+
+                    {personalYr && (
+                      <div className="bg-white/50 rounded-2xl p-4 border border-white/40 space-y-1">
+                        <p className="text-xs font-medium text-gray-400 uppercase tracking-widest">Personal Year {personalYr} + Your Strategy</p>
+                        <p className="text-sm text-gray-600 leading-relaxed">
+                          You are in a Personal Year {personalYr} — <span className="italic">{PERSONAL_YEAR[personalYr]}</span>{' '}
+                          {(typeStrategy[hdData.type] ?? typeStrategy['generator'])(personalYr)}
+                        </p>
+                      </div>
+                    )}
+
+                    {expressNum && (
+                      <div className="bg-white/50 rounded-2xl p-4 border border-white/40 space-y-1">
+                        <p className="text-xs font-medium text-gray-400 uppercase tracking-widest">Expression {expressNum} + {hdData.profile} Profile</p>
+                        <p className="text-sm text-gray-600 leading-relaxed">
+                          Your Expression Number {expressNum} — <span className="font-medium text-gray-700">{EXPRESSION_NUM[expressNum]?.title}</span> — describes the natural mode through which your gifts move into the world.{' '}
+                          Your {hdData.profile} Profile shapes the life story through which that expression travels.{' '}
+                          {EXPRESSION_NUM[expressNum]?.desc.split('. ')[0]}. The {hdData.profileLine1}/{hdData.profileLine2} adds the arc: {(PROFILE[hdData.profileLine1] ?? '').split(' — ')[1]?.split('.')[0]?.toLowerCase()}.
+                        </p>
+                      </div>
+                    )}
+
+                    {birthdayNum && (
+                      <div className="bg-white/50 rounded-2xl p-4 border border-white/40 space-y-1">
+                        <p className="text-xs font-medium text-gray-400 uppercase tracking-widest">Birthday Number {birthdayNum} + Authority</p>
+                        <p className="text-sm text-gray-600 leading-relaxed">
+                          Your Birthday Number {birthdayNum} — <span className="font-medium text-gray-700">{BIRTHDAY_NUM[birthdayNum]?.title}</span> — marks a specific gift you arrived with at birth.{' '}
+                          Paired with your {hdData.authority} authority, this gift is most alive when you honor how you are designed to decide:{' '}
+                          {hdData.authority === 'emotional' ? 'waiting for emotional clarity before you act with it'
+                            : hdData.authority === 'sacral'  ? 'trusting the gut yes that arises when this gift is truly called for'
+                            : hdData.authority === 'splenic' ? 'following the quiet in-the-moment knowing of when to deploy it'
+                            : 'letting dialogue and discernment reveal when and how to share it'}.
+                        </p>
+                      </div>
+                    )}
+
+                  </div>
                 </div>
-                <div className="bg-white/50 rounded-2xl p-4 border border-white/40 space-y-1">
-                  <p className="text-xs font-medium text-gray-400 uppercase tracking-widest">Sun Sign + HD Type</p>
-                  <p className="text-sm text-gray-600 leading-relaxed">
-                    The {sunSign.element} {sunSign.modality} energy of {sunSign.name} flows through the lens of your {hdData.type.replace(/-/g,' ')} design.
-                    {hdData.type==='generator'||hdData.type==='manifesting-generator'?` Your ${sunSign.element} vitality is activated through response — when your sacral lights up, the world lights up with you.`:hdData.type==='projector'?` Your ${sunSign.element} nature is channeled through deep perception — you guide others into what they cannot yet see in themselves.`:` Your ${sunSign.element} fire expresses itself through bold initiation — you don't need permission to begin.`}
-                  </p>
-                </div>
-              </div>
-            </div>
-          ) : (
+
+                {/* ── Defined Channels in context ── */}
+                {hdData.definedChannels?.length > 0 && (
+                  <div className="glass-card rounded-3xl p-6 space-y-3">
+                    <h2 className="font-playfair text-xl text-gray-700">Your Channels as a Whole</h2>
+                    <p className="text-xs text-gray-400">
+                      Your defined channels are the consistent energies you carry — they don&apos;t come and go. Seen together, they form the architecture of your gifts.
+                    </p>
+                    <div className="space-y-2">
+                      {hdData.definedChannels.map(([g1, g2]) => {
+                        const key  = `${g1}-${g2}`;
+                        const name = CHANNEL_NAMES[key] ?? CHANNEL_NAMES[`${g2}-${g1}`] ?? `Channel ${g1}–${g2}`;
+                        const [nameShort, nameLong] = name.split(' — ');
+                        return (
+                          <button key={key} onClick={() => openChannel([g1, g2])}
+                            className="w-full flex items-start gap-3 p-3 rounded-2xl border bg-white/30 border-white/30 hover:bg-white/50 text-left transition-colors">
+                            <div className="mt-1 w-2 h-2 rounded-full shrink-0 bg-[#b88a92] opacity-60" />
+                            <div className="flex-1 min-w-0">
+                              <p className="text-xs font-semibold text-gray-500">{g1} — {g2} · {nameShort}</p>
+                              {nameLong && <p className="text-sm text-gray-600 mt-0.5">{nameLong}</p>}
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <p className="text-xs text-gray-400 pt-1">Tap any channel to read its full description.</p>
+                  </div>
+                )}
+              </>
+            );
+          })() : (
             <div className="glass-card rounded-3xl p-10 text-center space-y-3">
               <p className="text-gray-500 text-sm">Synthesis requires your birth chart and numerology data.</p>
               <p className="text-xs text-gray-400">Add your birth details on <a href="/profile" className="text-[#b88a92] underline">Profile</a> to unlock cross-system insights.</p>
@@ -1660,6 +1815,162 @@ export default function CosmicPage() {
       {/* ════ TRANSITS ════ */}
       {tab === 'transits' && (
         <div className="space-y-4">
+
+          {/* ── Affecting You Now ── */}
+          {(() => {
+            if (!transitData?.personality || !hdData?.personality) return null;
+
+            const OUTER = ['jupiter','saturn','uranus','neptune','pluto'];
+            const OUTER_ORB = 5;
+            const OUTER_EMOJI = { jupiter:'🪐', saturn:'⏳', uranus:'⚡', neptune:'🌊', pluto:'🌑' };
+            const OUTER_COLOR = {
+              jupiter: { bg:'from-amber-50 to-yellow-50',  border:'border-amber-200/60',  dot:'bg-amber-400',  pill:'bg-amber-100 text-amber-600' },
+              saturn:  { bg:'from-stone-50 to-slate-50',   border:'border-stone-200/60',   dot:'bg-stone-400',  pill:'bg-stone-100 text-stone-600' },
+              uranus:  { bg:'from-cyan-50 to-sky-50',      border:'border-cyan-200/60',    dot:'bg-cyan-400',   pill:'bg-cyan-100 text-cyan-600' },
+              neptune: { bg:'from-violet-50 to-purple-50', border:'border-violet-200/60',  dot:'bg-violet-400', pill:'bg-violet-100 text-violet-600' },
+              pluto:   { bg:'from-rose-50 to-pink-50',     border:'border-rose-200/60',    dot:'bg-rose-400',   pill:'bg-rose-100 text-rose-600' },
+            };
+            const OUTER_DURATION = {
+              jupiter:'~1–3 months', saturn:'~3–6 months',
+              uranus:'~1–2 years', neptune:'~2–3 years', pluto:'~3–5 years',
+            };
+            const NATAL_DOMAIN = {
+              sun:       'your sense of self and core purpose',
+              moon:      'your emotional foundations and inner world',
+              mercury:   'your mind and the way you communicate',
+              venus:     'your heart, your capacity for love, and what you value most',
+              mars:      'your drive, desire, and the force behind your actions',
+              jupiter:   'your relationship with abundance and faith',
+              saturn:    'your discipline and your long-arc mastery',
+              uranus:    'your impulse toward freedom and reinvention',
+              neptune:   'your spiritual sensitivity and imagination',
+              pluto:     'your relationship with power and deep transformation',
+              northNode: 'your soul\'s evolutionary direction',
+              southNode: 'your karmic past and comfort zones',
+            };
+            const TRANSIT_BODY = {
+              jupiter: {
+                Conjunction: (nd) => `Jupiter is meeting ${nd} directly — this is a genuine opening. Expansion, luck, and new possibility are flowing into this area of your life. Say yes.`,
+                Square:      (nd) => `Jupiter is stretching ${nd} beyond familiar bounds. Growth is available here, but it asks you to reach further than feels comfortable.`,
+                Opposition:  (nd) => `Jupiter is illuminating ${nd} through contrast and tension — abundance and excess are both in play. Discernment is the practice.`,
+                Trine:       (nd) => `Jupiter is flowing harmoniously with ${nd} right now — a quiet but real blessing. Doors are opening without you having to force them.`,
+                Sextile:     (nd) => `Jupiter is creating gentle opportunity in ${nd}. The door is ajar — walk through it with intention and watch what opens.`,
+              },
+              saturn: {
+                Conjunction: (nd) => `Saturn is sitting directly on ${nd} — something is being crystallized, tested, and restructured at its root. This chapter is asking for your full honesty and your best effort. What you build here lasts.`,
+                Square:      (nd) => `Saturn is testing ${nd} with friction and delay. The resistance is real, but it is clarifying exactly what is true and what is not. What survives this transit has earned its place.`,
+                Opposition:  (nd) => `Saturn is bringing ${nd} to a point of reckoning — a reality check that ultimately serves you. What has been building is now being weighed against what is real.`,
+                Trine:       (nd) => `Saturn is supporting ${nd} with quiet, enduring strength. Long-term work is paying off here — steady effort is being rewarded.`,
+                Sextile:     (nd) => `Saturn is offering structured opportunity through ${nd}. Slow and deliberate action now creates something that will hold for a long time.`,
+              },
+              uranus: {
+                Conjunction: (nd) => `Uranus is breaking ${nd} open — expect the unexpected. A liberation you didn't know you needed is arriving, often disguised as disruption.`,
+                Square:      (nd) => `Uranus is shaking ${nd} loose from its familiar shape. The instability is real, but it is clearing space for something more authentic to take root.`,
+                Opposition:  (nd) => `Uranus is polarizing ${nd} — what was settled is up for reinvention. The sudden shifts are asking which version of this part of your life is actually true.`,
+                Trine:       (nd) => `Uranus is awakening ${nd} with surprising ease — an exciting, liberating shift that feels energizing rather than destabilizing. Let it move you.`,
+                Sextile:     (nd) => `Uranus is opening a window through ${nd} — a chance to refresh and renovate in a way that doesn't require upheaval.`,
+              },
+              neptune: {
+                Conjunction: (nd) => `Neptune is dissolving the edges of ${nd} — clarity may feel elusive right now, but something more whole and more honest is forming in the fog. Trust the not-knowing.`,
+                Square:      (nd) => `Neptune is blurring ${nd} — illusions and longings are more active than usual here. Trust your felt experience over the stories you're telling yourself.`,
+                Opposition:  (nd) => `Neptune is casting ${nd} in a dreamlike quality — the boundary between what is real and what is longed for is thinning. Gentle discernment is your compass.`,
+                Trine:       (nd) => `Neptune is softening ${nd} with grace and beauty — spiritual sensitivity and inspiration are flowing more freely through this area of your life.`,
+                Sextile:     (nd) => `Neptune is opening a gentle channel through ${nd} — imagination, empathy, and spiritual awareness are quietly enriching this domain.`,
+              },
+              pluto: {
+                Conjunction: (nd) => `Pluto is transforming ${nd} at the very root — this is a multi-year chapter of deep, total change. What can no longer be sustained will not survive it. What remains will be more essentially and unmistakably you.`,
+                Square:      (nd) => `Pluto is forcing a reckoning with ${nd} — power, control, and what must finally be released are all on the table. This is not a comfortable transit, but it is an honest one.`,
+                Opposition:  (nd) => `Pluto is pulling ${nd} through its deepest transformation via contrast — what can no longer be sustained is ending, and what is most essential is being revealed through that ending.`,
+                Trine:       (nd) => `Pluto is transforming ${nd} with surprising depth and relative ease — deep change is underway without the usual upheaval. Something old is composting into something far more alive.`,
+                Sextile:     (nd) => `Pluto is opening a subtle channel of transformation through ${nd} — power and depth are quietly becoming available in this area of your life.`,
+              },
+            };
+            const ASP_HEADLINE = {
+              Conjunction: (tp, np) => `${cap(tp)} is joining your ${PLANET_LBL[np] ?? np}`,
+              Square:      (tp, np) => `${cap(tp)} is testing your ${PLANET_LBL[np] ?? np}`,
+              Opposition:  (tp, np) => `${cap(tp)} is polarizing your ${PLANET_LBL[np] ?? np}`,
+              Trine:       (tp, np) => `${cap(tp)} is blessing your ${PLANET_LBL[np] ?? np}`,
+              Sextile:     (tp, np) => `${cap(tp)} is opening your ${PLANET_LBL[np] ?? np}`,
+            };
+            const MAJOR = new Set(['Conjunction','Square','Opposition','Trine','Sextile']);
+
+            // Compute outer-planet transit aspects with tighter personal orb
+            const outerAspects = [];
+            for (const tb of OUTER) {
+              if (transitLons[tb] == null) continue;
+              for (const [nb, nLon] of Object.entries(natalLons)) {
+                if (nLon == null) continue;
+                const diff  = ((transitLons[tb] - nLon) % 360 + 360) % 360;
+                const angle = Math.min(diff, 360 - diff);
+                for (const asp of ASPECT_DEFS) {
+                  const orb = Math.abs(angle - asp.angle);
+                  if (MAJOR.has(asp.name) && orb <= OUTER_ORB) {
+                    outerAspects.push({ transit: tb, natal: nb, aspName: asp.name, orb: orb.toFixed(1), symbol: asp.symbol });
+                    break;
+                  }
+                }
+              }
+            }
+
+            // Deduplicate: keep tightest orb per transit-natal pair, limit to most significant per transit planet
+            const seen = new Map();
+            for (const a of outerAspects.sort((x,y)=>+x.orb - +y.orb)) {
+              const k = `${a.transit}-${a.natal}`;
+              if (!seen.has(k)) seen.set(k, a);
+            }
+            const active = [...seen.values()].sort((a,b)=>
+              OUTER.indexOf(a.transit) - OUTER.indexOf(b.transit) || +a.orb - +b.orb
+            );
+
+            if (!active.length) return null;
+
+            return (
+              <div className="space-y-3">
+                <div className="px-1">
+                  <h2 className="font-playfair text-xl text-gray-700">Affecting You Now</h2>
+                  <p className="text-xs text-gray-400 mt-0.5">Longer-arc transits currently shaping your season. Tap any card to learn more.</p>
+                </div>
+                {active.map((a) => {
+                  const c   = OUTER_COLOR[a.transit];
+                  const nd  = NATAL_DOMAIN[a.natal] ?? `your ${PLANET_LBL[a.natal] ?? a.natal}`;
+                  const fn  = TRANSIT_BODY[a.transit]?.[a.aspName];
+                  const body = fn ? fn(nd) : null;
+                  if (!body) return null;
+                  const headline = (ASP_HEADLINE[a.aspName] ?? ((tp,np)=>`${cap(tp)} × ${PLANET_LBL[np]??np}`))(a.transit, a.natal);
+                  return (
+                    <button key={`${a.transit}-${a.natal}`}
+                      onClick={() => {
+                        const asp = ASPECT_DESC[a.aspName];
+                        if (!asp) return;
+                        setDetail({
+                          title: headline,
+                          subtitle: `${OUTER_EMOJI[a.transit]} ${a.aspName} ${asp.symbol} · ${a.orb}° orb · ${OUTER_DURATION[a.transit]}`,
+                          tags: [a.aspName, cap(a.transit), OUTER_DURATION[a.transit]],
+                          body,
+                        });
+                      }}
+                      className={`w-full text-left bg-gradient-to-br ${c.bg} border ${c.border} rounded-3xl p-5 space-y-3 hover:shadow-sm active:scale-[0.99] transition-all`}
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="space-y-0.5">
+                          <div className="flex items-center gap-2">
+                            <span className="text-lg">{OUTER_EMOJI[a.transit]}</span>
+                            <span className="font-playfair text-base text-gray-700">{headline}</span>
+                          </div>
+                          <p className="text-xs text-gray-400 pl-7">{a.aspName} {ASPECT_DESC[a.aspName]?.symbol} · {a.orb}° orb</p>
+                        </div>
+                        <span className={`shrink-0 text-xs px-2.5 py-1 rounded-full font-medium ${c.pill}`}>
+                          {OUTER_DURATION[a.transit]}
+                        </span>
+                      </div>
+                      <p className="text-sm text-gray-600 leading-relaxed pl-1">{body}</p>
+                    </button>
+                  );
+                })}
+              </div>
+            );
+          })()}
+
           <div className="glass-card rounded-3xl p-6 space-y-4">
             <div>
               <h2 className="font-playfair text-xl text-gray-700">Current Planetary Positions</h2>
