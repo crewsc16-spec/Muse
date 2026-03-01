@@ -1,46 +1,27 @@
-import { createServerClient } from '@supabase/ssr';
 import { NextResponse } from 'next/server';
 
 export async function proxy(request) {
-  let supabaseResponse = NextResponse.next({ request });
-
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll();
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value)
-          );
-          supabaseResponse = NextResponse.next({ request });
-          cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
-          );
-        },
-      },
-    }
-  );
-
-  // getSession reads from cookies locally (no network call) — more reliable
-  // on the edge than getUser() which validates against Supabase servers.
-  // Individual pages still call getUser() for secure data access.
-  const { data: { session } } = await supabase.auth.getSession();
-  const user = session?.user ?? null;
-
   const { pathname } = request.nextUrl;
   const protectedRoutes = ['/journal', '/vision-board', '/daily', '/profile', '/quizzes', '/board'];
 
-  if (!user && protectedRoutes.some(route => pathname.startsWith(route))) {
-    const url = request.nextUrl.clone();
-    url.pathname = '/login';
-    return NextResponse.redirect(url);
+  if (protectedRoutes.some(route => pathname.startsWith(route))) {
+    // Check for any Supabase session cookie chunk. The Google OAuth session
+    // is large and gets split into multiple sb-*-auth-token.N cookies.
+    // Bypassing the SSR client here avoids chunked-cookie reconstruction
+    // issues in the edge runtime — individual pages do the real auth check.
+    const cookies = request.cookies.getAll();
+    const hasSession = cookies.some(
+      c => c.name.includes('-auth-token') && !c.name.includes('code-verifier') && c.value
+    );
+
+    if (!hasSession) {
+      const url = request.nextUrl.clone();
+      url.pathname = '/login';
+      return NextResponse.redirect(url);
+    }
   }
 
-  return supabaseResponse;
+  return NextResponse.next({ request });
 }
 
 export const config = {
