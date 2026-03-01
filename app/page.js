@@ -112,7 +112,7 @@ export default function HomePage() {
   });
 
   return (
-    <div className="min-h-screen" style={{ background: 'linear-gradient(135deg, #fdf8f3 0%, #fce8e8 50%, #e8e0f5 100%)' }}>
+    <div className="min-h-screen">
       <div className="max-w-4xl mx-auto px-4 py-10 space-y-8">
 
         {/* ── Hero greeting ── */}

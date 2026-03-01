@@ -1975,7 +1975,7 @@ export default function QuizzesPage() {
     : 0;
 
   return (
-    <div className="min-h-screen" style={{ background: 'linear-gradient(135deg, #fdf8f3 0%, #fce8e8 50%, #e8e0f5 100%)' }}>
+    <div className="min-h-screen">
       <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
 
         {/* ── Quiz card ── */}
