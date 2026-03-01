@@ -226,10 +226,10 @@ export default function JournalPage() {
             </p>
           </div>
           <button
-            onClick={handleNewEntry}
+            onClick={shufflePrompt}
             className="btn-gradient text-white text-sm px-4 py-2 rounded-full font-medium"
           >
-            + New Entry
+            Shuffle Prompt
           </button>
         </div>
 
