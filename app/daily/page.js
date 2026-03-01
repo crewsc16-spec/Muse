@@ -300,7 +300,7 @@ export default function DailyPage() {
           {content.chartData?.sunSign && (
             <div className="mt-2 space-y-0.5">
               <p className="text-xs text-gray-300">✦ Personalised by your natal chart</p>
-              <p className="text-xs text-gray-300/60">Guided by your chart — with space left for your higher power.</p>
+              <p className="text-xs text-gray-500">Guided by your chart — with space left for your higher power.</p>
             </div>
           )}
           {/* Cosmic weather strip — changes daily based on transits */}
