@@ -235,6 +235,1502 @@ const QUIZZES = [
       },
     },
   },
+  {
+    id: 'chakra',
+    emoji: '🌈',
+    title: "Which Chakra Needs Attention?",
+    description: 'Discover which of your seven energy centres is asking for care and healing right now.',
+    questions: [
+      {
+        text: 'When you honestly check in with your body and life right now, the area that feels most off is…',
+        options: [
+          { label: 'My sense of safety — finances, home, or physical wellbeing feel shaky', value: 'root' },
+          { label: 'My creativity and joy — I feel flat, uninspired, cut off from pleasure', value: 'sacral' },
+          { label: 'My confidence — I feel powerless and unable to trust my own direction', value: 'solar' },
+          { label: 'My heart — I feel guarded, grieving, or unable to open up', value: 'heart' },
+        ],
+      },
+      {
+        text: 'In conversations, the thing I struggle with most is…',
+        options: [
+          { label: 'Finding the courage to say what I truly think and feel', value: 'throat' },
+          { label: 'Trusting my gut instinct over the noise of other people\'s opinions', value: 'thirdeye' },
+          { label: 'Feeling connected to a sense of meaning or higher purpose', value: 'crown' },
+          { label: 'Speaking freely without fear of losing security or belonging', value: 'root' },
+        ],
+      },
+      {
+        text: 'My body has been signalling that something is blocked through…',
+        options: [
+          { label: 'A creative restlessness — energy with nowhere beautiful to go', value: 'sacral' },
+          { label: 'Digestive upset, fatigue, or a hollow feeling in my stomach area', value: 'solar' },
+          { label: 'Tightness in my chest or a wordless ache I can\'t quite name', value: 'heart' },
+          { label: 'Jaw tension, a sore throat, or tears rising when I try to speak my truth', value: 'throat' },
+        ],
+      },
+      {
+        text: 'If I am fully honest, what I most long for is…',
+        options: [
+          { label: 'Clear intuition — to trust my inner vision without constant second-guessing', value: 'thirdeye' },
+          { label: 'A felt sense of divine purpose and deep spiritual peace', value: 'crown' },
+          { label: 'True stability — a solid foundation I can rest my whole life on', value: 'root' },
+          { label: 'To feel excited, creative, and genuinely alive again', value: 'sacral' },
+        ],
+      },
+      {
+        text: 'A pattern that keeps showing up in my relationships is…',
+        options: [
+          { label: 'Making myself smaller or dimming my power to keep the peace', value: 'solar' },
+          { label: 'Keeping my walls up even with the people I love most', value: 'heart' },
+          { label: 'Holding back my real words and ending up feeling chronically unseen', value: 'throat' },
+          { label: 'Overriding red flags I can clearly see with logic or wishful thinking', value: 'thirdeye' },
+        ],
+      },
+      {
+        text: 'What I most need more of in my life right now is…',
+        options: [
+          { label: 'A sense of larger meaning — that my life is part of something', value: 'crown' },
+          { label: 'Rhythm, consistency, and simple earthly nourishment', value: 'root' },
+          { label: 'Pleasure, creativity, and enjoying life without guilt', value: 'sacral' },
+          { label: 'Self-trust, healthy boundaries, and confidence in my own power', value: 'solar' },
+        ],
+      },
+      {
+        text: 'The healing practice that genuinely calls to me right now is…',
+        options: [
+          { label: 'Heart-opening movement, a cacao ceremony, or writing forgiveness letters', value: 'heart' },
+          { label: 'Singing, chanting, journaling, or finally having the brave conversation', value: 'throat' },
+          { label: 'Sitting in meditation, dream journaling, or spending a night under the stars', value: 'thirdeye' },
+          { label: 'Prayer, extended breathwork, or a period of silence and spiritual retreat', value: 'crown' },
+        ],
+      },
+    ],
+    results: {
+      root: {
+        title: 'Root Chakra',
+        emoji: '🟥',
+        tagline: 'Your foundation is calling for care.',
+        description: 'The root chakra governs safety, belonging, and the primal sense of having enough. When it needs attention you may feel anxious, financially stressed, or disconnected from your body. Grounding practices — walking barefoot, nourishing food, time in nature, and breathwork — help restore the steady earth energy you need.',
+        keywords: ['Security', 'Grounding', 'Safety', 'Stability', 'Presence'],
+      },
+      sacral: {
+        title: 'Sacral Chakra',
+        emoji: '🧡',
+        tagline: 'Your creative and sensual life is asking to be rekindled.',
+        description: 'The sacral chakra holds the energy of pleasure, creativity, desire, and flow. When it\'s blocked you may feel creatively dry, emotionally numb, or cut off from what once brought you joy. Nourish it through dance, water, expressive art, and giving yourself permission to want what you want.',
+        keywords: ['Creativity', 'Pleasure', 'Flow', 'Desire', 'Emotion'],
+      },
+      solar: {
+        title: 'Solar Plexus Chakra',
+        emoji: '💛',
+        tagline: 'Your personal power is ready to rise.',
+        description: 'The solar plexus chakra is the seat of will, confidence, and self-determination. When it is blocked you may feel powerless, indecisive, or chronically undervalued. Reclaim it through clear boundary-setting, intentional action, and practices that remind you of your inherent worth.',
+        keywords: ['Confidence', 'Power', 'Will', 'Agency', 'Self-Worth'],
+      },
+      heart: {
+        title: 'Heart Chakra',
+        emoji: '💚',
+        tagline: 'The tender centre of your chest is asking to be opened.',
+        description: 'The heart chakra governs love, compassion, and the courage to stay open. When it needs healing you may feel guarded, grieving, or unable to fully trust. Forgiveness rituals, heart-opening yoga, genuine connection, and letting yourself be loved without conditions are the medicine.',
+        keywords: ['Love', 'Compassion', 'Forgiveness', 'Openness', 'Healing'],
+      },
+      throat: {
+        title: 'Throat Chakra',
+        emoji: '💙',
+        tagline: 'Your truth is waiting to be spoken.',
+        description: 'The throat chakra is the centre of authentic expression, communication, and creative voice. When blocked you may hold back your real thoughts, feel chronically misunderstood, or swallow words that need saying. Chanting, singing, journaling, and brave conversations where you say the real thing are your medicine.',
+        keywords: ['Expression', 'Truth', 'Voice', 'Communication', 'Authenticity'],
+      },
+      thirdeye: {
+        title: 'Third Eye Chakra',
+        emoji: '🔮',
+        tagline: 'Your inner vision is asking to be trusted.',
+        description: 'The third eye chakra governs intuition, inner knowing, and the ability to perceive beyond the surface. When clouded you may overthink, distrust your gut, or feel unable to access your own clarity. Meditation, dream journaling, and choosing to act on intuition even when uncertain will open it.',
+        keywords: ['Intuition', 'Vision', 'Clarity', 'Perception', 'Inner-Knowing'],
+      },
+      crown: {
+        title: 'Crown Chakra',
+        emoji: '🌸',
+        tagline: 'You are seeking reconnection with the sacred.',
+        description: 'The crown chakra connects you to your higher self, spiritual understanding, and the experience of unity. When it needs attention you may feel isolated, purposeless, or cut off from the sense that life holds meaning. Meditation, prayer, breathwork, and time in awe of something greater will nourish it.',
+        keywords: ['Spirituality', 'Unity', 'Purpose', 'Transcendence', 'Peace'],
+      },
+    },
+  },
+  {
+    id: 'attachment',
+    emoji: '💞',
+    title: "What's Your Attachment Style?",
+    description: 'Explore how your early experiences shaped the way you love, connect, and respond in close relationships.',
+    questions: [
+      {
+        text: 'When a partner hasn\'t replied in a few hours, you…',
+        options: [
+          { label: 'Assume they\'re busy and get on with your day without drama', value: 'secure' },
+          { label: 'Start scanning your last messages for what might have gone wrong', value: 'anxious' },
+          { label: 'Enjoy the space — a little distance feels natural and easy', value: 'avoidant' },
+          { label: 'Swing between "they hate me" and "I don\'t even care anyway"', value: 'fearful' },
+        ],
+      },
+      {
+        text: 'Your idea of a healthy relationship is…',
+        options: [
+          { label: 'Two whole people who genuinely choose each other, every day', value: 'secure' },
+          { label: 'Someone who is consistently available and reliably reassuring', value: 'anxious' },
+          { label: 'A deep connection that doesn\'t require me to give up my independence', value: 'avoidant' },
+          { label: 'Something I desperately want but genuinely worry I don\'t deserve', value: 'fearful' },
+        ],
+      },
+      {
+        text: 'When you feel hurt by someone you love, you…',
+        options: [
+          { label: 'Express it clearly and trust you\'ll work it through together', value: 'secure' },
+          { label: 'Need reassurance immediately — the uncertainty is unbearable', value: 'anxious' },
+          { label: 'Withdraw and process alone, sometimes for a long time', value: 'avoidant' },
+          { label: 'Lash out and feel guilty for it, or go completely cold', value: 'fearful' },
+        ],
+      },
+      {
+        text: 'In the early stages of romance, your pattern tends to be…',
+        options: [
+          { label: 'Excited but grounded — enjoying getting to know someone step by step', value: 'secure' },
+          { label: 'Falling fast and quietly obsessing over whether they feel the same', value: 'anxious' },
+          { label: 'Interested but wary — one foot always near the exit', value: 'avoidant' },
+          { label: 'Intensely drawn in while simultaneously bracing for rejection', value: 'fearful' },
+        ],
+      },
+      {
+        text: 'If you had to describe the love in your childhood home, you\'d say…',
+        options: [
+          { label: 'I felt loved and safe — my needs were largely met consistently', value: 'secure' },
+          { label: 'Love felt inconsistent — I always had to work a little to feel seen', value: 'anxious' },
+          { label: 'I learned to be self-sufficient — emotional needs were discouraged', value: 'avoidant' },
+          { label: 'It was unpredictable — the people I loved most also scared me sometimes', value: 'fearful' },
+        ],
+      },
+      {
+        text: 'When conflict arises in a relationship, your instinct is to…',
+        options: [
+          { label: 'Stay in the conversation and talk it through with care', value: 'secure' },
+          { label: 'Escalate or cling — afraid this conflict means the beginning of the end', value: 'anxious' },
+          { label: 'Shut down and go silent until it passes on its own', value: 'avoidant' },
+          { label: 'Swing between wanting to fight and wanting to disappear entirely', value: 'fearful' },
+        ],
+      },
+      {
+        text: 'Your deepest fear in love is…',
+        options: [
+          { label: 'Losing someone I truly care for — but I know I\'d eventually survive it', value: 'secure' },
+          { label: 'Not being enough — and being abandoned because of it', value: 'anxious' },
+          { label: 'Being consumed by someone else and losing myself in the process', value: 'avoidant' },
+          { label: 'Both: being left behind AND being too close — love terrifies me both ways', value: 'fearful' },
+        ],
+      },
+      {
+        text: 'Intimacy, to you, most often feels…',
+        options: [
+          { label: 'Nourishing, natural, and something I lean into freely', value: 'secure' },
+          { label: 'Something I crave achingly and simultaneously fear losing', value: 'anxious' },
+          { label: 'Uncomfortable — I prefer closeness in measured, controllable doses', value: 'avoidant' },
+          { label: 'A beautiful, terrifying paradox I don\'t know how to win', value: 'fearful' },
+        ],
+      },
+    ],
+    results: {
+      secure: {
+        title: 'Secure Attachment',
+        emoji: '🌿',
+        tagline: 'You love with an open, grounded heart.',
+        description: 'Securely attached individuals offer love freely and receive it without excessive anxiety or need to guard themselves. You likely experienced consistent care early in life, and that foundation allows you to navigate intimacy with both warmth and healthy independence. You are a genuine gift to the people you love.',
+        keywords: ['Security', 'Trust', 'Balance', 'Openness', 'Warmth'],
+      },
+      anxious: {
+        title: 'Anxious Attachment',
+        emoji: '🌊',
+        tagline: 'Your heart loves deeply — and fears deeply too.',
+        description: 'The anxiously attached person craves intimacy and is simultaneously terrified of losing it. Your love is passionate and devoted, but it is shadowed by a fear that you are not quite enough. Your work is learning that you are worthy of love even when you stop performing love perfectly.',
+        keywords: ['Devotion', 'Sensitivity', 'Depth', 'Longing', 'Growth'],
+      },
+      avoidant: {
+        title: 'Avoidant Attachment',
+        emoji: '🌬️',
+        tagline: 'You prize freedom and self-sufficiency above all.',
+        description: 'The avoidantly attached person learned early that emotional needs were best managed alone. You are fiercely independent and capable, but intimacy can trigger a subtle urge to withdraw. Your growth edge is discovering that connection doesn\'t have to mean losing yourself — and that being needed is not a trap.',
+        keywords: ['Independence', 'Self-Reliance', 'Space', 'Boundaries', 'Resilience'],
+      },
+      fearful: {
+        title: 'Fearful-Avoidant Attachment',
+        emoji: '🌑',
+        tagline: 'You long for love and fear it in equal measure.',
+        description: 'The fearful-avoidant pattern holds the most contradictory hunger: a deep longing for closeness and an equally deep terror of it. This often arises when early love also brought harm. Your path is one of the most courageous there is: to let both the longing and the fear be true, and to inch toward safety anyway.',
+        keywords: ['Complexity', 'Courage', 'Healing', 'Depth', 'Transformation'],
+      },
+    },
+  },
+  {
+    id: 'wound',
+    emoji: '🌷',
+    title: "What Is Your Core Wound?",
+    description: 'The core wound is the deep emotional injury we carry from childhood — the story that quietly runs everything until we see it.',
+    questions: [
+      {
+        text: 'When someone you love pulls away or goes quiet, your gut reaction is…',
+        options: [
+          { label: 'Panic — my greatest fear is being left and I feel it in my whole body', value: 'abandonment' },
+          { label: 'A quiet dread that I\'ve done something to make myself unwanted', value: 'rejection' },
+          { label: 'Replaying our last interaction to find where I looked foolish or weak', value: 'humiliation' },
+          { label: 'High alert — wondering if I can actually trust this person at all', value: 'betrayal' },
+        ],
+      },
+      {
+        text: 'A pattern you keep noticing across painful situations is…',
+        options: [
+          { label: 'A bone-deep sense that things are deeply unfair and no one acknowledges it', value: 'injustice' },
+          { label: 'People always seem to leave — especially when I need them most', value: 'abandonment' },
+          { label: 'I am never quite the one who is truly chosen or fully wanted', value: 'rejection' },
+          { label: 'I end up feeling embarrassed, exposed, or made small', value: 'humiliation' },
+        ],
+      },
+      {
+        text: 'Your deepest relational fear is…',
+        options: [
+          { label: 'That the people I trust most will eventually let me down or deceive me', value: 'betrayal' },
+          { label: 'Being treated unfairly no matter how much I do right', value: 'injustice' },
+          { label: 'Being left with no one who truly stays', value: 'abandonment' },
+          { label: 'Being fully seen and still being turned away', value: 'rejection' },
+        ],
+      },
+      {
+        text: 'If you had to name what you most often felt as a child, it would be…',
+        options: [
+          { label: 'Embarrassed, mocked, or made to feel stupid or small', value: 'humiliation' },
+          { label: 'Let down by the very people who were supposed to protect me', value: 'betrayal' },
+          { label: 'At a disadvantage — like the rules didn\'t apply equally to me', value: 'injustice' },
+          { label: 'Invisible — like I could disappear and no one would truly notice', value: 'abandonment' },
+        ],
+      },
+      {
+        text: 'The thought that loops most often in your mind is…',
+        options: [
+          { label: '"There\'s something fundamentally unlovable about me"', value: 'rejection' },
+          { label: '"I am a fool for having hoped, tried, or trusted"', value: 'humiliation' },
+          { label: '"Everyone has an agenda I can\'t see — I can\'t fully let my guard down"', value: 'betrayal' },
+          { label: '"I work so hard and others seem to get what I deserve"', value: 'injustice' },
+        ],
+      },
+      {
+        text: 'When you feel overlooked or left out, you experience…',
+        options: [
+          { label: 'A hollow panic that rises up — it feels existential, not just situational', value: 'abandonment' },
+          { label: 'The immediate assumption that I am the problem', value: 'rejection' },
+          { label: 'An overwhelming urge to hide, shrink, or make myself invisible', value: 'humiliation' },
+          { label: 'The cold suspicion that I was only included for what I could offer', value: 'betrayal' },
+        ],
+      },
+      {
+        text: 'You find it hardest to forgive when…',
+        options: [
+          { label: 'Something fundamentally unfair happened and was never acknowledged', value: 'injustice' },
+          { label: 'Someone walked away without warning or any real explanation', value: 'abandonment' },
+          { label: 'You were vulnerable — and they turned away anyway', value: 'rejection' },
+          { label: 'You were diminished or exposed in front of others', value: 'humiliation' },
+        ],
+      },
+      {
+        text: 'Your strongest unconscious coping strategy has been…',
+        options: [
+          { label: 'Becoming hyper-vigilant and extremely careful about who I let close', value: 'betrayal' },
+          { label: 'Becoming a fierce advocate for fairness — sometimes at great personal cost', value: 'injustice' },
+          { label: 'Becoming so self-sufficient that I never truly need anyone', value: 'abandonment' },
+          { label: 'Achieving, succeeding, or over-helping to earn my right to belong', value: 'rejection' },
+        ],
+      },
+    ],
+    results: {
+      abandonment: {
+        title: 'The Abandonment Wound',
+        emoji: '🌷',
+        tagline: 'Your deepest fear is being left — and it has quietly shaped everything.',
+        description: 'When the abandonment wound runs deep, you may over-attach, self-abandon to keep people close, or leave first before you can be left. The healing path is learning to be with yourself so fully — with such genuine warmth — that aloneness no longer feels like a death sentence.',
+        keywords: ['Attachment', 'Self-Soothing', 'Inner-Security', 'Presence', 'Belonging'],
+      },
+      rejection: {
+        title: 'The Rejection Wound',
+        emoji: '🌷',
+        tagline: 'You have carried the belief that you are not quite enough.',
+        description: 'The rejection wound whispers that there is something fundamentally unlovable about you — and it drives you to achieve, help, or perform in order to earn your place. The medicine is not more doing; it is the radical discovery that you belong simply by existing.',
+        keywords: ['Worthiness', 'Belonging', 'Self-Acceptance', 'Authenticity', 'Courage'],
+      },
+      humiliation: {
+        title: 'The Humiliation Wound',
+        emoji: '🌷',
+        tagline: 'You learned to hide or shrink yourself to stay safe.',
+        description: 'The humiliation wound often forms when you were mocked, shamed, or made to feel small at a formative moment. You may carry a powerful inner critic and a deep habit of staying invisible. Healing begins when you choose to be seen — imperfectly, vulnerably — and discover that the world does not end.',
+        keywords: ['Dignity', 'Visibility', 'Self-Compassion', 'Courage', 'Voice'],
+      },
+      betrayal: {
+        title: 'The Betrayal Wound',
+        emoji: '🌷',
+        tagline: 'Trust doesn\'t come easily — and it has been earned in blood.',
+        description: 'When betrayal has cut deep, the nervous system learns to scan for deception everywhere. You may be loyal to a fault while keeping a piece of yourself permanently guarded. The path forward is discernment: learning to distinguish truly trustworthy people from those who only appear that way.',
+        keywords: ['Trust', 'Discernment', 'Boundaries', 'Vulnerability', 'Healing'],
+      },
+      injustice: {
+        title: 'The Injustice Wound',
+        emoji: '🌷',
+        tagline: 'You have a fierce, aching sense of what is right — and what is not.',
+        description: 'The injustice wound is carried by those who experienced unfairness that was never acknowledged. You may be a passionate advocate for others while secretly wondering when someone will advocate for you. Healing includes turning that fierceness inward and becoming your own champion.',
+        keywords: ['Fairness', 'Advocacy', 'Integrity', 'Self-Compassion', 'Justice'],
+      },
+    },
+  },
+  {
+    id: 'enneagram',
+    emoji: '🔢',
+    title: "What's Your Enneagram Type?",
+    description: 'The Enneagram maps nine distinct personality structures — each with its own gifts, fears, and path toward wholeness.',
+    questions: [
+      {
+        text: 'Your primary motivation in life is…',
+        options: [
+          { label: 'To do what is right, ethical, and correct at all times', value: 'type1' },
+          { label: 'To be genuinely loved and to help those who matter to me', value: 'type2' },
+          { label: 'To succeed, be admired, and achieve something that matters', value: 'type3' },
+          { label: 'To express my authentic self and find deep meaning in my life', value: 'type4' },
+        ],
+      },
+      {
+        text: 'Your fundamental relationship with the world is…',
+        options: [
+          { label: 'Observer — I gather understanding before I act', value: 'type5' },
+          { label: 'Cautious — I seek security and look for what could go wrong', value: 'type6' },
+          { label: 'Expansive — there are too many adventures and possibilities to explore', value: 'type7' },
+          { label: 'Powerful — I take charge and protect the things and people I care about', value: 'type8' },
+        ],
+      },
+      {
+        text: 'When conflict arises in a group, you…',
+        options: [
+          { label: 'Try to restore harmony so everyone feels okay again', value: 'type9' },
+          { label: 'Point out what the right course of action clearly is', value: 'type1' },
+          { label: 'Focus on what each person is feeling and what they need right now', value: 'type2' },
+          { label: 'Shift into problem-solving mode to get things back on track', value: 'type3' },
+        ],
+      },
+      {
+        text: 'Your inner world is most dominated by…',
+        options: [
+          { label: 'A longing for beauty, depth, and what always seems to be missing', value: 'type4' },
+          { label: 'Curiosity, systems, and the pleasure of deep understanding', value: 'type5' },
+          { label: 'What-ifs, contingency plans, and assessing what could go wrong', value: 'type6' },
+          { label: 'A whirl of possibilities, ideas, and pleasurable anticipation', value: 'type7' },
+        ],
+      },
+      {
+        text: 'Your core fear is…',
+        options: [
+          { label: 'Being controlled, violated, or stripped of my power', value: 'type8' },
+          { label: 'Conflict, disharmony, and losing my sense of inner peace', value: 'type9' },
+          { label: 'Being wrong, flawed, or morally compromised', value: 'type1' },
+          { label: 'Being unwanted or unloved for who I truly am underneath', value: 'type2' },
+        ],
+      },
+      {
+        text: 'The shadow pattern you most wish you could change is…',
+        options: [
+          { label: 'Losing myself in roles, performance, and chasing others\' approval', value: 'type3' },
+          { label: 'Getting lost in melancholy and comparing my insides to others\' outsides', value: 'type4' },
+          { label: 'Hoarding energy and knowledge rather than fully engaging with life', value: 'type5' },
+          { label: 'Anxiety spirals and defaulting to worst-case-scenario thinking', value: 'type6' },
+        ],
+      },
+      {
+        text: 'What people most reliably count on you for is…',
+        options: [
+          { label: 'Energy, optimism, and the ability to make anything more alive', value: 'type7' },
+          { label: 'Strength, decisiveness, and willingness to stand up for what\'s right', value: 'type8' },
+          { label: 'Steadiness, calm, and the capacity to hold everyone\'s perspective', value: 'type9' },
+          { label: 'Integrity, precision, and holding everyone to a high standard', value: 'type1' },
+        ],
+      },
+      {
+        text: 'Your highest gift to the world is…',
+        options: [
+          { label: 'Unconditional love, generosity, and seeing others\' hidden potential', value: 'type2' },
+          { label: 'Inspiring people to aim higher through your example and achievement', value: 'type3' },
+          { label: 'Depth, authenticity, and the courage to name what others won\'t', value: 'type4' },
+          { label: 'Rare insight and the kind of knowledge that genuinely illuminates', value: 'type5' },
+        ],
+      },
+      {
+        text: 'In relationships, what you most need is…',
+        options: [
+          { label: 'Consistency, reliability, and someone I can trust completely', value: 'type6' },
+          { label: 'Freedom, adventure, and a partner who doesn\'t limit my possibilities', value: 'type7' },
+          { label: 'Honesty, respect, and someone who can handle my full intensity', value: 'type8' },
+          { label: 'Peace, acceptance, and ease — a relationship that doesn\'t demand too much', value: 'type9' },
+        ],
+      },
+    ],
+    results: {
+      type1: {
+        title: 'Type 1 — The Perfectionist',
+        emoji: '⚖️',
+        tagline: 'You came here to make things right.',
+        description: 'You carry a deep conviction that there is a right way to live and act — and you hold yourself to that standard relentlessly. Your gifts are integrity, precision, and a moral compass that doesn\'t waver. The invitation of your type is to discover that you are already good, even when nothing is perfect.',
+        keywords: ['Integrity', 'Ethics', 'Precision', 'Reform', 'Goodness'],
+      },
+      type2: {
+        title: 'Type 2 — The Helper',
+        emoji: '🌹',
+        tagline: 'Your love is your superpower and your sacrifice.',
+        description: 'You feel most alive when you are needed, and you give generously — sometimes too generously. Your gift is an extraordinary warmth and the ability to sense what others need before they name it. The invitation is to turn that same devotion inward and ask: what do I need?',
+        keywords: ['Love', 'Generosity', 'Care', 'Warmth', 'Service'],
+      },
+      type3: {
+        title: 'Type 3 — The Achiever',
+        emoji: '🏆',
+        tagline: 'You are here to shine — but beneath the shine lives your truest self.',
+        description: 'You move through the world with charm, efficiency, and an intuitive understanding of how to succeed. Your gift is the ability to inspire and get things done. The invitation of your type is to slow down and discover that you are loveable not for what you accomplish, but simply for who you are.',
+        keywords: ['Achievement', 'Adaptability', 'Ambition', 'Success', 'Excellence'],
+      },
+      type4: {
+        title: 'Type 4 — The Individualist',
+        emoji: '🎭',
+        tagline: 'You have the courage to feel what others won\'t.',
+        description: 'You experience life more intensely than most, drawn to beauty, depth, and authentic expression. Your gift is the ability to articulate the ineffable. The invitation of your type is to recognise that you are not fundamentally deficient — you are deeply, magnificently, irreducibly yourself.',
+        keywords: ['Authenticity', 'Depth', 'Beauty', 'Creativity', 'Feeling'],
+      },
+      type5: {
+        title: 'Type 5 — The Investigator',
+        emoji: '🔭',
+        tagline: 'You map the world through understanding.',
+        description: 'Your mind is a formidable instrument, and you feel safest when you understand how things work. You observe, analyse, and gather knowledge with rare precision. The invitation of your type is to step into the world you\'ve been studying — and share your gifts with people who need them.',
+        keywords: ['Knowledge', 'Analysis', 'Privacy', 'Expertise', 'Insight'],
+      },
+      type6: {
+        title: 'Type 6 — The Loyalist',
+        emoji: '🛡️',
+        tagline: 'Your faithfulness is one of the rarest gifts.',
+        description: 'You are a devoted ally, a careful planner, and someone who can sense danger before anyone else. Your gift is loyal, committed love and an exceptional ability to prepare for what others overlook. The invitation is to trust yourself as much as you trust the people and systems you rely on.',
+        keywords: ['Loyalty', 'Trust', 'Courage', 'Community', 'Discernment'],
+      },
+      type7: {
+        title: 'Type 7 — The Enthusiast',
+        emoji: '🎠',
+        tagline: 'Joy is your north star.',
+        description: 'You are vivid, multi-passionate, and fuelled by the endless feast of possibility this life offers. You bring aliveness wherever you go and refuse to be confined. The invitation of your type is to discover that staying fully with one beautiful thing — long enough to feel its depth — is freedom, not limitation.',
+        keywords: ['Joy', 'Freedom', 'Enthusiasm', 'Possibility', 'Adventure'],
+      },
+      type8: {
+        title: 'Type 8 — The Challenger',
+        emoji: '⚡',
+        tagline: 'You are here to protect, lead, and tell the truth.',
+        description: 'You move through the world with intensity, directness, and a refusal to be diminished. Your gift is strength, justice, and the courage to stand in the fire when others step back. The invitation of your type is to let your softness be seen — vulnerability in the right hands is the deepest power of all.',
+        keywords: ['Strength', 'Justice', 'Intensity', 'Protection', 'Leadership'],
+      },
+      type9: {
+        title: 'Type 9 — The Peacemaker',
+        emoji: '🕊️',
+        tagline: 'You carry peace as a gift — now share it with yourself.',
+        description: 'You have a rare capacity to hold multiple perspectives without judgment, and your presence is genuinely calming. Your gift is vast empathy and an instinct for harmony. The invitation of your type is to wake up fully to your own needs — and to discover that your voice matters as much as anyone else\'s.',
+        keywords: ['Peace', 'Harmony', 'Acceptance', 'Presence', 'Unity'],
+      },
+    },
+  },
+  {
+    id: 'dosha',
+    emoji: '🌺',
+    title: "What's Your Ayurvedic Dosha?",
+    description: 'Ayurveda describes three fundamental constitutions — Vata, Pitta, and Kapha — that shape body, mind, and spirit.',
+    questions: [
+      {
+        text: 'Your body type and build tends to be…',
+        options: [
+          { label: 'Slender and light, with a tendency to forget to eat when busy', value: 'vata' },
+          { label: 'Variable — my weight and appetite shift noticeably with the seasons', value: 'vata' },
+          { label: 'Medium and muscular, with a strong metabolism and reliable hunger', value: 'pitta' },
+          { label: 'Solid and sturdy, with a tendency to retain weight easily', value: 'kapha' },
+        ],
+      },
+      {
+        text: 'Under stress, your most recognisable pattern is…',
+        options: [
+          { label: 'I become irritable, sharp-tongued, or overly controlling', value: 'pitta' },
+          { label: 'I drive myself relentlessly until I eventually burn out', value: 'pitta' },
+          { label: 'I become scattered, anxious, and my mind races uncontrollably', value: 'vata' },
+          { label: 'I withdraw, comfort-eat, and become foggy and sluggish', value: 'kapha' },
+        ],
+      },
+      {
+        text: 'Your relationship with sleep is…',
+        options: [
+          { label: 'I love it — I could always do with more of it', value: 'kapha' },
+          { label: 'Heavy and long — I wake slowly and need time to truly begin', value: 'kapha' },
+          { label: 'Light and irregular — I fall asleep easily but wake often in the night', value: 'vata' },
+          { label: 'Moderate — I sleep reasonably well but my mind can be busy near bedtime', value: 'pitta' },
+        ],
+      },
+      {
+        text: 'Your natural pace and working style is…',
+        options: [
+          { label: 'Quick and variable — I move fast but tire and lose focus easily', value: 'vata' },
+          { label: 'Creative and erratic — I work in inspired bursts followed by crashes', value: 'vata' },
+          { label: 'Purposeful and driven — I stay on task until the goal is achieved', value: 'pitta' },
+          { label: 'Slow and steady — I prefer consistency and resist being rushed', value: 'kapha' },
+        ],
+      },
+      {
+        text: 'Your digestion tends to be…',
+        options: [
+          { label: 'Strong and urgent — I get very hungry and irritable if I miss meals', value: 'pitta' },
+          { label: 'Heat-sensitive — prone to acid, inflammation, or loose stools', value: 'pitta' },
+          { label: 'Irregular and uncomfortable — I bloat easily and often feel constipated', value: 'vata' },
+          { label: 'Slow but steady — I can go a long time without eating and feel fine', value: 'kapha' },
+        ],
+      },
+      {
+        text: 'When emotionally overwhelmed, your default mode is…',
+        options: [
+          { label: 'Holding on — I process slowly and find it very hard to let go', value: 'kapha' },
+          { label: 'Retreating inward — I go quiet and withdraw from everyone around me', value: 'kapha' },
+          { label: 'Anxiety and hypervigilance — my mind spirals and I can\'t stop it', value: 'vata' },
+          { label: 'Frustration and control — I need to fix or manage the situation immediately', value: 'pitta' },
+        ],
+      },
+      {
+        text: 'The climate you feel best in is…',
+        options: [
+          { label: 'Warm and humid — cold wind completely drains and depletes me', value: 'vata' },
+          { label: 'Sunny and gentle — I wilt in cold, dry, or harsh weather', value: 'vata' },
+          { label: 'Cool and temperate — I overheat and become uncomfortable easily', value: 'pitta' },
+          { label: 'Warm and dry — damp, cold weather makes me heavy and unmotivated', value: 'kapha' },
+        ],
+      },
+      {
+        text: 'Your learning and communication style is…',
+        options: [
+          { label: 'Sharp and focused — I love debate, precision, and being right', value: 'pitta' },
+          { label: 'Direct and concise — I dislike vagueness or wasted words', value: 'pitta' },
+          { label: 'Thoughtful and devoted — I learn slowly but retain almost everything', value: 'kapha' },
+          { label: 'Enthusiastic but scattered — I grasp ideas fast and forget them just as fast', value: 'vata' },
+        ],
+      },
+    ],
+    results: {
+      vata: {
+        title: 'Vata Dosha',
+        emoji: '🌬️',
+        tagline: 'You are the wind — creative, light, and always in motion.',
+        description: 'Vata types are the dreamers and creatives of Ayurveda: quick-minded, sensitive, and full of inspiration. When balanced, vata brings vibrancy and artistry. When out of balance, it turns to anxiety, scattered energy, and forgetting to eat or sleep. Your medicine is warmth, routine, oil, and rest.',
+        keywords: ['Creativity', 'Movement', 'Sensitivity', 'Lightness', 'Inspiration'],
+      },
+      pitta: {
+        title: 'Pitta Dosha',
+        emoji: '🔥',
+        tagline: 'You are the fire — focused, fierce, and transformative.',
+        description: 'Pitta types are the leaders and achievers of Ayurveda: sharp, passionate, and extraordinarily efficient. When balanced, pitta brings precision and drive. When out of balance it becomes irritability, perfectionism, and burnout. Your medicine is cooling practices, play, and the art of genuine surrender.',
+        keywords: ['Focus', 'Drive', 'Intelligence', 'Passion', 'Precision'],
+      },
+      kapha: {
+        title: 'Kapha Dosha',
+        emoji: '🌿',
+        tagline: 'You are the earth — steady, nourishing, and deeply enduring.',
+        description: 'Kapha types are the nurturers and stabilisers: loyal, patient, and capable of extraordinary love. When balanced, kapha brings grace and emotional resilience. When out of balance it slides into lethargy and attachment. Your medicine is movement, stimulation, and the courage to release what you\'ve outgrown.',
+        keywords: ['Stability', 'Nurture', 'Patience', 'Endurance', 'Loyalty'],
+      },
+    },
+  },
+  {
+    id: 'moon',
+    emoji: '🌙',
+    title: "Which Moon Phase Are You?",
+    description: 'The moon\'s four phases mirror the seasons of our inner life — discover which one you\'re living in right now.',
+    questions: [
+      {
+        text: 'Your current life chapter feels like…',
+        options: [
+          { label: 'A blank page — something is ending and I\'m between two identities', value: 'new' },
+          { label: 'A slow build — I sense momentum starting to gather around me', value: 'waxing' },
+          { label: 'A peak — I\'m in full expression and my life is visible to others', value: 'full' },
+          { label: 'A harvest — integrating, releasing, and composting what has passed', value: 'waning' },
+        ],
+      },
+      {
+        text: 'Your natural relationship with beginnings is…',
+        options: [
+          { label: 'I need silence and incubation before I can sense what wants to begin', value: 'new' },
+          { label: 'I get excited by fresh starts and dive straight into building', value: 'waxing' },
+          { label: 'I love being in the full expression of something already underway', value: 'full' },
+          { label: 'I value the clearing work — what must be released so the new can come', value: 'waning' },
+        ],
+      },
+      {
+        text: 'When you look at the night sky, you feel most drawn to…',
+        options: [
+          { label: 'The dark sky — the vast, quiet promise of what is invisible but coming', value: 'new' },
+          { label: 'The crescent — potential made visible, growing a little more each night', value: 'waxing' },
+          { label: 'The full moon — pure luminous presence and bold, radiant completion', value: 'full' },
+          { label: 'The waning light — beauty in the graceful process of letting go', value: 'waning' },
+        ],
+      },
+      {
+        text: 'Your social and relational energy right now is…',
+        options: [
+          { label: 'Quiet and deeply inward — I\'m in a cocoon of introspection', value: 'new' },
+          { label: 'Emerging — I\'m ready to connect but still finding my footing', value: 'waxing' },
+          { label: 'Open and radiant — I feel genuinely seen and want to be present', value: 'full' },
+          { label: 'Selective — I\'m shedding what no longer nourishes and choosing wisely', value: 'waning' },
+        ],
+      },
+      {
+        text: 'The spiritual theme of your current season is…',
+        options: [
+          { label: 'Seeds, fertile emptiness, and the courage to not know yet', value: 'new' },
+          { label: 'Effort, faith, and showing up for the growing thing', value: 'waxing' },
+          { label: 'Gratitude, illumination, and the full-bodied presence of now', value: 'full' },
+          { label: 'Surrender, wisdom, and the grace of sacred release', value: 'waning' },
+        ],
+      },
+      {
+        text: 'What you most need from your practice right now is…',
+        options: [
+          { label: 'Silence, rest, and writing about what wants to be born', value: 'new' },
+          { label: 'Action steps, accountability, and forward momentum', value: 'waxing' },
+          { label: 'Celebration, community, and showing up in your full power', value: 'full' },
+          { label: 'Forgiveness rituals, decluttering, and gentle but decisive releasing', value: 'waning' },
+        ],
+      },
+      {
+        text: 'Your current energy level feels like…',
+        options: [
+          { label: 'Still and quiet — the spark is present but not yet lit', value: 'new' },
+          { label: 'Activating — I\'m gaining strength and momentum with each day', value: 'waxing' },
+          { label: 'Full and radiant — I am at capacity, pouring my light out', value: 'full' },
+          { label: 'Gently receding — nourishing wisdom now rather than output', value: 'waning' },
+        ],
+      },
+      {
+        text: 'Your greatest gift to offer the world right now is…',
+        options: [
+          { label: 'Holding sacred space for what hasn\'t been born yet', value: 'new' },
+          { label: 'Turning vision into action with growing, joyful clarity', value: 'waxing' },
+          { label: 'Illuminating others with your full presence and generosity', value: 'full' },
+          { label: 'Distilling the wisdom of what has passed and releasing with grace', value: 'waning' },
+        ],
+      },
+    ],
+    results: {
+      new: {
+        title: 'New Moon',
+        emoji: '🌑',
+        tagline: 'You are between worlds — and that is exactly where magic begins.',
+        description: 'The new moon phase is the sacred pause before the next cycle begins. If this is your phase, you are in a liminal space — clearing what was, feeling into what wants to emerge, resting in fertile darkness. Don\'t rush the seed into flower. The most powerful work of new moon time is internal: dreaming, intending, and trusting the unknown.',
+        keywords: ['Beginnings', 'Intention', 'Rest', 'Potential', 'Renewal'],
+      },
+      waxing: {
+        title: 'Waxing Moon',
+        emoji: '🌒',
+        tagline: 'You are in your season of becoming.',
+        description: 'The waxing moon rises in energy and light, calling you into action and the brave work of building what you\'ve envisioned. If this is your phase, momentum is available — you\'re moving from seed to shoot. Take steps, show up, and let the growing light of your intention guide you forward.',
+        keywords: ['Growth', 'Momentum', 'Action', 'Building', 'Faith'],
+      },
+      full: {
+        title: 'Full Moon',
+        emoji: '🌕',
+        tagline: 'You are radiant, complete, and fully seen.',
+        description: 'The full moon is the apex of the cycle — a time of illumination, expression, and fullness. If this is your phase, you are at a peak: visible, potent, and pouring your light into the world. Celebrate, share, show up in your full power. And notice what the light also illuminates for release.',
+        keywords: ['Illumination', 'Gratitude', 'Expression', 'Fullness', 'Presence'],
+      },
+      waning: {
+        title: 'Waning Moon',
+        emoji: '🌘',
+        tagline: 'You are a master of sacred release.',
+        description: 'The waning moon is the phase of harvesting wisdom and graceful release. If this is your phase, you are not in decline — you are in deep integration. What has served its purpose? The waning moon asks you to release with gratitude so the new cycle can begin on clear, fertile ground.',
+        keywords: ['Release', 'Wisdom', 'Integration', 'Surrender', 'Clearing'],
+      },
+    },
+  },
+  {
+    id: 'goddess',
+    emoji: '🌸',
+    title: "Which Goddess Archetype Are You?",
+    description: 'Six goddess archetypes from Greek mythology offer a map of feminine power — discover which one lives most vividly within you.',
+    questions: [
+      {
+        text: 'Your deepest core need in life is…',
+        options: [
+          { label: 'Freedom, wild spaces, and the sovereignty of my own path', value: 'artemis' },
+          { label: 'Love, beauty, and the full experience of sensory pleasure', value: 'aphrodite' },
+          { label: 'Knowledge, strategy, and the satisfaction of hard problems', value: 'athena' },
+          { label: 'Depth, transformation, and the courage to face what lives in the dark', value: 'persephone' },
+        ],
+      },
+      {
+        text: 'Your relationship with home is…',
+        options: [
+          { label: 'I pour love into nourishing and providing for those in my care', value: 'demeter' },
+          { label: 'My sanctuary — a peaceful, beautifully ordered space is sacred to me', value: 'hestia' },
+          { label: 'A resting place between adventures — not somewhere to stay forever', value: 'artemis' },
+          { label: 'A pleasure palace — beauty, flowers, candles, and sensory delight', value: 'aphrodite' },
+        ],
+      },
+      {
+        text: 'When someone comes to you in crisis, you…',
+        options: [
+          { label: 'Assess the situation and offer a clear, strategic, practical plan', value: 'athena' },
+          { label: 'Sit with them in the darkness and help them find their own way through', value: 'persephone' },
+          { label: 'Feed them, care for them, and make sure all their needs are met', value: 'demeter' },
+          { label: 'Create a calm, safe, quiet container and offer steady, wordless presence', value: 'hestia' },
+        ],
+      },
+      {
+        text: 'The relationship dynamic that suits you most is…',
+        options: [
+          { label: 'Independent allies — we champion each other\'s freedom and separate goals', value: 'artemis' },
+          { label: 'Passionate union — magnetic, alive with feeling, and full of desire', value: 'aphrodite' },
+          { label: 'Meeting of minds — intellectual equals who genuinely challenge each other', value: 'athena' },
+          { label: 'Soul bond — a love that has survived hardship and grown deeper for it', value: 'persephone' },
+        ],
+      },
+      {
+        text: 'Your sacred space in nature is…',
+        options: [
+          { label: 'A fertile garden, orchard, or wild field overflowing with abundance', value: 'demeter' },
+          { label: 'A warm fireside or a still, candlelit room at the heart of a home', value: 'hestia' },
+          { label: 'A moonlit forest, a mountain trail, or the open wilderness at night', value: 'artemis' },
+          { label: 'The sea at sunset, a rose garden, anywhere achingly beautiful', value: 'aphrodite' },
+        ],
+      },
+      {
+        text: 'The quality you most wish to fully embody is…',
+        options: [
+          { label: 'Wisdom — to see with absolute clarity and act with deep discernment', value: 'athena' },
+          { label: 'Resilience — to have journeyed through the underworld and emerged whole', value: 'persephone' },
+          { label: 'Abundance — the capacity to give endlessly from a truly full heart', value: 'demeter' },
+          { label: 'Peace — the rare mastery of genuine inner stillness and deep contentment', value: 'hestia' },
+        ],
+      },
+    ],
+    results: {
+      artemis: {
+        title: 'Artemis',
+        emoji: '🏹',
+        tagline: 'Untamed, independent, and fiercely free.',
+        description: 'Artemis is the goddess of the hunt and the wild moon, devoted above all to her own freedom and the sovereignty of her path. As her archetype, you are self-directed, purposeful, and deeply uncomfortable with anything that cages you. You are most alive in nature, in pursuit of your goals, and in your own company.',
+        keywords: ['Freedom', 'Sovereignty', 'Purpose', 'Nature', 'Independence'],
+      },
+      aphrodite: {
+        title: 'Aphrodite',
+        emoji: '🌹',
+        tagline: 'You are love, beauty, and the magnetic power of desire.',
+        description: 'Aphrodite is the goddess of love and beauty, whose power lives in attraction, pleasure, and the celebration of what is most alive. As her archetype, you move through the world with warmth, aesthetic sensitivity, and a gift for creating beauty everywhere. Your invitation is to love abundantly — beginning with yourself.',
+        keywords: ['Love', 'Beauty', 'Desire', 'Pleasure', 'Magnetism'],
+      },
+      athena: {
+        title: 'Athena',
+        emoji: '🦉',
+        tagline: 'Strategy, wisdom, and the grace of the warrior-scholar.',
+        description: 'Athena is the goddess of wisdom and strategic warfare: clear-minded, capable, and unafraid of hard problems. As her archetype, you thrive in intellectual challenge, value fairness, and approach life with precision. You are a natural advisor — just remember that the heart\'s wisdom is equal to the mind\'s.',
+        keywords: ['Wisdom', 'Strategy', 'Clarity', 'Justice', 'Craft'],
+      },
+      persephone: {
+        title: 'Persephone',
+        emoji: '🌒',
+        tagline: 'You have walked into the dark and returned transformed.',
+        description: 'Persephone journeyed into the underworld and returned as queen of both realms. As her archetype, you are no stranger to transformation, loss, and the dark night of the soul. You carry a rare dual gift: the lightness of spring and the wisdom of one who has been through the fire.',
+        keywords: ['Transformation', 'Depth', 'Resilience', 'Duality', 'Rebirth'],
+      },
+      demeter: {
+        title: 'Demeter',
+        emoji: '🌾',
+        tagline: 'You are the earth\'s nourishment embodied.',
+        description: 'Demeter is the great mother goddess of the harvest, whose love sustains all life. As her archetype, you possess a profound instinct to nurture, provide, and create abundance for those in your care. Your love is fierce and your generosity is legendary. Remember to feed yourself as lavishly as you feed others.',
+        keywords: ['Nurture', 'Abundance', 'Love', 'Fertility', 'Devotion'],
+      },
+      hestia: {
+        title: 'Hestia',
+        emoji: '🕯️',
+        tagline: 'You are the sacred keeper of the inner flame.',
+        description: 'Hestia is the goddess of the hearth and inner life, whose domain is the quiet, sacred centre of all things. As her archetype, you require peace, order, and a space that is truly your own. Your gift to the world is the warm, grounded sanctuary of your presence.',
+        keywords: ['Peace', 'Sanctuary', 'Simplicity', 'Devotion', 'Stillness'],
+      },
+    },
+  },
+  {
+    id: 'ritual',
+    emoji: '🕯️',
+    title: "What's Your Ritual Style?",
+    description: 'Spiritual practice takes as many forms as there are practitioners — discover the style that resonates most deeply with you.',
+    questions: [
+      {
+        text: 'Your ideal ritual setting is…',
+        options: [
+          { label: 'Alone at my altar, in silence with candlelight and incense', value: 'solitary' },
+          { label: 'Outside — barefoot in a forest, by water, or under an open sky', value: 'nature' },
+          { label: 'In a circle with others who share my path and intentions', value: 'community' },
+          { label: 'At my desk or studio, surrounded by art supplies and beautiful materials', value: 'creative' },
+        ],
+      },
+      {
+        text: 'Your ritual most often includes…',
+        options: [
+          { label: 'Journaling, oracle cards, and deep private reflection', value: 'solitary' },
+          { label: 'Herbs, stones, the moon, and natural materials gathered on walks', value: 'nature' },
+          { label: 'Shared prayer, ceremony, or collective energy work', value: 'community' },
+          { label: 'Art-making, collage, music, or writing as a devotional offering', value: 'creative' },
+        ],
+      },
+      {
+        text: 'The moment you feel most connected to something sacred is…',
+        options: [
+          { label: 'In private stillness, when the outside world falls completely away', value: 'solitary' },
+          { label: 'When nature speaks and I am quiet enough to actually hear it', value: 'nature' },
+          { label: 'When I feel the field of a group aligned in the same intention', value: 'community' },
+          { label: 'When I lose myself in making something and forget what time it is', value: 'creative' },
+        ],
+      },
+      {
+        text: 'What drives your spiritual practice most deeply is…',
+        options: [
+          { label: 'Personal sovereignty — being the authority of my own inner life', value: 'solitary' },
+          { label: 'Reverence for the living Earth and her rhythms and seasons', value: 'nature' },
+          { label: 'The power and healing of shared spiritual experience', value: 'community' },
+          { label: 'The conviction that making something is the most honest form of prayer', value: 'creative' },
+        ],
+      },
+      {
+        text: 'If you could add one thing to your practice, it would be…',
+        options: [
+          { label: 'More uninterrupted time alone to go deep without interruption', value: 'solitary' },
+          { label: 'More time in wild, green places or near moving water', value: 'nature' },
+          { label: 'A soul circle, coven, or spiritual community to share my path with', value: 'community' },
+          { label: 'Permission to make my practice messier, weirder, and more artistic', value: 'creative' },
+        ],
+      },
+      {
+        text: 'Your altar or ritual space probably contains…',
+        options: [
+          { label: 'Candles, incense, oracle cards, and a cherished journal', value: 'solitary' },
+          { label: 'Crystals, feathers, dried flowers, and things gathered on walks', value: 'nature' },
+          { label: 'Shared objects, group photos, and a calendar full of ceremony dates', value: 'community' },
+          { label: 'Paints, collage paper, poetry books, and coloured pens', value: 'creative' },
+        ],
+      },
+      {
+        text: 'You feel spiritually depleted when…',
+        options: [
+          { label: 'I haven\'t had enough uninterrupted time alone to reset', value: 'solitary' },
+          { label: 'I\'ve been indoors too long, cut off from the living world', value: 'nature' },
+          { label: 'I\'m isolated and haven\'t shared sacred space with kindred souls', value: 'community' },
+          { label: 'I\'ve gone too long without making something from the heart', value: 'creative' },
+        ],
+      },
+      {
+        text: 'The phrase that best describes your spiritual life is…',
+        options: [
+          { label: '"Between me and the divine — no intermediary needed"', value: 'solitary' },
+          { label: '"The earth is my temple"', value: 'nature' },
+          { label: '"Where two or more are gathered, there is magic"', value: 'community' },
+          { label: '"To create is to pray"', value: 'creative' },
+        ],
+      },
+    ],
+    results: {
+      solitary: {
+        title: 'The Solitary Practitioner',
+        emoji: '🕯️',
+        tagline: 'Your sacred space lives within.',
+        description: 'You are most at home in private, silent practice: your altar, your journal, your candles, your own company. You don\'t need a tradition or a community to make your practice real — you are the ceremony. The invitation of this path is to trust your own authority as the most qualified guide of your spiritual life.',
+        keywords: ['Sovereignty', 'Privacy', 'Depth', 'Self-Trust', 'Ritual'],
+      },
+      nature: {
+        title: 'The Nature Mystic',
+        emoji: '🌿',
+        tagline: 'The earth is your altar and the sky is your church.',
+        description: 'Your spirituality is inseparable from the living world: the moon\'s phases, the forest\'s silence, the river\'s voice. You are most connected when barefoot on soil or watching the stars appear. The practice that nourishes you most is simply showing up for the world as it is — and letting it speak.',
+        keywords: ['Earth', 'Reverence', 'Presence', 'Cycles', 'Wildness'],
+      },
+      community: {
+        title: 'The Circle Keeper',
+        emoji: '🔮',
+        tagline: 'Magic multiplies when hearts align.',
+        description: 'You come alive spiritually in community: in circles, ceremonies, shared prayer, and the field of collective intention. You understand instinctively that some healing can only happen in the presence of others. Your gift is both building sacred containers and holding space for others to step into them.',
+        keywords: ['Community', 'Ceremony', 'Collective', 'Connection', 'Belonging'],
+      },
+      creative: {
+        title: 'The Creative Devotee',
+        emoji: '🎨',
+        tagline: 'Every act of creation is an act of prayer.',
+        description: 'For you, making is the most honest form of spirituality. Whether you paint, write, collage, or compose, the creative act is your meditation, your prayer, and your offering. You move between worlds when deep in the making — and the things you create carry more spirit than you may even realise.',
+        keywords: ['Creativity', 'Making', 'Expression', 'Prayer', 'Beauty'],
+      },
+    },
+  },
+  {
+    id: 'nervous',
+    emoji: '💫',
+    title: "What Does Your Nervous System Need?",
+    description: 'Your nervous system speaks a specific language — discover the kind of nourishment that genuinely restores and regulates you.',
+    questions: [
+      {
+        text: 'When you\'re overwhelmed, your body most clearly wants…',
+        options: [
+          { label: 'To lie down, do nothing, and let time pass without demands', value: 'rest' },
+          { label: 'To go for a walk, shake something loose, or move physically', value: 'movement' },
+          { label: 'To call a friend and talk through what I\'m feeling out loud', value: 'connection' },
+          { label: 'To be alone, in quiet, far from any input or expectation', value: 'solitude' },
+        ],
+      },
+      {
+        text: 'Your nervous system feels most regulated when…',
+        options: [
+          { label: 'I\'ve had enough sleep and genuine unstructured time', value: 'rest' },
+          { label: 'I\'ve moved my body in some intentional way today', value: 'movement' },
+          { label: 'I feel genuinely seen and understood by another person', value: 'connection' },
+          { label: 'I\'ve had long, uninterrupted stretches of alone time', value: 'solitude' },
+        ],
+      },
+      {
+        text: 'After a draining social event, you recover by…',
+        options: [
+          { label: 'A long nap or an early bedtime — sleep restores me', value: 'rest' },
+          { label: 'A solo workout or brisk walk to discharge the built-up energy', value: 'movement' },
+          { label: 'A debrief with one trusted person to process what happened', value: 'connection' },
+          { label: 'Complete silence and zero interaction until I feel myself again', value: 'solitude' },
+        ],
+      },
+      {
+        text: 'Your body\'s most familiar stress signal is…',
+        options: [
+          { label: 'Bone-deep exhaustion and real difficulty getting out of bed', value: 'rest' },
+          { label: 'Restlessness, tension in my muscles, or an urge to fidget', value: 'movement' },
+          { label: 'A longing ache — wanting to be truly heard and held', value: 'connection' },
+          { label: 'Overwhelm from too many people, sounds, and competing demands', value: 'solitude' },
+        ],
+      },
+      {
+        text: 'The practice you consistently return to when depleted is…',
+        options: [
+          { label: 'Napping, gentle stretching, or giving myself permission to do nothing', value: 'rest' },
+          { label: 'Running, dancing, yoga, or any form of intentional physical movement', value: 'movement' },
+          { label: 'Long conversations, shared meals, or meaningful community spaces', value: 'connection' },
+          { label: 'Solo time in nature, journaling, or long reflective walks alone', value: 'solitude' },
+        ],
+      },
+      {
+        text: 'You know you\'re genuinely thriving when…',
+        options: [
+          { label: 'I\'m sleeping deeply and waking up feeling genuinely restored', value: 'rest' },
+          { label: 'My body feels alive, energised, and truly free', value: 'movement' },
+          { label: 'My relationships feel rich, nourishing, and reciprocal', value: 'connection' },
+          { label: 'I have long stretches of inner quiet and creative freedom', value: 'solitude' },
+        ],
+      },
+      {
+        text: 'The phrase that best captures your nervous system right now is…',
+        options: [
+          { label: '"I am running on empty and need to completely stop"', value: 'rest' },
+          { label: '"I feel stuck in my body and need to shake something loose"', value: 'movement' },
+          { label: '"I am lonely — even in rooms full of people"', value: 'connection' },
+          { label: '"The world is too loud and I can\'t find my own signal in the noise"', value: 'solitude' },
+        ],
+      },
+      {
+        text: 'If you could prescribe yourself one week of healing, it would be…',
+        options: [
+          { label: 'Total rest — no schedule, no obligations, no screens, no demands', value: 'rest' },
+          { label: 'Active restoration — hiking, swimming, dancing, embodied movement', value: 'movement' },
+          { label: 'Deep community — meaningful conversation and shared daily ritual', value: 'connection' },
+          { label: 'A silent retreat alone in nature with no one else around', value: 'solitude' },
+        ],
+      },
+    ],
+    results: {
+      rest: {
+        title: 'Deep Rest',
+        emoji: '🌙',
+        tagline: 'Your system is asking you to stop — and that is wisdom.',
+        description: 'Your nervous system is waving a white flag, and the most rebellious and healing thing you can do right now is to rest without guilt. True rest — not passive scrolling but genuine restoration — is the medicine. Protect space for unstructured naps, early bedtimes, and the radical act of doing absolutely nothing.',
+        keywords: ['Rest', 'Restoration', 'Slowness', 'Surrender', 'Renewal'],
+      },
+      movement: {
+        title: 'Embodied Movement',
+        emoji: '🌊',
+        tagline: 'Your body is your medicine.',
+        description: 'Your nervous system speaks the language of the body, and right now it is asking you to move — not as exercise, but as release. Dance, walk, shake, swim, stretch: anything that helps your body discharge what your mind can\'t process. Your body holds the wisdom your thoughts can\'t reach.',
+        keywords: ['Movement', 'Embodiment', 'Release', 'Energy', 'Vitality'],
+      },
+      connection: {
+        title: 'Nourishing Connection',
+        emoji: '💞',
+        tagline: 'You heal in relationship.',
+        description: 'Your nervous system is regulated by co-regulation — the ancient nourishment of being truly seen, heard, and held by another person. You need real connection right now: not performance or scrolling, but genuine presence with someone who knows how to meet you. Reach out. Let yourself be held.',
+        keywords: ['Connection', 'Co-Regulation', 'Belonging', 'Love', 'Community'],
+      },
+      solitude: {
+        title: 'Sacred Solitude',
+        emoji: '🌲',
+        tagline: 'Silence is your most powerful resource.',
+        description: 'Your nervous system is overwhelmed by input — too many voices, demands, and external frequencies competing for your signal. What you need is not more — it is less. Sacred solitude: time alone in quiet, in nature, away from screens and others\' needs. In the silence, you will find yourself again.',
+        keywords: ['Solitude', 'Quiet', 'Silence', 'Boundaries', 'Restoration'],
+      },
+    },
+  },
+  {
+    id: 'love',
+    emoji: '💌',
+    title: "What's Your Love Language?",
+    description: 'Gary Chapman\'s five love languages describe the ways we most deeply give and receive love — which one speaks to your heart?',
+    questions: [
+      {
+        text: 'You feel most genuinely loved when someone…',
+        options: [
+          { label: 'Tells you exactly what they love and appreciate about you', value: 'words' },
+          { label: 'Quietly handles something from your to-do list without being asked', value: 'acts' },
+          { label: 'Brings you something — anything — that shows you were on their mind', value: 'gifts' },
+          { label: 'Gives you their full, undivided, phone-down attention', value: 'time' },
+        ],
+      },
+      {
+        text: 'The gesture that genuinely melts your heart is…',
+        options: [
+          { label: 'A spontaneous hug or a gentle, affectionate touch in passing', value: 'touch' },
+          { label: 'A heartfelt handwritten note that arrives completely out of nowhere', value: 'words' },
+          { label: 'Someone picking you up from somewhere without being asked', value: 'acts' },
+          { label: 'A small, perfectly chosen gift that shows they truly know you', value: 'gifts' },
+        ],
+      },
+      {
+        text: 'You feel most disconnected in a relationship when…',
+        options: [
+          { label: 'You\'re physically together but you\'re both lost in your phones', value: 'time' },
+          { label: 'There\'s been no physical closeness or affection for too long', value: 'touch' },
+          { label: 'Appreciation and genuine affirmation have completely dried up', value: 'words' },
+          { label: 'You feel like you\'re managing everything alone with no practical support', value: 'acts' },
+        ],
+      },
+      {
+        text: 'In a difficult conversation, what matters most to you is…',
+        options: [
+          { label: 'Receiving a thoughtful gesture that signals they want to make it right', value: 'gifts' },
+          { label: 'Sitting together without any rush until it\'s truly worked through', value: 'time' },
+          { label: 'Being held or touched — it communicates what words simply can\'t', value: 'touch' },
+          { label: 'Hearing the words clearly: "I love you. I\'m sorry. You matter."', value: 'words' },
+        ],
+      },
+      {
+        text: 'Your partner\'s most romantic gesture would be…',
+        options: [
+          { label: 'Planning every detail of a special day so I don\'t have to think', value: 'acts' },
+          { label: 'Surprising me with something unexpected and completely "me"', value: 'gifts' },
+          { label: 'Carving out an entire uninterrupted day just to be together', value: 'time' },
+          { label: 'A long, lingering embrace — no rush, no agenda, just presence', value: 'touch' },
+        ],
+      },
+      {
+        text: 'When you\'re having a hard time, you most need…',
+        options: [
+          { label: 'To hear: "I see you, I love you, you are not alone in this"', value: 'words' },
+          { label: 'Someone showing up and doing something practical to help', value: 'acts' },
+          { label: 'A care package or thoughtful token — proof you were thought of', value: 'gifts' },
+          { label: 'Quiet company — someone who sits with you and simply stays', value: 'time' },
+        ],
+      },
+      {
+        text: 'After a long, hard week, your ideal Sunday morning looks like…',
+        options: [
+          { label: 'Slow morning cuddles and easy physical warmth throughout the day', value: 'touch' },
+          { label: 'A long conversation where you feel genuinely and fully understood', value: 'words' },
+          { label: 'Someone else cooking breakfast and handling all the chores', value: 'acts' },
+          { label: 'Being given something beautiful and thoughtful — flowers, a favourite treat', value: 'gifts' },
+        ],
+      },
+      {
+        text: 'You feel most loved in friendship when…',
+        options: [
+          { label: 'A friend clears their whole afternoon just to spend it with you', value: 'time' },
+          { label: 'Someone greets you with a real hug and reaches for your hand', value: 'touch' },
+          { label: 'A friend tells you, unprompted, how much you truly mean to them', value: 'words' },
+          { label: 'Someone shows up for you practically, without needing to be asked', value: 'acts' },
+        ],
+      },
+    ],
+    results: {
+      words: {
+        title: 'Words of Affirmation',
+        emoji: '💌',
+        tagline: 'Language is your love — speak it and receive it freely.',
+        description: 'Words are not small things to you: they carry weight, meaning, and the power to heal or wound. You feel most loved when someone takes the time to articulate what you mean to them — and most cherished when that expression is specific, sincere, and spontaneous. Ask for the words you need. They are a gift you deserve.',
+        keywords: ['Affirmation', 'Expression', 'Language', 'Recognition', 'Communication'],
+      },
+      acts: {
+        title: 'Acts of Service',
+        emoji: '🌻',
+        tagline: 'Love, for you, is made visible through thoughtful action.',
+        description: 'You feel most loved when someone rolls up their sleeves and shows up practically — not because they have to, but because they noticed. The unasked-for action, the burden quietly lifted, the task done with care: these are the love letters your heart has been waiting for. Ask for help, and receive it as love.',
+        keywords: ['Service', 'Action', 'Care', 'Thoughtfulness', 'Support'],
+      },
+      gifts: {
+        title: 'Receiving Gifts',
+        emoji: '🎁',
+        tagline: 'A gift is a symbol — proof that someone thought of you.',
+        description: 'For you, the gift is never really about the object — it\'s about what the object represents: that someone was thinking of you when you weren\'t there. You don\'t need extravagance; you need intention. Let yourself be delighted by what people choose for you — it is love made tangible.',
+        keywords: ['Thoughtfulness', 'Symbol', 'Remembrance', 'Delight', 'Appreciation'],
+      },
+      time: {
+        title: 'Quality Time',
+        emoji: '⌛',
+        tagline: 'Your love language is undivided presence.',
+        description: 'For you, the most profound act of love is full attention: no phone, no distraction, just two people genuinely present with each other. You don\'t want to be half-listened to — you want to feel like the only person in the world, for this moment. Protect this in your relationships, and ask for it without apology.',
+        keywords: ['Presence', 'Attention', 'Devotion', 'Connection', 'Depth'],
+      },
+      touch: {
+        title: 'Physical Touch',
+        emoji: '🤍',
+        tagline: 'Your body knows love — and asks to feel it.',
+        description: 'Touch is not superficial for you — it is the most direct channel to your heart. A hand on your shoulder, a long hug, a gentle touch in passing: these are the grammar of love your nervous system understands most fluently. You are deeply nourished by physical warmth, and you have every right to ask for it.',
+        keywords: ['Touch', 'Warmth', 'Safety', 'Comfort', 'Presence'],
+      },
+    },
+  },
+  {
+    id: 'shadow',
+    emoji: '🌑',
+    title: "Which Shadow Archetype Is Active?",
+    description: 'Carl Jung identified the shadow as the parts of ourselves we disown — discovering yours is the first step toward integrating it.',
+    questions: [
+      {
+        text: 'Under pressure, the voice in your head tends to say…',
+        options: [
+          { label: '"It\'s not good enough — do it again, do it properly"', value: 'perfectionist' },
+          { label: '"No one appreciates how much I do — I carry this alone"', value: 'martyr' },
+          { label: '"If they won\'t handle it correctly, I\'ll just take over myself"', value: 'tyrant' },
+          { label: '"I can\'t deal with this right now — I need to check out"', value: 'escapist' },
+        ],
+      },
+      {
+        text: 'Your most recognisable coping mechanism is…',
+        options: [
+          { label: 'Working harder, refining obsessively, and refusing to submit until it\'s perfect', value: 'perfectionist' },
+          { label: 'Sacrificing my own needs for others and then feeling quietly resentful', value: 'martyr' },
+          { label: 'Taking control of the situation and the people around me', value: 'tyrant' },
+          { label: 'Numbing out through food, screens, fantasy, or anything that distracts', value: 'escapist' },
+        ],
+      },
+      {
+        text: 'Your shadow shows up in relationships most through…',
+        options: [
+          { label: 'Criticising, correcting, or holding everyone to impossible standards', value: 'perfectionist' },
+          { label: 'Over-giving and then collapsing in unexpressed, silent suffering', value: 'martyr' },
+          { label: 'Intimidating or dominating to avoid the vulnerability of needing someone', value: 'tyrant' },
+          { label: 'Disappearing into distraction when difficult conversations arise', value: 'escapist' },
+        ],
+      },
+      {
+        text: 'At its root, your shadow is protecting you from…',
+        options: [
+          { label: 'The terror of being found flawed, wrong, or fundamentally not enough', value: 'perfectionist' },
+          { label: 'The fear that if you stop giving, you will stop being loved', value: 'martyr' },
+          { label: 'The deep vulnerability of genuinely needing another person', value: 'tyrant' },
+          { label: 'The pain of being fully present inside a difficult reality', value: 'escapist' },
+        ],
+      },
+      {
+        text: 'Others sometimes experience you as…',
+        options: [
+          { label: 'Overly critical, rigid, or simply impossible to satisfy', value: 'perfectionist' },
+          { label: 'Quietly resentful or subtly passive-aggressive', value: 'martyr' },
+          { label: 'Controlling, forceful, or overwhelming to be around', value: 'tyrant' },
+          { label: 'Emotionally absent, unreliable, or impossible to fully reach', value: 'escapist' },
+        ],
+      },
+      {
+        text: 'When a project or plan isn\'t going as intended, you…',
+        options: [
+          { label: 'Fixate on the flaws and find it nearly impossible to declare it done', value: 'perfectionist' },
+          { label: 'Take on all the extra work yourself and say nothing about it', value: 'martyr' },
+          { label: 'Intervene aggressively and override the people responsible', value: 'tyrant' },
+          { label: 'Quietly disengage or pretend to yourself that it no longer matters', value: 'escapist' },
+        ],
+      },
+      {
+        text: 'The gift hidden inside your shadow is…',
+        options: [
+          { label: 'An exceptional eye for quality and a genuine commitment to excellence', value: 'perfectionist' },
+          { label: 'Profound generosity and the capacity to love without keeping score', value: 'martyr' },
+          { label: 'Natural leadership, strength, and the courage to take decisive action', value: 'tyrant' },
+          { label: 'Extraordinary creativity and the ability to access other worlds', value: 'escapist' },
+        ],
+      },
+      {
+        text: 'Your shadow heals when you learn to…',
+        options: [
+          { label: 'Embrace "good enough" and discover that love is not conditional on performance', value: 'perfectionist' },
+          { label: 'Receive as generously as you give, and name your needs without shame', value: 'martyr' },
+          { label: 'Allow yourself to be vulnerable and trust others with your soft underbelly', value: 'tyrant' },
+          { label: 'Stay present with discomfort long enough to let it actually transform you', value: 'escapist' },
+        ],
+      },
+    ],
+    results: {
+      perfectionist: {
+        title: 'The Perfectionist Shadow',
+        emoji: '⚖️',
+        tagline: 'Excellence is your gift — and your cage.',
+        description: 'The perfectionist shadow drives you toward the best — and then refuses to let you rest once you arrive. Behind the impossible standards lives a wounded belief: that love is conditional on performance. Your liberation begins when you discover that you are loveable in your incompleteness too.',
+        keywords: ['Excellence', 'Standards', 'Self-Compassion', 'Release', 'Worthiness'],
+      },
+      martyr: {
+        title: 'The Martyr Shadow',
+        emoji: '🌹',
+        tagline: 'You give beautifully — but at a cost to yourself.',
+        description: 'The martyr shadow is not without love — it is love that has been routed entirely outward, with nothing remaining for the self. You sacrifice and over-give, then feel the quiet burn of resentment no one sees. The invitation is radical: to receive as much as you give, and to discover that your needs are equally sacred.',
+        keywords: ['Giving', 'Self-Care', 'Receiving', 'Boundaries', 'Compassion'],
+      },
+      tyrant: {
+        title: 'The Tyrant Shadow',
+        emoji: '⚡',
+        tagline: 'Your strength, unchecked, becomes control.',
+        description: 'The tyrant shadow emerges when a wound around powerlessness is left unhealed. You lead, push, and take over because deep inside, being in control feels like the only way to be safe. The healing happens when you let yourself be vulnerable — and discover that trust does not destroy you.',
+        keywords: ['Power', 'Vulnerability', 'Trust', 'Leadership', 'Transformation'],
+      },
+      escapist: {
+        title: 'The Escapist Shadow',
+        emoji: '🌙',
+        tagline: 'Your imagination is sacred — and also a hiding place.',
+        description: 'The escapist shadow has a genuine gift: an extraordinary interior world of creativity and imagination. But it has also learned to use that world to disappear when life becomes too hard. The invitation is not to give up your inner life, but to bring it into contact with reality — where your gifts can actually transform things.',
+        keywords: ['Creativity', 'Presence', 'Courage', 'Reality', 'Imagination'],
+      },
+    },
+  },
+  {
+    id: 'hd',
+    emoji: '💎',
+    title: "What's Your Human Design Type?",
+    description: 'Human Design synthesises astrology, the I Ching, Kabbalah, and the chakra system into a unique map of how your energy works.',
+    questions: [
+      {
+        text: 'Your relationship with work and your energy is best described as…',
+        options: [
+          { label: 'I work best when I wait for something to genuinely light me up — gut-yes or nothing', value: 'generator' },
+          { label: 'I\'m most alive juggling multiple passions at full speed and pivoting freely', value: 'manifesting_generator' },
+          { label: 'I need to initiate things myself — waiting for permission or prompts drains me', value: 'manifestor' },
+          { label: 'I work best in focused bursts when I feel recognised and genuinely invited', value: 'projector' },
+        ],
+      },
+      {
+        text: 'When making major decisions, your approach is…',
+        options: [
+          { label: 'I wait a full lunar cycle — the truth reveals itself slowly through time', value: 'reflector' },
+          { label: 'My gut responds — a clear physical yes or no I can feel in my body', value: 'generator' },
+          { label: 'I test it by acting — I know what fits by how it feels in motion', value: 'manifesting_generator' },
+          { label: 'I follow the impulse — I know what I want to initiate and I act', value: 'manifestor' },
+        ],
+      },
+      {
+        text: 'Your relationship with rest is…',
+        options: [
+          { label: 'I must rest often — I absorb others\' energy and need to discharge it', value: 'projector' },
+          { label: 'I\'m deeply affected by lunar rhythms and honour them in my schedule', value: 'reflector' },
+          { label: 'I rest when my sacral energy is truly empty — not a moment before', value: 'generator' },
+          { label: 'I skip between projects — variety and change of scene is my rest', value: 'manifesting_generator' },
+        ],
+      },
+      {
+        text: 'People tend to experience your energy as…',
+        options: [
+          { label: 'Powerful and initiating — sometimes hard to predict or pin down', value: 'manifestor' },
+          { label: 'Perceptive and guiding — deeply insightful about others\' potential', value: 'projector' },
+          { label: 'Fluid and reflective — taking on the colour of whoever is around me', value: 'reflector' },
+          { label: 'Warm and reliable — consistently energised when doing work I love', value: 'generator' },
+        ],
+      },
+      {
+        text: 'Your natural role in any group or team is…',
+        options: [
+          { label: 'The multi-passionate force who sparks energy and isn\'t afraid to pivot', value: 'manifesting_generator' },
+          { label: 'The visionary who sets things in motion without waiting for permission', value: 'manifestor' },
+          { label: 'The guide who sees the whole system and knows how to make it work', value: 'projector' },
+          { label: 'The mirror who reflects the group\'s health and wellbeing back to it', value: 'reflector' },
+        ],
+      },
+      {
+        text: 'When you\'re living in true alignment, you feel…',
+        options: [
+          { label: 'Satisfied — deeply lit-up and engaged with the work I\'m building', value: 'generator' },
+          { label: 'Fulfilled — in joyful flow between many things I genuinely love', value: 'manifesting_generator' },
+          { label: 'At peace — initiating freely without resistance or pushback', value: 'manifestor' },
+          { label: 'Successful — recognised, valued, and invited to contribute my gifts', value: 'projector' },
+        ],
+      },
+      {
+        text: 'Your core growth challenge is…',
+        options: [
+          { label: 'Knowing which feelings and energies are truly mine versus those I\'ve absorbed', value: 'reflector' },
+          { label: 'Patience — waiting to respond rather than acting from my head', value: 'generator' },
+          { label: 'Completing what I start before racing to the next exciting thing', value: 'manifesting_generator' },
+          { label: 'Informing others before I act, to reduce unnecessary resistance', value: 'manifestor' },
+        ],
+      },
+      {
+        text: 'Your greatest gift to the people around you is…',
+        options: [
+          { label: 'Seeing people more clearly than they see themselves', value: 'projector' },
+          { label: 'Sensing the health of any environment with uncommon accuracy', value: 'reflector' },
+          { label: 'Sustaining infectious enthusiasm that lifts the energy of any team', value: 'generator' },
+          { label: 'Proving what becomes possible when you refuse to be put in a box', value: 'manifesting_generator' },
+        ],
+      },
+    ],
+    results: {
+      generator: {
+        title: 'Generator',
+        emoji: '⚡',
+        tagline: 'You are the life force — here to respond and build.',
+        description: 'Generators are the builders and sustainers of the world, with a powerful sacral energy that replenishes itself when engaged with work that genuinely lights them up. Your strategy is to wait for something to respond to — to let your gut lead. When you honour the gut yes and the gut no, you move from frustration into deep, abiding satisfaction.',
+        keywords: ['Sustainability', 'Response', 'Satisfaction', 'Energy', 'Mastery'],
+      },
+      manifesting_generator: {
+        title: 'Manifesting Generator',
+        emoji: '🔥',
+        tagline: 'You are a multi-passionate force of nature.',
+        description: 'Manifesting Generators carry the creative fire of both Generator and Manifestor: sacral life-force energy plus the capacity to initiate. You are built for speed, multiple passions, and pivoting when something no longer lights you up. Your strategy is to respond first, then inform. Your signature is fulfilment.',
+        keywords: ['Versatility', 'Speed', 'Passion', 'Fulfilment', 'Momentum'],
+      },
+      manifestor: {
+        title: 'Manifestor',
+        emoji: '🌟',
+        tagline: 'You are here to initiate — not to wait for permission.',
+        description: 'Manifestors are the original initiators: those who can act from pure impulse and set entire chains of events into motion. Your strategy is to inform those around you before you act — not to ask permission, but to reduce the resistance your powerful, closed aura can otherwise generate. Your signature is peace.',
+        keywords: ['Initiation', 'Independence', 'Impact', 'Trailblazing', 'Peace'],
+      },
+      projector: {
+        title: 'Projector',
+        emoji: '🔭',
+        tagline: 'You are a natural guide — here to see and be seen.',
+        description: 'Projectors have a penetrating, focused aura designed to read, understand, and guide others. You see into systems and people with rare clarity — but your energy is not limitless. Your strategy is to wait for recognition and invitation before sharing your gifts. When recognised and invited, your guidance is extraordinary.',
+        keywords: ['Guidance', 'Recognition', 'Insight', 'Efficiency', 'Wisdom'],
+      },
+      reflector: {
+        title: 'Reflector',
+        emoji: '🌕',
+        tagline: 'You are a mirror of the cosmos — rare and luminous.',
+        description: 'Reflectors are the rarest type in Human Design, making up just 1% of the population. With no defined centres, you are completely open — sampling the energy around you and reflecting the health of your environment back to it. Your strategy is to wait a full lunar cycle before major decisions. You are deeply shaped by where and with whom you spend your time.',
+        keywords: ['Openness', 'Reflection', 'Sensitivity', 'Rarity', 'Wisdom'],
+      },
+    },
+  },
+  {
+    id: 'practice',
+    emoji: '⭐',
+    title: "Which Daily Practice Suits You?",
+    description: 'Discover the daily spiritual practice that genuinely fits your nature — the one you\'ll actually want to return to.',
+    questions: [
+      {
+        text: 'Your ideal first 20 minutes of the morning looks like…',
+        options: [
+          { label: 'Writing — morning pages, gratitude, or stream-of-consciousness journaling', value: 'journaling' },
+          { label: 'Drawing a card and sitting quietly with its message for the day ahead', value: 'oracle' },
+          { label: 'Sitting in stillness — breathing, just being, before the day begins', value: 'meditation' },
+          { label: 'Moving my body — stretching, yoga, or a walk outside to wake up', value: 'movement' },
+        ],
+      },
+      {
+        text: 'Your spiritual growth happens most reliably through…',
+        options: [
+          { label: 'Writing — I discover what I think and feel when I see it on the page', value: 'journaling' },
+          { label: 'Symbols and archetypes — the language of the intuitive, non-linear mind', value: 'oracle' },
+          { label: 'Silence and inner listening — the truth lives between thoughts', value: 'meditation' },
+          { label: 'My body — it processes what my mind can\'t and leads me home', value: 'movement' },
+        ],
+      },
+      {
+        text: 'You feel most genuinely grounded after…',
+        options: [
+          { label: 'Getting everything out of my head and onto paper', value: 'journaling' },
+          { label: 'Working with a deck that gives language to what I can\'t yet name', value: 'oracle' },
+          { label: 'Even a five-minute sit — it returns me to myself completely', value: 'meditation' },
+          { label: 'Physical exertion of any kind — my body is my deepest anchor', value: 'movement' },
+        ],
+      },
+      {
+        text: 'If stranded on a desert island, the tool you\'d want is…',
+        options: [
+          { label: 'My favourite journal and a good pen', value: 'journaling' },
+          { label: 'A deck of oracle or tarot cards', value: 'oracle' },
+          { label: 'A meditation cushion and unbroken silence', value: 'meditation' },
+          { label: 'My running shoes or a yoga mat', value: 'movement' },
+        ],
+      },
+      {
+        text: 'What you most seek from a daily practice is…',
+        options: [
+          { label: 'Clarity, self-understanding, and genuine integration of experience', value: 'journaling' },
+          { label: 'Guidance, inspiration, and a daily touch of the mysterious', value: 'oracle' },
+          { label: 'Inner peace, presence, and relief from the noise of my own mind', value: 'meditation' },
+          { label: 'Physical energy, groundedness, and embodied vitality', value: 'movement' },
+        ],
+      },
+      {
+        text: 'The spiritual teachers or tools that call to you most are…',
+        options: [
+          { label: 'Julia Cameron, Anaïs Nin, or anyone who champions the written self', value: 'journaling' },
+          { label: 'Pam Colman Smith, Kim Krans, or any visionary oracle creator', value: 'oracle' },
+          { label: 'Thich Nhat Hanh, Tara Brach, or any true mindfulness teacher', value: 'meditation' },
+          { label: 'Somatic therapists, embodiment teachers, or movement healers', value: 'movement' },
+        ],
+      },
+      {
+        text: 'The time of day you most want to protect for your practice is…',
+        options: [
+          { label: 'Early morning — before the world and its demands get in', value: 'journaling' },
+          { label: 'Evening — when the veil between worlds grows naturally thinner', value: 'oracle' },
+          { label: 'Any quiet pocket — morning, midday, or just before sleep', value: 'meditation' },
+          { label: 'Midday or end of day — when my body is asking to shift its energy', value: 'movement' },
+        ],
+      },
+      {
+        text: 'What you most want your practice to give you is…',
+        options: [
+          { label: 'A record of your becoming — proof of your own depth over time', value: 'journaling' },
+          { label: 'A daily conversation with your higher self through symbol and image', value: 'oracle' },
+          { label: 'The peace that passes understanding, returned to again and again', value: 'meditation' },
+          { label: 'A body that genuinely feels like home, every single day', value: 'movement' },
+        ],
+      },
+    ],
+    results: {
+      journaling: {
+        title: 'Daily Journaling',
+        emoji: '📓',
+        tagline: 'The page is your most faithful spiritual companion.',
+        description: 'You process the world through words. Writing is not just a hobby — it is how you discover what you actually think, integrate what you feel, and hear the voice of your own wisdom. A daily journaling practice is not about productivity; it is about maintaining the dialogue with yourself that makes your inner life legible.',
+        keywords: ['Reflection', 'Clarity', 'Expression', 'Integration', 'Self-Knowledge'],
+      },
+      oracle: {
+        title: 'Oracle Practice',
+        emoji: '🃏',
+        tagline: 'You think in archetypes and speak in symbols.',
+        description: 'Your intuition is primed for the symbolic and the archetypal. Working with oracle or tarot cards is not about prediction — it is about giving your subconscious mind a doorway to speak through. A daily card draw becomes a living dialogue with the deeper self, offering a new lens through which to interpret the day.',
+        keywords: ['Intuition', 'Symbols', 'Archetype', 'Guidance', 'Mystery'],
+      },
+      meditation: {
+        title: 'Daily Meditation',
+        emoji: '🧘',
+        tagline: 'Stillness is your superpower.',
+        description: 'You are most yourself in the pause between thoughts. A daily meditation practice is your most direct route to the inner quiet where decisions are clear, anxiety softens, and life regains its spaciousness. You don\'t need to master meditation — you only need to sit down, and return to the breath whenever you wander.',
+        keywords: ['Stillness', 'Presence', 'Peace', 'Clarity', 'Mindfulness'],
+      },
+      movement: {
+        title: 'Movement Practice',
+        emoji: '🌊',
+        tagline: 'Your body is your primary teacher.',
+        description: 'Your spiritual life is embodied — you process emotion, access intuition, and touch the divine through physical experience. A daily movement practice is your anchor: the place where thought quiets and body wisdom speaks. Yoga, dance, running, swimming — the form matters less than showing up in your body, every day.',
+        keywords: ['Embodiment', 'Vitality', 'Grounding', 'Presence', 'Healing'],
+      },
+    },
+  },
 ];
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
