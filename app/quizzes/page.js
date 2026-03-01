@@ -304,6 +304,42 @@ const QUIZZES = [
           { label: 'Prayer, extended breathwork, or a period of silence and spiritual retreat', value: 'crown' },
         ],
       },
+      {
+        text: 'The thing I find most difficult to ask for honestly is…',
+        options: [
+          { label: 'More stability — safety, security, and a life that doesn\'t feel so precarious', value: 'root' },
+          { label: 'Permission to want what I want and enjoy life without guilt or apology', value: 'sacral' },
+          { label: 'Recognition that my direction and efforts are genuinely valued', value: 'solar' },
+          { label: 'To be loved without having to earn or deserve it first', value: 'heart' },
+        ],
+      },
+      {
+        text: 'When I sit in genuine stillness, the voice I most often hear says…',
+        options: [
+          { label: '"Don\'t say it — they won\'t understand, and you\'ll only regret it"', value: 'throat' },
+          { label: '"You don\'t really know what to think — wait until someone wiser tells you"', value: 'thirdeye' },
+          { label: '"None of this matters — you can\'t feel any real sense of why you\'re here"', value: 'crown' },
+          { label: '"Keep your guard up — things aren\'t as safe as they appear"', value: 'root' },
+        ],
+      },
+      {
+        text: 'The way my inner blocks show up in my body most clearly is…',
+        options: [
+          { label: 'A flatness or restlessness — creative energy with nowhere beautiful to go', value: 'sacral' },
+          { label: 'A gnawing urge to prove myself or take control when things feel uncertain', value: 'solar' },
+          { label: 'A guardedness — a reluctance to fully open even with the people I love', value: 'heart' },
+          { label: 'Words that stay swallowed — or that come out wrong and leave me feeling unseen', value: 'throat' },
+        ],
+      },
+      {
+        text: 'What I most want to stop apologising for is…',
+        options: [
+          { label: 'Having clear intuition about things I can\'t logically explain', value: 'thirdeye' },
+          { label: 'My need for meaning, purpose, and something larger to believe in', value: 'crown' },
+          { label: 'Needing more stability and predictability than others seem to need', value: 'root' },
+          { label: 'My appetite for pleasure, beauty, and things that make me feel genuinely alive', value: 'sacral' },
+        ],
+      },
     ],
     results: {
       root: {
@@ -1054,6 +1090,33 @@ const QUIZZES = [
           { label: 'Resilience — to have journeyed through the underworld and emerged whole', value: 'persephone' },
           { label: 'Abundance — the capacity to give endlessly from a truly full heart', value: 'demeter' },
           { label: 'Peace — the rare mastery of genuine inner stillness and deep contentment', value: 'hestia' },
+        ],
+      },
+      {
+        text: 'In friendship, what you offer that no one else quite can is…',
+        options: [
+          { label: 'An independence that gives others permission to be fully themselves too', value: 'artemis' },
+          { label: 'Your warmth and aliveness — you make ordinary moments feel like celebrations', value: 'aphrodite' },
+          { label: 'The way you show up practically — present and nourishing without being asked', value: 'demeter' },
+          { label: 'A quality of stillness that makes people feel settled just by being near you', value: 'hestia' },
+        ],
+      },
+      {
+        text: 'The loss that would genuinely devastate you most is…',
+        options: [
+          { label: 'Your clarity — the ability to understand and see what others miss', value: 'athena' },
+          { label: 'Your depth — being forced to live only on the surface of things', value: 'persephone' },
+          { label: 'Your freedom — being caged, controlled, or obligated to belong', value: 'artemis' },
+          { label: 'Beauty itself — colour, pleasure, and sensory aliveness stripped from your life', value: 'aphrodite' },
+        ],
+      },
+      {
+        text: 'When you\'re at your most powerful, the people around you feel…',
+        options: [
+          { label: 'Nourished — held and cared for in a way that touches something deep', value: 'demeter' },
+          { label: 'Centred — your presence creates a stillness that makes everything manageable', value: 'hestia' },
+          { label: 'Sharper — like the whole conversation has been elevated and they can think more clearly', value: 'athena' },
+          { label: 'Truly understood — like their pain has been witnessed without judgment or rush', value: 'persephone' },
         ],
       },
     ],
@@ -1831,7 +1894,8 @@ export default function QuizzesPage() {
   const [activeQuiz, setActiveQuiz] = useState(null);
   const [step, setStep]             = useState(0);
   const [answers, setAnswers]       = useState([]);
-  const [result, setResult]         = useState(null);
+  const [result, setResult]               = useState(null);
+  const [secondaryResult, setSecondaryResult] = useState(null);
   const [saved, setSaved]           = useState({});
   const [saving, setSaving]         = useState({});
   const [sb, setSb]                 = useState(null);
@@ -1848,6 +1912,7 @@ export default function QuizzesPage() {
     setStep(0);
     setAnswers([]);
     setResult(null);
+    setSecondaryResult(null);
   }
 
   function resetToList() {
@@ -1855,12 +1920,14 @@ export default function QuizzesPage() {
     setStep(0);
     setAnswers([]);
     setResult(null);
+    setSecondaryResult(null);
   }
 
   function retake() {
     setStep(0);
     setAnswers([]);
     setResult(null);
+    setSecondaryResult(null);
   }
 
   function handleAnswer(value) {
@@ -1874,11 +1941,13 @@ export default function QuizzesPage() {
       // Tally votes
       const tally = {};
       for (const v of newAnswers) tally[v] = (tally[v] ?? 0) + 1;
-      const winner = Object.keys(activeQuiz.results).reduce(
-        (best, key) => (tally[key] ?? 0) > (tally[best] ?? 0) ? key : best,
-        Object.keys(activeQuiz.results)[0]
+      const sorted = Object.keys(activeQuiz.results).sort(
+        (a, b) => (tally[b] ?? 0) - (tally[a] ?? 0)
       );
-      setResult(activeQuiz.results[winner]);
+      setResult(activeQuiz.results[sorted[0]]);
+      const runnerUpKey = sorted[1];
+      const runnerUpScore = tally[runnerUpKey] ?? 0;
+      setSecondaryResult(runnerUpScore >= 2 ? activeQuiz.results[runnerUpKey] : null);
     }
   }
 
@@ -2006,9 +2075,22 @@ export default function QuizzesPage() {
                 ))}
               </div>
 
-              <p className="text-sm text-gray-600 leading-relaxed text-center mb-8 max-w-lg mx-auto">
+              <p className="text-sm text-gray-600 leading-relaxed text-center mb-6 max-w-lg mx-auto">
                 {result.description}
               </p>
+
+              {secondaryResult && (
+                <div className="mb-8 mx-auto max-w-lg border-t border-white/30 pt-5">
+                  <p className="text-xs text-gray-400 text-center mb-3 uppercase tracking-wider">You also carry a strong thread of</p>
+                  <div className="bg-white/40 rounded-2xl p-4 flex items-start gap-3">
+                    <span className="text-2xl flex-shrink-0">{secondaryResult.emoji}</span>
+                    <div>
+                      <h3 className="font-playfair text-base text-gray-700">{secondaryResult.title}</h3>
+                      <p className="text-xs text-gray-500 mt-0.5 italic">{secondaryResult.tagline}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               <div className="flex flex-wrap gap-3 justify-center">
                 <button
