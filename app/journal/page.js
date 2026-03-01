@@ -175,27 +175,27 @@ export default function JournalPage() {
         <section className="glass-card rounded-3xl p-5">
           {/* Prompt bar */}
           {activePrompt ? (
-            <div className="flex items-start gap-2 mb-4 bg-white/50 rounded-2xl px-4 py-3">
-              <span className="text-base flex-shrink-0">💬</span>
-              <p className="text-sm text-gray-600 italic leading-snug flex-1">{activePrompt}</p>
-              <div className="flex items-center gap-1 flex-shrink-0">
+            <div className="mb-4">
+              <div className="flex items-start gap-2 bg-white/50 rounded-2xl px-4 py-3">
+                <span className="text-base flex-shrink-0">💬</span>
+                <p className="text-sm text-gray-600 italic leading-snug flex-1">{activePrompt}</p>
+              </div>
+              <div className="flex items-center gap-3 mt-2 px-1">
                 <button
                   onClick={shufflePrompt}
-                  title="Shuffle prompt"
-                  className="text-gray-300 hover:text-[#b88a92] transition-colors p-1"
+                  className="text-xs text-gray-300 hover:text-[#b88a92] transition-colors flex items-center gap-1"
                 >
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M17 4l4 4-4 4V9h-1.5c-1.17 0-2.2.64-2.76 1.59L7.5 19H3v-2h3.5l4.5-7.96A5 5 0 0 1 15.5 7H17V4zm-6.26 9.67l.96-1.7-.74-1.31A5 5 0 0 0 6.5 8H3v2h3.5c.77 0 1.46.41 1.85 1.03l2.39 2.64zm6.26 2.33H15.5a2 2 0 0 1-1.74-1.01L12.83 13l-1 1.77.44.78C13.03 16.75 14.2 18 15.5 18H17v3l4-4-4-4v3z"/>
                   </svg>
+                  New prompt
                 </button>
+                <span className="text-gray-200 text-xs">·</span>
                 <button
                   onClick={() => setPromptDismissed(true)}
-                  title="Dismiss prompt"
-                  className="text-gray-300 hover:text-[#b88a92] transition-colors p-1"
+                  className="text-xs text-gray-300 hover:text-[#b88a92] transition-colors"
                 >
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-                  </svg>
+                  No prompt
                 </button>
               </div>
             </div>
@@ -204,7 +204,7 @@ export default function JournalPage() {
               onClick={shufflePrompt}
               className="text-xs text-gray-300 hover:text-[#b88a92] transition-colors mb-3 flex items-center gap-1"
             >
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M17 4l4 4-4 4V9h-1.5c-1.17 0-2.2.64-2.76 1.59L7.5 19H3v-2h3.5l4.5-7.96A5 5 0 0 1 15.5 7H17V4zm-6.26 9.67l.96-1.7-.74-1.31A5 5 0 0 0 6.5 8H3v2h3.5c.77 0 1.46.41 1.85 1.03l2.39 2.64zm6.26 2.33H15.5a2 2 0 0 1-1.74-1.01L12.83 13l-1 1.77.44.78C13.03 16.75 14.2 18 15.5 18H17v3l4-4-4-4v3z"/>
               </svg>
               Add a prompt
