@@ -215,8 +215,27 @@ export default function ProfilePage() {
     setHdCalc(null);
     setHdError('');
 
+    // Auto-geocode if birthPlace text is present but lat/lon are missing
+    let resolvedLat = birthLat;
+    let resolvedLon = birthLon;
+    if (birthPlace && (resolvedLat == null || resolvedLon == null)) {
+      try {
+        const res = await fetch(
+          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(birthPlace)}&format=json&limit=1`,
+          { headers: { 'Accept-Language': 'en-US,en' } }
+        );
+        const data = await res.json();
+        if (data[0]) {
+          resolvedLat = parseFloat(data[0].lat);
+          resolvedLon = parseFloat(data[0].lon);
+          setBirthLat(resolvedLat);
+          setBirthLon(resolvedLon);
+        }
+      } catch {}
+    }
+
     const utcOffset = birthTimezone ? getUtcOffset(birthTimezone, birthDate) : 0;
-    const base = { date: birthDate, time: birthTime, birthPlace, birthTimezone, utcOffset, system: astroSystem, birthLat, birthLon };
+    const base = { date: birthDate, time: birthTime, birthPlace, birthTimezone, utcOffset, system: astroSystem, birthLat: resolvedLat, birthLon: resolvedLon };
     let hdFields = {};
 
     if (birthDate && birthTime && birthTimezone) {
@@ -225,7 +244,7 @@ export default function ProfilePage() {
         const res = await fetch('/api/hd-chart', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ birthDate, birthTime, utcOffset, lat: birthLat, lon: birthLon }),
+          body: JSON.stringify({ birthDate, birthTime, utcOffset, lat: resolvedLat, lon: resolvedLon }),
         });
         if (!res.ok) throw new Error(`Server error ${res.status}`);
         const result = await res.json();
