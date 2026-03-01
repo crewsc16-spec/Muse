@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 
-// ─── HD Gate Wheel (for longitude reconstruction from gate+line) ──────────────
+// ─── HD Gate Wheel ────────────────────────────────────────────────────────────
 const GATE_WHEEL = [
   41,19,13,49,30,55,37,63,22,36,25,17,21,51,42,3,27,24,2,23,
   8,20,16,35,45,12,15,52,39,53,62,56,31,33,7,4,29,59,40,64,
@@ -11,17 +11,16 @@ const GATE_WHEEL = [
 ];
 
 // ─── Zodiac ───────────────────────────────────────────────────────────────────
-const SIGN_NAMES     = ['Aries','Taurus','Gemini','Cancer','Leo','Virgo','Libra','Scorpio','Sagittarius','Capricorn','Aquarius','Pisces'];
-const SIGN_SYMBOLS   = ['♈','♉','♊','♋','♌','♍','♎','♏','♐','♑','♒','♓'];
-const SIGN_ELEMENTS  = ['fire','earth','air','water','fire','earth','air','water','fire','earth','air','water'];
-const SIGN_MODALS    = ['cardinal','fixed','mutable','cardinal','fixed','mutable','cardinal','fixed','mutable','cardinal','fixed','mutable'];
+const SIGN_NAMES    = ['Aries','Taurus','Gemini','Cancer','Leo','Virgo','Libra','Scorpio','Sagittarius','Capricorn','Aquarius','Pisces'];
+const SIGN_SYMBOLS  = ['♈','♉','♊','♋','♌','♍','♎','♏','♐','♑','♒','♓'];
+const SIGN_ELEMENTS = ['fire','earth','air','water','fire','earth','air','water','fire','earth','air','water'];
+const SIGN_MODALS   = ['cardinal','fixed','mutable','cardinal','fixed','mutable','cardinal','fixed','mutable','cardinal','fixed','mutable'];
 
 function lonToSign(lon) {
   const norm = ((lon % 360) + 360) % 360;
   const i = Math.floor(norm / 30);
   return { name: SIGN_NAMES[i], symbol: SIGN_SYMBOLS[i], element: SIGN_ELEMENTS[i], modality: SIGN_MODALS[i], degree: (norm % 30).toFixed(1) };
 }
-
 function gateLineToLon(gate, line) {
   const idx = GATE_WHEEL.indexOf(gate);
   if (idx === -1) return 0;
@@ -59,46 +58,168 @@ function computeAspects(lonMap) {
 
 // ─── Numerology ───────────────────────────────────────────────────────────────
 function reduceNum(n) {
-  while (n > 9 && n !== 11 && n !== 22 && n !== 33) {
+  while (n > 9 && n !== 11 && n !== 22 && n !== 33)
     n = String(n).split('').reduce((s, d) => s + +d, 0);
-  }
   return n;
 }
-function getLifePath(dateStr) {
-  return reduceNum(dateStr.replace(/-/g,'').split('').reduce((s, d) => s + +d, 0));
-}
-function getPersonalYear(dateStr, todayStr) {
-  const [, bm, bd] = dateStr.split('-').map(Number);
-  const [ty] = todayStr.split('-').map(Number);
-  return reduceNum(bm + bd + ty);
-}
-function getBirthdayNum(dateStr) {
-  const day = +dateStr.split('-')[2];
-  return day > 9 ? reduceNum(day) : day;
-}
-function getExpressionNum(name) {
+function getLifePath(d)          { return reduceNum(d.replace(/-/g,'').split('').reduce((s,c)=>s+ +c,0)); }
+function getPersonalYear(d, t)   { const [,bm,bd]=d.split('-').map(Number); const [ty]=t.split('-').map(Number); return reduceNum(bm+bd+ty); }
+function getBirthdayNum(d)       { const day=+d.split('-')[2]; return day>9?reduceNum(day):day; }
+function getExpressionNum(name)  {
   if (!name?.trim()) return null;
-  const MAP = {A:1,B:2,C:3,D:4,E:5,F:6,G:7,H:8,I:9,J:1,K:2,L:3,M:4,N:5,O:6,P:7,Q:8,R:9,S:1,T:2,U:3,V:4,W:5,X:6,Y:7,Z:8};
-  const sum = name.toUpperCase().replace(/[^A-Z]/g,'').split('').reduce((s,c) => s + (MAP[c]??0), 0);
-  return reduceNum(sum);
+  const M={A:1,B:2,C:3,D:4,E:5,F:6,G:7,H:8,I:9,J:1,K:2,L:3,M:4,N:5,O:6,P:7,Q:8,R:9,S:1,T:2,U:3,V:4,W:5,X:6,Y:7,Z:8};
+  return reduceNum(name.toUpperCase().replace(/[^A-Z]/g,'').split('').reduce((s,c)=>s+(M[c]??0),0));
 }
 
-// ─── Descriptions ─────────────────────────────────────────────────────────────
-const LIFE_PATH = {
-  1:  { title: 'The Leader',        desc: 'You are here to pioneer, to initiate, and to stand in your own power. Independence, originality, and self-reliance are your greatest strengths. Your soul\'s purpose is to learn courage and forge a path where none existed before.' },
-  2:  { title: 'The Diplomat',      desc: 'You are here to bring harmony, to partner, and to listen deeply. Sensitivity, cooperation, and intuition are your gifts. Your path is one of service through connection — you thrive when you trust that your presence alone is enough.' },
-  3:  { title: 'The Creator',       desc: 'You are here to express, to inspire, and to bring joy. Creativity, communication, and emotional depth are woven into your purpose. When you share what lives inside you freely and without fear, you light up the world around you.' },
-  4:  { title: 'The Builder',       desc: 'You are here to create lasting foundations — in work, in relationships, in life. Discipline, loyalty, and methodical effort are your superpowers. The structures you build outlast you; that is your legacy to the world.' },
-  5:  { title: 'The Adventurer',    desc: 'You are here to experience, to adventure, and to usher in change. Adaptability, curiosity, and a love of freedom define your path. Your greatest gift is showing others what becomes possible when you stop playing it safe.' },
-  6:  { title: 'The Nurturer',      desc: 'You are here to love, to heal, and to serve with grace. Responsibility, beauty, and deep care for others are your nature. You create harmony wherever you go — remember to give that same grace and care to yourself.' },
-  7:  { title: 'The Seeker',        desc: 'You are here to know — to go deep, to question, and to touch the mystery of things. Wisdom, introspection, and spiritual insight are your gifts. You carry answers that can only be found in stillness and solitude.' },
-  8:  { title: 'The Manifestor',    desc: 'You are here to master the material world — to build empires, lead, and create abundance. Power, ambition, and executive vision are your nature. Your purpose is to wield great influence with equal integrity.' },
-  9:  { title: 'The Humanitarian',  desc: 'You are here to serve the whole — to complete, to release, and to love without conditions. Compassion, wisdom, and universal perspective are your gifts. Your deepest fulfillment comes through giving back what you have learned.' },
-  11: { title: 'The Illuminator',   desc: 'You carry Master Number 11 — a path of profound spiritual sensitivity, intuition, and inspiration. You are a channel between the seen and unseen worlds. Others are uplifted simply by being near you when you are fully aligned.' },
-  22: { title: 'The Master Builder',desc: 'You carry Master Number 22 — the most powerful vibration in numerology. You are here to turn visionary dreams into real-world structures that serve all of humanity. Your potential is enormous; so is your responsibility to ground it.' },
-  33: { title: 'The Master Teacher',desc: 'You carry Master Number 33 — the highest expression of compassion and service. You are here to uplift through love, truth, and healing. When you live your purpose fully, you become a light for the collective transformation of consciousness.' },
+// ─── Planet descriptions ──────────────────────────────────────────────────────
+const PLANET_DESC = {
+  sun:       { title: 'The Sun ☉', body: 'The Sun represents your core identity, your conscious self, and the energy you are here to radiate in this lifetime. It governs vitality, purpose, and creative force. Your sun sign is not who you are — it is who you are actively becoming through the experience of living.' },
+  moon:      { title: 'The Moon ☽', body: 'The Moon governs your emotional world, your instincts, your subconscious patterns, and the way you seek comfort and nourishment. It reveals the inner life that lives beneath your persona — the part of you that feels before it thinks. Your moon sign describes your emotional needs and what your soul requires to feel at home.' },
+  mercury:   { title: 'Mercury ☿', body: 'Mercury governs the mind — how you think, communicate, process information, and make connections between ideas. It rules language, learning, short travel, and the exchange of intelligence. Mercury\'s placement reveals how your intelligence expresses itself and what your mind is most naturally drawn toward.' },
+  venus:     { title: 'Venus ♀', body: 'Venus governs love, beauty, desire, and the things you find most valuable. It shapes how you attract and are attracted, your aesthetic sensibilities, and your relationship to pleasure and abundance. Venus reveals what your heart truly wants and the way you naturally move toward it.' },
+  mars:      { title: 'Mars ♂', body: 'Mars governs action, drive, desire, and the force with which you pursue what matters to you. It rules courage, sexuality, assertion, and the way you handle conflict. Your Mars placement reveals how you go after what you want and where your most primal, animating energy lives.' },
+  jupiter:   { title: 'Jupiter ♃', body: 'Jupiter governs expansion, wisdom, abundance, and good fortune. It shows where you are naturally blessed, where you grow most readily, and where optimism flows freely. Jupiter expands whatever it touches — and its transits often open doors of opportunity and broadened perspective.' },
+  saturn:    { title: 'Saturn ♄', body: 'Saturn governs discipline, structure, responsibility, and the lessons that shape you across time. It rules karma, limitation, mastery, and the long game. Where Saturn lives in your chart is where you face your greatest tests — and where, through sustained effort, you build your most enduring strength and authority.' },
+  uranus:    { title: 'Uranus ♅', body: 'Uranus governs revolution, awakening, sudden change, and the liberation of consciousness from its conditioned forms. It rules innovation, eccentricity, and the disruption of patterns that have outlived their purpose. Uranus breaks what is no longer true so that something more authentic can emerge in its place.' },
+  neptune:   { title: 'Neptune ♆', body: 'Neptune governs dreams, spirituality, illusion, compassion, and the dissolution of the boundaries between self and other. It rules the mystical, the creative imagination, and our connection to the collective unconscious. Neptune invites surrender — to something larger, more numinous, more true than the individual ego can hold.' },
+  pluto:     { title: 'Pluto ♇', body: 'Pluto governs transformation, power, the shadow, and the forces that move beneath the surface of conscious life. It rules death and rebirth in all their forms. Pluto\'s influence is slow and total — it strips away everything that is false so that what is most essential, most indestructible, can emerge and endure.' },
+  northNode: { title: 'North Node ☊', body: 'The North Node represents your soul\'s evolutionary direction in this lifetime — the path of growth, the growing edge, the qualities you are here to develop even when they feel unfamiliar or uncomfortable. It is not where you are at ease, but where you are called. Moving toward your North Node brings deep and lasting fulfillment.' },
+  southNode: { title: 'South Node ☋', body: 'The South Node represents your karmic past — the strengths, patterns, comfort zones, and tendencies you carry from previous experience. It is where you naturally retreat when life becomes difficult. The invitation is not to abandon these gifts, but to bring them with you as resources as you grow toward your North Node.' },
+  earth:     { title: 'Earth ⊕', body: 'In Human Design, the Earth gate is the unconscious grounding complement to the conscious Sun. Where the Sun represents your purpose and your light, the Earth shows how that purpose becomes rooted in physical reality. It is the energetic foundation that stabilizes and grounds your solar expression.' },
 };
 
+// ─── Aspect descriptions ──────────────────────────────────────────────────────
+const ASPECT_DESC = {
+  Conjunction: { symbol: '☌', color: '#f59e0b', body: 'A conjunction occurs when two planets occupy nearly the same degree of the zodiac, merging their energies into a unified force. This is the most powerful and intimate aspect — the two planets cannot be separated; they intensify, color, and reinforce one another. Conjunctions can be powerfully creative or intensely overwhelming, depending on the planets involved.' },
+  Sextile:     { symbol: '⚹', color: '#34d399', body: 'A sextile forms when two planets are approximately 60 degrees apart, creating a harmonious and naturally supportive connection. It represents opportunity — a flowing affinity between two energies that, when consciously engaged, produces ease, talent, and graceful momentum. Sextiles reward initiative; they are gifts that ask to be activated.' },
+  Square:      { symbol: '□', color: '#f87171', body: 'A square forms when two planets are 90 degrees apart, creating dynamic friction, tension, and challenge. It is the aspect of growth through difficulty — the two energies are fundamentally at odds and must be consciously integrated rather than avoided. Squares are among the most powerful drivers of achievement and transformation in any chart.' },
+  Trine:       { symbol: '△', color: '#60a5fa', body: 'A trine forms when two planets are 120 degrees apart, creating a flow of natural ease and harmonious alignment. It represents innate talent — areas where things come effortlessly, where gifts feel natural, where energy moves without resistance. Trines are the blessings in a chart; their gifts are most fully realized when actively engaged rather than taken for granted.' },
+  Opposition:  { symbol: '☍', color: '#c084fc', body: 'An opposition forms when two planets sit directly across the zodiac from one another, creating a polarity of competing energies that each carry a truth. It represents the tension between two forces seeking integration — the invitation is to hold both rather than collapsing into one. Oppositions often manifest through relationships, where we encounter our own disowned qualities mirrored in others.' },
+};
+
+// ─── Center descriptions ──────────────────────────────────────────────────────
+const CENTER_DESC = {
+  Head: {
+    defined: 'Your Head Center is defined — you carry a consistent and reliable pressure of mental inspiration. You are always being pressed to make sense of things, to formulate questions, to find answers that resolve the pressure you feel. This drive can be channeled productively when you learn which questions are genuinely yours to answer, and which belong to others.',
+    open:    'Your Head Center is open — you are not consistently under mental pressure of your own. Instead, you absorb and amplify the inspiration and mental pressure of others around you, which can lead to preoccupation with questions that were never yours. Your gift is a fluid ability to receive inspiration from many different sources without being fixed in any single frame.',
+  },
+  Ajna: {
+    defined: 'Your Ajna Center is defined — you have a consistent, recognizable way of processing thought and formulating perspective. Your mind works in a particular pattern that is reliable and repeatable. You are not here to be certain; you are here to have a consistent way of engaging with uncertainty, and to share that perspective when it is asked for.',
+    open:    'Your Ajna Center is open — your mind is naturally flexible and takes in many different ways of thinking and knowing. You may feel that your certainties shift, that you struggle to hold a fixed perspective. This is a gift: you are not locked into any single mental framework and can genuinely hold multiple truths simultaneously with wisdom.',
+  },
+  Throat: {
+    defined: 'Your Throat Center is defined — you have consistent, reliable access to communication, expression, and the power to manifest things into reality through action and speech. Your voice carries weight. The practice is learning which expressions are truly authentic — coming from your inner authority — and which are driven by conditioning or the pressure to fill silence.',
+    open:    'Your Throat Center is open — your expression is conditioned by who you are with and what the moment calls for, giving you a potentially vast range of voices. You may feel pressure to speak, to attract attention, to be heard. The invitation is to release that urgency and wait for the genuine moment when what you have to say will truly land.',
+  },
+  G: {
+    defined: 'Your G Center is defined — you have a consistent, reliable sense of self, identity, and direction. You know, at some level, who you are, even when the external world shifts. You are not easily knocked off your path by others\' opinions. Your magnetic field has a steady quality that naturally attracts the people and experiences that belong in your life.',
+    open:    'Your G Center is open — your sense of self and direction is fluid and shaped by the environments and people you move through. You may have wrestled with the question "who am I?" Your deepest gift is a profound sensitivity to the love and direction present in spaces and in others; you reflect back the quality of what surrounds you with remarkable clarity.',
+  },
+  Will: {
+    defined: 'Your Will Center is defined — you have consistent access to willpower and the capacity to make and keep genuine commitments. When you say you will do something, you can deliver. The practice is making only the promises that truly come from your heart — because your will is built to honor exactly what it commits to, and overextending it depletes you.',
+    open:    'Your Will Center is open — your willpower is not consistent, and it is not designed to be. Attempting to operate through sheer force of will leads to exhaustion and broken promises. Your gift is wisdom about ego, will, and commitment — you understand it deeply precisely because it does not function reliably within you, and so you have learned its true nature.',
+  },
+  Sacral: {
+    defined: 'Your Sacral Center is defined — you are a Generator or Manifesting Generator. You carry consistent, self-regenerating life force energy. When engaged in what is truly correct for you, your energy sustains itself and restores overnight. Your sacral response — the gut "uh-huh" or "uh-uh" — is your most reliable and honest inner oracle.',
+    open:    'Your Sacral Center is open — you do not have consistent sustaining life force energy of your own. You amplify the sacral energy of Generators around you, which can make you feel more energetic than you truly are. Rest is not optional for you — it is essential. Knowing when you are genuinely full, and stopping before depletion, is one of your most important practices.',
+  },
+  SolarPlexus: {
+    defined: 'Your Solar Plexus Center is defined — you have emotional authority. Your decision-making process moves through waves of feeling, and clarity is not found in the peak or the valley of that wave, but in the stillness that comes with time and patience. You are not designed to decide in the now. Sleep on things. Feel them over days. The truth clarifies as the wave settles.',
+    open:    'Your Solar Plexus Center is open — you absorb and amplify the emotional energy of everyone around you, often feeling their emotions more intensely than they do themselves. The practice is learning to distinguish your own feelings from what you are picking up from the field. Never make significant decisions when you or others are in emotional turmoil — wait for the calm.',
+  },
+  Spleen: {
+    defined: 'Your Spleen Center is defined — you have consistent access to intuitive knowing, instinct, and moment-to-moment awareness of what is healthy and safe. Your body speaks to you clearly. The Spleen\'s voice is quiet, immediate, and never repeats itself — it speaks once, in the present moment. Learning to trust this voice is one of the most powerful practices available to you.',
+    open:    'Your Spleen Center is open — your intuition is not consistently available and is conditioned by others. You may hold on to people, situations, and patterns past the time they are healthy, driven by a background fear that lives in the open Spleen. Your gift is an extraordinary sensitivity to others\' well-being, health, instincts, and fear — you feel it all.',
+  },
+  Root: {
+    defined: 'Your Root Center is defined — you carry a consistent adrenaline pressure and a reliable drive to act, to resolve tension, and to get things done. This pressure is a source of tremendous productivity when consciously directed. The practice is learning to work with the pressure without letting it drive you — acting from choice rather than from urgency.',
+    open:    'Your Root Center is open — you absorb and amplify the adrenaline and pressure of those around you. You may find yourself rushing to resolve pressure that isn\'t truly yours, or taking on others\' sense of urgency as if it were your own. Your gift is deep wisdom about pressure, stress, and the systems that generate them — you understand these forces profoundly.',
+  },
+};
+
+// ─── Gate descriptions ────────────────────────────────────────────────────────
+const GATE_DESC = {
+  1:  ['Self-Expression', 'Creative force and the power of individual self-expression. This gate carries the frequency of contribution: who you uniquely are, expressed without apology or modification, becomes a genuine gift to the whole. The call is simply to be yourself — fully, creatively, without performance.'],
+  2:  ['Direction of Self', 'The receptive and the keeper of direction. Gate 2 holds an unconscious knowing of where to go and how to align with higher purpose — even when the mind cannot explain it. It is the magnetic navigator, pointing toward home before the journey has been consciously chosen.'],
+  3:  ['Ordering', 'The energy of chaos seeking to crystallize into new order. Gate 3 sits at the threshold between the known and unknown, turning the pressure to begin into the first act of creation. This is the gate of the child, the innovation, the new thing that needs time and support to find its form.'],
+  4:  ['Formulization', 'The mental pressure to formulate answers and solutions to the questions that arise in consciousness. Gate 4 generates questions that must be resolved into logical understanding — driving the mind toward clarity even when certainty remains genuinely elusive. The gift is the answer; the shadow is holding answers as fixed truth.'],
+  5:  ['Fixed Rhythms', 'Universal timing and the wisdom of natural pattern. Gate 5 knows that everything has its season — that aligning with the right rhythm, waiting, pacing, and flowing with what is, is the secret to sustainable and deeply satisfying success. Forcing what is not yet ready creates friction; attuning creates flow.'],
+  6:  ['Friction', 'Emotional boundaries, conflict, and the conditions necessary for true intimacy. Gate 6 governs how we regulate closeness and distance; its energy creates the productive friction that makes genuine connection and profound emotional growth possible. Without this gate\'s discernment, intimacy becomes indiscriminate and draining.'],
+  7:  ['The Role of the Self', 'Natural leadership that emerges from authentic self-expression rather than position or force. Gate 7 carries the frequency of the democratic leader — one whose authority is felt, recognized, and followed because they are genuinely, unmistakably themselves. This gate leads by being, not by doing.'],
+  8:  ['Contribution', 'The gift of individual difference placed in service of the collective. Gate 8 asks: what is uniquely yours to offer? When this energy is expressed authentically, it becomes a creative role model that gives others implicit permission to also be exactly who they are, without apology.'],
+  9:  ['Focus', 'The power of concentrated attention and wholehearted commitment to the detail of what matters. Gate 9 grants the ability to give sustained, precise focus to a specific domain — contributing that finely held energy to something larger that it serves. It is the gift of the devoted specialist.'],
+  10: ['Behavior of the Self', 'Self-love expressed as a way of walking through the world. Gate 10 holds the codes for authentic behavior — honoring your own values, walking your own path, and living in a way that genuinely reflects your nature regardless of what the world expects or demands. This is not selfishness; it is integrity.'],
+  11: ['Ideas', 'Harmony, peace through ideas, and a love of the possible. Gate 11 generates a continuous stream of images and concepts that seek expression — it is the gate of the storyteller, the visionary, and the mind that sees connection where others see only chaos. The gift is the idea; the work is knowing which ones to act on.'],
+  12: ['Caution', 'Articulation, standstill, and social grace. Gate 12 understands the power of timing in communication — when to speak and when to be still. Its energy carries the frequency of the poet and the one who waits for the precise moment when words will truly land in the hearts of those who need to hear them.'],
+  13: ['The Listener', 'The sacred capacity to hold the secrets and stories of others. Gate 13 draws people to confide their deepest experiences; it is the witness, the keeper of collective memory, and the one who transforms personal stories into universal wisdom that can serve those who come after.'],
+  14: ['Power Skills', 'The accumulation of power and resources in service of a higher purpose. Gate 14 does not hoard; it generates energy that supports what is truly aligned, acting as a conduit for life force flowing in the direction that the G Center points. This gate\'s gift is not abundance for its own sake but abundance as a vehicle for purpose.'],
+  15: ['Extremes', 'The love of humanity and a deep embrace of the full spectrum of human behavior. Gate 15 does not seek the middle or the moderate; it honors all expressions of the human experience — the extreme, the eccentric, the inconsistent — as beautiful and necessary parts of the great design. Its gift is radical acceptance.'],
+  16: ['Skills', 'Enthusiasm, talent, and the drive to master a skill through devoted practice. Gate 16 is the energy of the enthusiast who understands that talent alone is not enough — that genuine mastery is cultivated through repetition, love, and the willingness to begin again every single time without resentment.'],
+  17: ['Opinions', 'The formation and sharing of logical perspective. Gate 17 generates opinions that, when welcomed and asked for, offer genuine guidance and orientation. It is the energy of the one who sees the pattern clearly and wants others to benefit from that clarity — but must learn to wait until the perspective is genuinely invited.'],
+  18: ['Correction', 'The drive to improve, perfect, and bring what is broken back into rightness. Gate 18 carries an instinctive recognition of what is not working; its gift is the courage and capability to correct it — not from criticism or superiority, but from a deep and authentic love of excellence and the desire to see things thrive.'],
+  19: ['Wanting', 'Sensitivity to the fundamental needs of others — for belonging, for nourishment, for the recognition of spirit. Gate 19 feels what is missing in the field around it and responds to those needs with natural, instinctive care; its energy is the basis of community, deep caring, and the bonds that sustain life across generations.'],
+  20: ['The Now', 'Pure presence and the power of contemplation expressed as authentic action in the present moment. Gate 20 is the bridge between inner awareness and outward expression; what is known in the deepest self becomes, through this gate, what is lived, spoken, and embodied now — without delay, without performance.'],
+  21: ['The Hunter', 'The drive to control, manage, and secure resources through focused will and authority. Gate 21 is the energy of the one who takes charge — not from ego, but from an instinctive understanding that things must be managed, held, and protected for the whole to thrive. This gate is not afraid of responsibility.'],
+  22: ['Openness', 'The grace of emotional listening and the gift of genuine receptivity to life. Gate 22 is social grace in its purest form — the ability to meet others with full presence, to listen deeply without an agenda, and to move with the natural rhythm of emotional exchange rather than trying to manage or control it.'],
+  23: ['Assimilation', 'The ability to translate individual breakthrough insight into language that others can actually receive and use. Gate 23 is the bridge between the inexplicable knowing of Gate 43 and the world that needs to understand it. Its gift is making the strange comprehensible, the fringe accessible, the revolutionary practical.'],
+  24: ['Return', 'The mind cycling back to find meaning and resolution for the unanswered questions it carries. Gate 24 is the energy of rationalization and return — turning ideas and experiences over and over until clarity arrives, not through force, but through the patient willingness to stay with what is not yet resolved.'],
+  25: ['The Spirit of the Self', 'Universal love, innocence, and the unconditional acceptance of all of life as it is. Gate 25 carries a frequency of impersonal, boundless love — not love that is earned or withheld, but love as a fundamental orientation toward existence itself. It is the gate of the one who loves life because life is, in its essence, love.'],
+  26: ['The Egoist', 'The art of promotion, persuasion, and the transmission of memory and accumulated wisdom. Gate 26 is the trickster, the storyteller, the one who can make others believe — not through manipulation, but through a genuine gift for bringing things to life through the telling of their story. It is the energy of the inspired salesperson.'],
+  27: ['Caring', 'The primal and beautiful instinct to nurture, protect, and sustain what is precious. Gate 27 is the frequency of the caregiver who ensures the continuation of life itself — in the form of children, community, values, animals, and the things most worth preserving and passing forward across time.'],
+  28: ['The Game Player', 'The struggle to find purpose and the courage to keep fighting for it. Gate 28 carries the energy of the one who knows that something is at stake — not physically, necessarily, but in the deepest sense of: what is this life for? It fuels a powerful, purposeful search for meaning through the lived experience of struggle itself.'],
+  29: ['Perseverance', 'The energy of total commitment and the gift of the wholehearted yes. Gate 29 carries the power of devotion — when engaged with what is truly aligned, it sustains effort through every obstacle and every setback. Its shadow is saying yes out of conditioning or fear rather than genuine sacral truth.'],
+  30: ['Desires', 'The recognition and embracing of feeling as the force of fate. Gate 30 is the frequency of desire in its most essential form — the longing that pulls you toward what you are here to experience. It does not seek to control fate; it submits to it with full emotional presence, trusting that what is felt is pointing somewhere real.'],
+  31: ['Influence', 'The natural authority of the one who speaks for and leads the collective. Gate 31\'s influence is democratic — it is earned through being genuinely representative of the needs, direction, and well-being of those it leads, not imposed through force or hierarchy. This is the voice of the recognized leader.'],
+  32: ['Continuity', 'The instinctive recognition of what has endurance and what will genuinely survive across time. Gate 32 is the voice of the Spleen reading the field for viability — what is worth protecting, what has the strength to last, and what should be released before it drains the system it is part of.'],
+  33: ['Privacy', 'Retreat, testimony, and the transformative power of memory and witness. Gate 33 witnesses life\'s experiences and, after a period of genuine withdrawal and digestion, transmutes them into wisdom that can be shared — but only when the moment is truly right, when the story has become something more than personal.'],
+  34: ['Power', 'Pure, raw, individual life force energy available to be expressed in the present moment. Gate 34 does not wait for permission — it is the frequency of the sacral in its most potent and undiluted form: the power of a body doing exactly what it is built to do, fully, generously, and without apology.'],
+  35: ['Change', 'The desire for progress, new experience, and the rich sense of having truly lived. Gate 35 moves through the full range of human experience not from restlessness or dissatisfaction, but from a genuine and beautiful hunger for what it means to be alive — to feel everything, to learn everything, to grow through contact with the breadth of life.'],
+  36: ['Crisis', 'The drive to seek depth of feeling and new experience through the intensity of the dark night. Gate 36 is the energy that enters crisis not to suffer but to discover what lives on the other side — it is the initiatory frequency of the emotional system at its most courageous, moving through the fire to arrive at genuine wisdom.'],
+  37: ['Friendship', 'The agreements, bonds, and sacred contracts that hold community together across time. Gate 37 is the frequency of family — not only by blood but chosen: the ones with whom you make the silent and binding agreement to show up, to be loyal, and to sustain the bond through every season of life.'],
+  38: ['Opposition', 'The fighter who finds meaning, purpose, and aliveness through the struggle itself. Gate 38 is the energy of the one who will not give up — not from stubbornness, but from a deep and cellular knowing that the resistance they face is precisely what their purpose requires them to move through and transform.'],
+  39: ['Provocation', 'The ability to stir emotional energy in others so that spirit can be found within it. Gate 39 does not provoke to cause harm — it provokes to awaken, to interrupt patterns of numbness or stagnation, and to open the door to what is truly alive and seeking expression beneath the surface of ordinary life.'],
+  40: ['Aloneness', 'The need for genuine rest, solitude, and the capacity to deliver on what has been genuinely promised. Gate 40 works hard and needs to withdraw afterward in order to restore. Its rhythm is give and rest — it cannot sustain endless output without periods of real aloneness in which to return to itself and refill.'],
+  41: ['Fantasy', 'The initiating energy of new experience arising through imagination, longing, and desire. Gate 41 holds the frequency of possibility before it becomes form — the dream, the image, the contraction of desire that precedes the expansion of a new cycle of living. It is the seed of every new beginning.'],
+  42: ['Growth', 'The energy of bringing cycles to their natural, meaningful, and satisfying completion. Gate 42 enters what others begin and sees it through to its full expression, understanding that growth is not linear but cyclical, spiral, and always reaching toward a completion that makes the next beginning possible and worthwhile.'],
+  43: ['Breakthrough', 'Sudden individual knowing that arrives complete and whole, without logical process or preparation. Gate 43 is the frequency of the download — the insight that comes from nowhere, bypasses the mind\'s usual procedures, and arrives as a certainty that feels undeniable. The challenge is finding language for what cannot quite be explained.'],
+  44: ['Coming to Meet', 'Pattern recognition and the instinct for what has worked before. Gate 44 is the memory of the Spleen — it reads the past for what succeeded, for what the patterns reveal, and brings that intelligence to bear on what is currently needed in the field. This gate does not forget; it learns and applies what it learns.'],
+  45: ['The Gatherer', 'Natural authority that gathers resources, people, and direction around a shared vision. Gate 45 is the king or queen frequency — the one who speaks for the tribe, manages its material reality, and holds the collective vision with clarity and consistency. Its power is to gather what is needed and distribute it wisely.'],
+  46: ['Determination of the Self', 'The love of the body and the quality of luck that arises from being fully, completely present in physical form. Gate 46 carries a serendipitous quality — things find it, opportunities open around it — not because it seeks them, but because it is so wholly inhabiting itself that life flows toward it as water flows toward the lowest point.'],
+  47: ['Realization', 'The mind struggling to find meaning in the experiences that have been lived but not yet understood. Gate 47 carries the pressure of oppression — the exhaustion of a consciousness that has been given more experience than it can yet integrate. Its gift emerges when it relaxes the need to understand and allows the realization to arise on its own.'],
+  48: ['Depth', 'The drive for depth of understanding and the existential fear of not knowing enough. Gate 48 is never satisfied with the surface of anything; it wants to go all the way down to the root. Its deepest fear is being found inadequate — and its greatest gift is precisely the extraordinary depth it cultivates through that very fear of shallowness.'],
+  49: ['Revolution', 'Transformation through the willingness to reject and release what no longer serves the principles that matter. Gate 49 is the frequency of revolution — not violence, but the clear-eyed, principled decision to end what is finished and to restructure when the agreements that sustained life have been fundamentally violated.'],
+  50: ['Values', 'The responsibility for the welfare of the collective and the preservation of what genuinely works and sustains life. Gate 50 carries the values and codes that allow a healthy community to thrive across time. It is the frequency of the one who knows what is worth keeping — and protects those things with quiet, fierce, unwavering dedication.'],
+  51: ['Shock', 'The initiatory energy of awakening through shock, surprise, and the completely unexpected. Gate 51 is the gate of individuation — the shockwave that disrupts the comfortable trance, breaks the pattern, and forces a genuine encounter with what is most fundamentally real and alive. It awakens through disruption rather than gentleness.'],
+  52: ['Stillness', 'The gift of not moving, of focused inaction, and the immense power of concentrated, patient presence. Gate 52 understands what most cannot: that stillness is not passivity but a form of tremendous power. From the mountain of non-action, the right moment for movement becomes completely and unmistakably clear.'],
+  53: ['Starting Things', 'The pressure, excitement, and momentum of initiating new cycles of development and experience. Gate 53 is the energy of the beginning — the surge that starts something genuinely new. Its gift is the capacity to initiate; its practice is learning to begin only what has the genuine potential for completion and growth.'],
+  54: ['Ambition', 'The transformative drive to rise, to achieve, and to materialize what spirit envisions in the physical world. Gate 54 is ambition in its truest and most exalted form — not grasping or competitive, but reaching toward something higher and bringing it into tangible reality through sustained, purposeful effort and aspiration.'],
+  55: ['Spirit', 'Mood, abundance, and the individual search for spirit within the full spectrum of emotional experience. Gate 55 rides the waves of feeling not as a victim of them but as a navigator — understanding that beneath every mood is a frequency of spirit waiting to be recognized, honored, and ultimately released into freedom.'],
+  56: ['Stimulation', 'The energy of the storyteller who turns lived experience into meaning through the alchemy of language. Gate 56 weaves ideas, experiences, and images into narratives that stimulate, provoke, and inspire genuine thinking. It understands deeply that how a story is told matters as much as what it contains — the form is the message.'],
+  57: ['Intuitive Clarity', 'The quiet, precise voice of intuitive knowing speaking in the present moment. Gate 57 is the sharpest frequency of the Spleen: a cellular, immediate awareness that knows before the mind forms its first thought. This voice whispers once, softly, in the now. Those who have learned to trust it have learned to trust the deepest intelligence of life.'],
+  58: ['Vitality', 'The joy of life and the drive toward aliveness, excellence, and what is authentically flourishing. Gate 58 cannot help but be enthusiastic about what is working, what is beautiful, and what could be even more fully and genuinely alive. Its gift is a contagious, irresistible love of existence that awakens this love in others.'],
+  59: ['Sexuality', 'The energy that breaks down barriers to create the genuine conditions for deep intimacy and authentic connection. Gate 59 is the sacral frequency that governs bonding — the aura-penetrating capacity to dissolve the distance between self and other, whether in sexual, creative, emotional, or spiritual union.'],
+  60: ['Acceptance', 'The wisdom of limitation as the very condition that makes all mutation and genuine growth possible. Gate 60 understands that all lasting change begins within constraint — that the seed must press against the shell. The pressure of limitation is not the obstacle but the precise force that drives transformation forward into new forms.'],
+  61: ['Mystery', 'Inner truth and the powerful pressure to know what cannot be known through ordinary means. Gate 61 lives permanently at the edge of the unknowable — pressing toward what the logical mind cannot grasp, sustained by a certainty that the answer exists and matters, even when its form remains stubbornly and beautifully mysterious.'],
+  62: ['Details', 'The power of the small, the factual, the precisely articulated, and the carefully expressed. Gate 62 is the mind that notices what others consistently miss: the detail, the discrepancy, the nuance that changes everything. Its gift is the ability to translate complex, abstract understanding into clear, concrete, and actionable form.'],
+  63: ['Doubt', 'The pressure of logical inquiry and the absolute necessity of questioning what merely appears to be true. Gate 63 holds the doubt that drives the scientific and philosophical mind — the principled refusal to accept what cannot be genuinely proven, the pressure to examine and re-examine what seems true until its truth has been truly established.'],
+  64: ['Confusion', 'The integration of accumulated past experiences into wisdom, moving through and out of confusion. Gate 64 is the pressure of the unresolved past seeking to become coherent and useful — images, memories, and experiences cycling through consciousness until they resolve into a pattern of understanding that can finally and peacefully be released.'],
+};
+
+// ─── Numerology descriptions ──────────────────────────────────────────────────
+const LIFE_PATH = {
+  1:  { title: 'The Leader',         desc: 'You are here to pioneer, to initiate, and to stand in your own power. Independence, originality, and self-reliance are your greatest strengths. Your soul\'s purpose is to learn courage and forge a path where none existed before.' },
+  2:  { title: 'The Diplomat',       desc: 'You are here to bring harmony, to partner, and to listen deeply. Sensitivity, cooperation, and intuition are your gifts. Your path is one of service through connection — you thrive when you trust that your presence alone is enough.' },
+  3:  { title: 'The Creator',        desc: 'You are here to express, to inspire, and to bring joy. Creativity, communication, and emotional depth are woven into your purpose. When you share what lives inside you freely and without fear, you light up the world around you.' },
+  4:  { title: 'The Builder',        desc: 'You are here to create lasting foundations — in work, in relationships, in life. Discipline, loyalty, and methodical effort are your superpowers. The structures you build outlast you; that is your legacy to the world.' },
+  5:  { title: 'The Adventurer',     desc: 'You are here to experience, to adventure, and to usher in change. Adaptability, curiosity, and a love of freedom define your path. Your greatest gift is showing others what becomes possible when you stop playing it safe.' },
+  6:  { title: 'The Nurturer',       desc: 'You are here to love, to heal, and to serve with grace. Responsibility, beauty, and deep care for others are your nature. You create harmony wherever you go — remember to give that same grace to yourself.' },
+  7:  { title: 'The Seeker',         desc: 'You are here to know — to go deep, to question, and to touch the mystery. Wisdom, introspection, and spiritual insight are your gifts. You carry answers that can only be found in stillness.' },
+  8:  { title: 'The Manifestor',     desc: 'You are here to master the material world — to build, lead, and create abundance. Power, ambition, and executive vision are your nature. Your purpose is to wield great influence with equal integrity.' },
+  9:  { title: 'The Humanitarian',   desc: 'You are here to serve the whole — to complete, to release, and to love without conditions. Compassion, wisdom, and universal perspective are your gifts. Your deepest fulfillment comes through giving back what you have learned.' },
+  11: { title: 'The Illuminator',    desc: 'You carry Master Number 11 — a path of profound spiritual sensitivity, intuition, and inspiration. You are a channel between the seen and unseen. Others are uplifted simply by being near you when you are fully aligned.' },
+  22: { title: 'The Master Builder', desc: 'You carry Master Number 22 — the most powerful vibration in numerology. You are here to turn visionary dreams into real-world structures that serve all of humanity. Your potential is enormous; so is your responsibility to ground it.' },
+  33: { title: 'The Master Teacher', desc: 'You carry Master Number 33 — the highest expression of compassion and service. You are here to uplift through love, truth, and healing. When you live your purpose fully, you become a light for the collective transformation of consciousness.' },
+};
 const PERSONAL_YEAR = {
   1: 'A year of new beginnings — plant seeds, set clear intentions, and step boldly into something new.',
   2: 'A year of patience and partnership — relationships deepen, intuition sharpens, and cooperation opens doors.',
@@ -110,34 +231,30 @@ const PERSONAL_YEAR = {
   8: 'A year of power and abundance — material matters rise, claim your worth, and step into authority.',
   9: 'A year of completion — release what no longer serves to clear the way for all that is coming next.',
 };
-
 const HD_TYPE = {
   'generator':             'You are a Generator — the life force of this world. You are designed to respond to life, not initiate it. When something lights you up with a deep gut "uh-huh," that is your sacral wisdom speaking. Wait to respond, and watch your path illuminate.',
   'manifesting-generator': 'You are a Manifesting Generator — a powerhouse of energy and multi-passionate creation. You respond first, then inform others of your chosen path. You move fast, skip steps others need, and do it your own way. This is not a flaw — it is your design.',
-  'manifestor':            'You are a Manifestor — the initiator, the trailblazer, the one who impacts the world simply by moving through it. You don\'t need to wait for anyone. Your strategy is to inform those in your field before you act, releasing resistance before it begins.',
-  'projector':             'You are a Projector — the wise guide and the one who truly sees others more deeply than they see themselves. You are designed to manage, direct, and guide — but only when genuinely invited. Your gift is penetrating insight. Wait for the recognition.',
-  'reflector':             'You are a Reflector — the rarest and most mystical type in Human Design. You are a mirror of your environment, sampling and reflecting the health and truth of your community back to it. A full lunar cycle (29.5 days) is your timing for major decisions.',
+  'manifestor':            'You are a Manifestor — the initiator, the trailblazer, the one who impacts the world simply by moving through it. You don\'t need to wait. Your strategy is to inform those in your field before you act, releasing resistance before it begins.',
+  'projector':             'You are a Projector — the wise guide who truly sees others more deeply than they see themselves. You are designed to manage, direct, and guide — but only when genuinely invited. Your gift is penetrating insight. Wait for the recognition.',
+  'reflector':             'You are a Reflector — the rarest and most mystical type. You are a mirror of your environment, sampling and reflecting the health and truth of your community. A full lunar cycle (29.5 days) is your timing for major decisions.',
 };
-
 const AUTHORITY = {
-  'emotional':      'Emotional Authority: You make decisions through your emotional wave. There is no truth in the now for you — clarity comes when the wave has moved through and reached stillness. Sleep on every significant decision. Let yourself feel it across time.',
-  'sacral':         'Sacral Authority: Your gut knows before your mind does. The deep body response of "uh-huh" or "uh-uh" is your most reliable oracle. Not logic, not emotion — the immediate felt response in your body. Trust it. It does not explain itself.',
-  'splenic':        'Splenic Authority: Your spleen speaks once, quietly, in the moment — and never repeats itself. It is the oldest intelligence in your body, wired for survival and well-being. If you felt it, it was real. It is gone if you wait. Act when you hear it.',
-  'ego':            'Ego Authority: Your will and desire are your inner compass. When you speak from the heart about what you want and what you don\'t want, the truth emerges. You make commitments you can keep — and when something no longer calls to you, you honor that too.',
-  'self-projected': 'Self-Projected Authority: You discover your truth by hearing yourself speak it. Talk to people you trust, and listen carefully to what you say — not to their response, but to the sound and feel of your own words. Your truth lives in your voice.',
-  'mental':         'Mental Authority: There is no inner authority located in your body. You must discuss, move through different environments, and feel the resonance of each space. Gather perspectives from many sources, and let the right decision become clear through that process.',
-  'lunar':          'Lunar Authority: As a Reflector, you are designed to wait a full lunar cycle (29.5 days) before making any significant decision. Let the moon move through all 64 gates and carry your question with her. What is true in the end is what was always true.',
+  'emotional':      'Emotional Authority: You make decisions through your emotional wave. Clarity comes when the wave has moved through and reached stillness — not at the peak or the bottom. Sleep on every significant decision. Let yourself feel it across time.',
+  'sacral':         'Sacral Authority: Your gut knows before your mind does. The deep body response of "uh-huh" or "uh-uh" is your most reliable oracle. Not logic, not emotion — the immediate felt response in your body. Trust it.',
+  'splenic':        'Splenic Authority: Your spleen speaks once, quietly, in the moment — and never repeats itself. It is the oldest intelligence in your body. If you felt it, it was real. Act when you hear it.',
+  'ego':            'Ego Authority: Your will and desire are your inner compass. When you speak from the heart about what you truly want, the truth emerges. Make only commitments you can keep — and honor what you said you would do.',
+  'self-projected': 'Self-Projected Authority: You discover your truth by hearing yourself speak it. Talk to people you trust, and listen carefully to what you say — not to their response, but to the sound and feel of your own words.',
+  'mental':         'Mental Authority: There is no inner authority located in your body. Discuss, move through different environments, and feel the resonance of each space. Let the right decision become clear through dialogue and discernment.',
+  'lunar':          'Lunar Authority: As a Reflector, you are designed to wait a full lunar cycle (29.5 days) before any significant decision. Let the moon move through all 64 gates and carry your question with her.',
 };
-
 const PROFILE = {
-  1: 'Investigator — You need a solid foundation beneath you before you can move. You study, research, and prepare with depth. You feel safe when you know enough. Your gift is embodied knowledge that others can stand on and trust.',
-  2: 'Hermit — You carry natural talents that emerge effortlessly when you are left alone to simply be yourself. Others see gifts in you that you may not yet recognize. You are called out of your hermitage by life itself — and you respond when the call is genuine.',
-  3: 'Martyr — You learn through direct experience, through bumping into things and discovering what does not work. Your path is beautifully experimental. Every so-called failure is data. You bond deeply with those who witness and honor your process without judgment.',
-  4: 'Opportunist — Your network is your life force. Fixed foundations, long friendships, and a trusted inner circle are everything. You influence those closest to you through the quality of your presence. Your opportunities emerge through the warmth of existing relationships.',
-  5: 'Heretic — You are seen, often before you speak, as someone who carries practical solutions that work for everyone. Others project a kind of savior quality onto you. You are here to deliver what is genuinely needed — and to manage those projections with care and integrity.',
-  6: 'Role Model — Your life unfolds in three distinct phases: experimentation and discovery (roughly 0–30), retreat and observation from the rooftop (roughly 30–50), and embodied role modeling (roughly 50+). You become the living example of what it means to live with wisdom.',
+  1: 'Investigator — You need a solid foundation beneath you before you can move. You study, research, and prepare with depth. You feel safe when you know enough. Your gift is embodied knowledge that others can stand on.',
+  2: 'Hermit — You carry natural talents that emerge effortlessly when left alone to simply be yourself. Others see gifts in you that you may not yet recognize. You are called out of your hermitage by life itself.',
+  3: 'Martyr — You learn through direct experience, through bumping into things and discovering what does not work. Your path is beautifully experimental. Every so-called failure is data. You bond deeply with those who witness your process.',
+  4: 'Opportunist — Your network is your life force. Fixed foundations, long friendships, and a trusted inner circle are everything. You influence those closest to you. Your opportunities emerge through the warmth of existing relationships.',
+  5: 'Heretic — You are seen, often before you speak, as someone who carries practical solutions for everyone. Others project a savior quality onto you. You are here to deliver what is genuinely needed — and to manage those projections with integrity.',
+  6: 'Role Model — Your life unfolds in three phases: experimentation (roughly 0–30), rooftop observation (roughly 30–50), and embodied role modeling (roughly 50+). You become the living example of what it means to live with wisdom.',
 };
-
 const CHANNEL_NAMES = {
   '1-8':   'Inspiration — Creative role modeling that uplifts others',
   '2-14':  'The Beat — Keeper of the keys to higher love and direction',
@@ -156,10 +273,7 @@ const CHANNEL_NAMES = {
   '19-49': 'Synthesis — Profound sensitivity to the needs and hungers of others',
   '20-34': 'Charisma — Busy-ness and the power of action expressing itself',
   '21-45': 'Money — The gift of managing resources, communities, and people',
-  '22-12': 'Openness — A deeply social and emotionally expressive being',
-  '23-43': 'Structuring — Unique individual insights translated into form',
-  '24-61': 'Awareness — Inspired thinking arising from inner mental pressure',
-  '25-51': 'Initiation — The shock of individuation and the courage it takes',
+  '25-51': 'Initiation — The shock and the courage of true individuation',
   '26-44': 'Surrender — The power of transmitting the wisdom of the past into the future',
   '27-50': 'Preservation — Deep caring for the welfare of others and the community',
   '28-38': 'Struggle — The gift of finding purpose through the struggle itself',
@@ -172,31 +286,18 @@ const CHANNEL_NAMES = {
   '39-55': 'Emoting — Deep moodiness in the eternal search for spirit and meaning',
   '42-53': 'Maturation — A life lived in balanced and meaningful cycles',
   '43-23': 'Structuring — Unique individual insights translated into clear form',
-  '44-26': 'Surrender — Transmitting the wisdom of the past into the future',
   '47-64': 'Abstraction — Mental activity, pattern recognition, and the love of thinking',
   '48-16': 'The Wavelength — Exceptional talent devoted to the pursuit of perfection',
   '49-19': 'Synthesis — Sensitivity to the hungers and needs that shape community',
-  '50-27': 'Preservation — Deep and instinctual caring for those in your community',
-  '51-25': 'Initiation — The shock and the courage of true individuation',
-  '52-9':  'Concentration — Focused stillness and the power of deep determination',
-  '53-42': 'Maturation — A life of meaningful cycles and graceful completion',
-  '54-32': 'Transformation — Ambition, drive, and the engine of material change',
-  '55-39': 'Emoting — The depths of moodiness in search of spirit and aliveness',
-  '56-11': 'Curiosity — The love of ideas and the gift of inspired storytelling',
-  '57-34': 'Power — Intuitive power and survival intelligence expressed through action',
-  '58-18': 'Judgment — Aliveness and the joy of striving for what is truly correct',
   '59-6':  'Mating — The drive to break down barriers in service of authentic intimacy',
-  '60-3':  'Mutation — The pressure of a pulse that initiates fundamental change',
   '61-24': 'Awareness — Mental inspiration arising from inner pressure toward knowing',
   '62-17': 'Acceptance — The logic of following a trustworthy and reliable guide',
   '63-4':  'Logic — Doubt, scrutiny, and the arrival at proven, reliable answers',
   '64-47': 'Abstraction — The love of thinking, pattern recognition, and mental synthesis',
 };
 
-function channelLabel(pair) {
-  const [a, b] = [pair[0], pair[1]].sort((x, y) => x - y);
-  return CHANNEL_NAMES[`${a}-${b}`] ?? `Channel ${a}–${b}`;
-}
+function channelKey(pair) { const [a,b]=[pair[0],pair[1]].sort((x,y)=>x-y); return `${a}-${b}`; }
+function channelLabel(pair) { return CHANNEL_NAMES[channelKey(pair)] ?? `Channel ${pair[0]}–${pair[1]}`; }
 
 // ─── Center meta ──────────────────────────────────────────────────────────────
 const CENTER_META = {
@@ -212,64 +313,90 @@ const CENTER_META = {
 };
 
 // ─── Planet display ───────────────────────────────────────────────────────────
-const PLANET_SYM = {
-  sun: '☉', earth: '⊕', moon: '☽', mercury: '☿', venus: '♀', mars: '♂',
-  jupiter: '♃', saturn: '♄', uranus: '♅', neptune: '♆', pluto: '♇',
-  northNode: '☊', southNode: '☋',
-};
-const PLANET_LBL = {
-  sun: 'Sun', earth: 'Earth', moon: 'Moon', mercury: 'Mercury', venus: 'Venus',
-  mars: 'Mars', jupiter: 'Jupiter', saturn: 'Saturn', uranus: 'Uranus',
-  neptune: 'Neptune', pluto: 'Pluto', northNode: 'North Node', southNode: 'South Node',
-};
+const PLANET_SYM = { sun:'☉',earth:'⊕',moon:'☽',mercury:'☿',venus:'♀',mars:'♂',jupiter:'♃',saturn:'♄',uranus:'♅',neptune:'♆',pluto:'♇',northNode:'☊',southNode:'☋' };
+const PLANET_LBL = { sun:'Sun',earth:'Earth',moon:'Moon',mercury:'Mercury',venus:'Venus',mars:'Mars',jupiter:'Jupiter',saturn:'Saturn',uranus:'Uranus',neptune:'Neptune',pluto:'Pluto',northNode:'North Node',southNode:'South Node' };
 const BODY_ORDER = ['sun','earth','moon','mercury','venus','mars','jupiter','saturn','uranus','neptune','pluto','northNode','southNode'];
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function cap(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ''; }
 function fmtDate(d) {
   if (!d) return '';
-  return new Date(d + 'T12:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+  return new Date(d+'T12:00:00').toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
 }
+
 function NumBadge({ n, sm }) {
   return (
-    <span className={`rounded-full btn-gradient flex items-center justify-center shrink-0 ${sm ? 'w-7 h-7' : 'w-12 h-12'}`}>
-      <span className={`text-white font-bold ${sm ? 'text-xs' : 'text-lg'}`}>{n}</span>
+    <span className={`rounded-full btn-gradient flex items-center justify-center shrink-0 ${sm?'w-7 h-7':'w-12 h-12'}`}>
+      <span className={`text-white font-bold ${sm?'text-xs':'text-lg'}`}>{n}</span>
     </span>
+  );
+}
+
+// ─── Detail Modal ─────────────────────────────────────────────────────────────
+function InfoModal({ item, onClose }) {
+  if (!item) return null;
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4"
+      onClick={onClose}
+    >
+      <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" />
+      <div
+        className="relative glass-card rounded-3xl p-6 w-full max-w-lg max-h-[80vh] overflow-y-auto space-y-3 shadow-2xl"
+        onClick={e => e.stopPropagation()}
+      >
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            {item.symbol && (
+              <p className="text-2xl mb-1" style={item.color ? { color: item.color } : {}}>{item.symbol}</p>
+            )}
+            <h3 className="font-playfair text-xl text-gray-700">{item.title}</h3>
+            {item.subtitle && <p className="text-xs text-gray-400 mt-0.5">{item.subtitle}</p>}
+          </div>
+          <button
+            onClick={onClose}
+            className="text-gray-300 hover:text-gray-500 transition-colors text-xl leading-none shrink-0 mt-1"
+          >
+            ×
+          </button>
+        </div>
+        {item.tags?.length > 0 && (
+          <div className="flex flex-wrap gap-1.5">
+            {item.tags.map(t => (
+              <span key={t} className="text-xs px-2.5 py-0.5 rounded-full bg-white/60 border border-white/40 text-gray-500">{t}</span>
+            ))}
+          </div>
+        )}
+        <p className="text-sm text-gray-600 leading-relaxed">{item.body}</p>
+      </div>
+    </div>
   );
 }
 
 // ─── Main page ────────────────────────────────────────────────────────────────
 export default function CosmicPage() {
-  const [birthData,   setBirthData]   = useState(null);
-  const [hdData,      setHdData]      = useState(null);
-  const [transitData, setTransitData] = useState(null);
-  const [loading,     setLoading]     = useState(true);
-  const [tab,         setTab]         = useState('overview');
-  const [displayName, setDisplayName] = useState('');
-  const [today] = useState(() => new Date().toISOString().slice(0, 10));
+  const [birthData,    setBirthData]    = useState(null);
+  const [hdData,       setHdData]       = useState(null);
+  const [transitData,  setTransitData]  = useState(null);
+  const [loading,      setLoading]      = useState(true);
+  const [tab,          setTab]          = useState('overview');
+  const [displayName,  setDisplayName]  = useState('');
+  const [detail,       setDetail]       = useState(null);
+  const [today] = useState(() => new Date().toISOString().slice(0,10));
 
   useEffect(() => {
     setDisplayName(localStorage.getItem('displayName') ?? '');
-
     async function load() {
       let bd = null;
       try { bd = JSON.parse(localStorage.getItem('birthData') ?? 'null'); } catch {}
       setBirthData(bd);
-
       const fetchHD = (date, time, utcOffset) =>
-        fetch('/api/hd-chart', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ birthDate: date, birthTime: time, utcOffset }),
-        }).then(r => r.ok ? r.json() : null).catch(() => null);
-
+        fetch('/api/hd-chart',{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({birthDate:date,birthTime:time,utcOffset}) })
+          .then(r => r.ok ? r.json() : null).catch(()=>null);
       const [natal, transit] = await Promise.all([
-        bd?.date && bd?.time && bd?.utcOffset != null
-          ? fetchHD(bd.date, bd.time, bd.utcOffset)
-          : Promise.resolve(null),
-        fetchHD(today, '12:00', 0),
+        bd?.date && bd?.time && bd?.utcOffset != null ? fetchHD(bd.date, bd.time, bd.utcOffset) : Promise.resolve(null),
+        fetchHD(today,'12:00',0),
       ]);
-
       setHdData(natal);
       setTransitData(transit);
       setLoading(false);
@@ -277,43 +404,93 @@ export default function CosmicPage() {
     load();
   }, [today]);
 
-  // ── Derive longitude maps from gate+line ───────────────────────────────────
   const natalLons = {};
-  if (hdData?.personality) {
-    for (const [body, { gate, line }] of Object.entries(hdData.personality)) {
-      natalLons[body] = gateLineToLon(gate, line);
-    }
-  }
+  if (hdData?.personality) for (const [b,{gate,line}] of Object.entries(hdData.personality)) natalLons[b] = gateLineToLon(gate,line);
   const transitLons = {};
-  if (transitData?.personality) {
-    for (const [body, { gate, line }] of Object.entries(transitData.personality)) {
-      transitLons[body] = gateLineToLon(gate, line);
-    }
-  }
+  if (transitData?.personality) for (const [b,{gate,line}] of Object.entries(transitData.personality)) transitLons[b] = gateLineToLon(gate,line);
 
   const natalAspects   = computeAspects(natalLons);
-  const transitGateSet = new Set(
-    transitData?.personality ? Object.values(transitData.personality).map(a => a.gate) : []
-  );
+  const transitGateSet = new Set(transitData?.personality ? Object.values(transitData.personality).map(a=>a.gate) : []);
 
-  // ── Numerology ─────────────────────────────────────────────────────────────
-  const lifePath    = birthData?.date ? getLifePath(birthData.date)              : null;
-  const personalYr  = birthData?.date ? getPersonalYear(birthData.date, today)   : null;
-  const birthdayNum = birthData?.date ? getBirthdayNum(birthData.date)           : null;
-  const expressNum  = displayName     ? getExpressionNum(displayName)            : null;
+  const lifePath    = birthData?.date ? getLifePath(birthData.date)            : null;
+  const personalYr  = birthData?.date ? getPersonalYear(birthData.date, today) : null;
+  const birthdayNum = birthData?.date ? getBirthdayNum(birthData.date)         : null;
+  const expressNum  = displayName     ? getExpressionNum(displayName)          : null;
 
-  // ── Signs ──────────────────────────────────────────────────────────────────
-  const sunSign        = natalLons.sun   != null ? lonToSign(natalLons.sun)         : null;
-  const moonSign       = natalLons.moon  != null ? lonToSign(natalLons.moon)        : null;
-  const transitSunSign = transitLons.sun != null ? lonToSign(transitLons.sun)       : null;
-  const transitMoonSign= transitLons.moon!= null ? lonToSign(transitLons.moon)      : null;
+  const sunSign         = natalLons.sun    != null ? lonToSign(natalLons.sun)    : null;
+  const moonSign        = natalLons.moon   != null ? lonToSign(natalLons.moon)   : null;
+  const transitSunSign  = transitLons.sun  != null ? lonToSign(transitLons.sun)  : null;
+  const transitMoonSign = transitLons.moon != null ? lonToSign(transitLons.moon) : null;
+
+  // ── Detail openers ─────────────────────────────────────────────────────────
+  function openPlanet(body, sign) {
+    const d = PLANET_DESC[body];
+    if (!d) return;
+    setDetail({
+      title: d.title,
+      subtitle: sign ? `${sign.symbol} ${sign.name} ${sign.degree}° · ${cap(sign.element)} · ${cap(sign.modality)}` : undefined,
+      tags: sign ? [cap(sign.element), cap(sign.modality)] : [],
+      body: d.body,
+    });
+  }
+  function openAspect(asp) {
+    const d = ASPECT_DESC[asp.name];
+    if (!d) return;
+    setDetail({
+      symbol: d.symbol,
+      color: d.color,
+      title: asp.name,
+      subtitle: `${PLANET_LBL[asp.planet1]} ${asp.name} ${PLANET_LBL[asp.planet2]} · ${asp.orb}° orb`,
+      body: d.body,
+    });
+  }
+  function openGate(gate, line, context) {
+    const d = GATE_DESC[gate];
+    if (!d) return;
+    setDetail({
+      title: `Gate ${gate} · ${d[0]}`,
+      subtitle: context ?? (line ? `Line ${line}` : undefined),
+      body: d[1],
+    });
+  }
+  function openCenter(key, isDefined) {
+    const d = CENTER_DESC[key];
+    const m = CENTER_META[key];
+    if (!d || !m) return;
+    setDetail({
+      title: m.label,
+      subtitle: isDefined ? 'Defined' : 'Open / Undefined',
+      tags: [isDefined ? 'Defined' : 'Open', m.theme],
+      body: isDefined ? d.defined : d.open,
+    });
+  }
+  function openChannel(pair) {
+    const key = channelKey(pair);
+    const label = CHANNEL_NAMES[key];
+    setDetail({
+      title: `Channel ${pair[0]}–${pair[1]}`,
+      subtitle: label?.split('—')[0].trim(),
+      body: label ?? `The channel connecting gates ${pair[0]} and ${pair[1]}.`,
+    });
+  }
+  function openTransitPlanet(body, gate, line) {
+    const d = PLANET_DESC[body];
+    const sign = lonToSign(gateLineToLon(gate, line));
+    if (!d) return;
+    setDetail({
+      title: d.title,
+      subtitle: `Currently in ${sign.symbol} ${sign.name} · Gate ${gate}.${line}`,
+      tags: ['Transit', cap(sign.element)],
+      body: d.body,
+    });
+  }
 
   const TABS = [
-    { id: 'overview',   label: 'Overview'     },
-    { id: 'astrology',  label: 'Astrology'    },
-    { id: 'hd',         label: 'Human Design' },
-    { id: 'numerology', label: 'Numerology'   },
-    { id: 'transits',   label: 'Transits'     },
+    {id:'overview',   label:'Overview'},
+    {id:'astrology',  label:'Astrology'},
+    {id:'hd',         label:'Human Design'},
+    {id:'numerology', label:'Numerology'},
+    {id:'transits',   label:'Transits'},
   ];
 
   if (loading) return (
@@ -330,17 +507,21 @@ export default function CosmicPage() {
       <h1 className="font-playfair text-3xl text-gray-700">Your Cosmic Chart</h1>
       <div className="glass-card rounded-3xl p-10 text-center space-y-3">
         <p className="text-gray-500 text-sm">No birth data found.</p>
-        <p className="text-xs text-gray-400">
-          Go to <a href="/profile" className="text-[#b88a92] underline">Profile</a> and enter your birth date, time, and location to unlock your full chart.
-        </p>
+        <p className="text-xs text-gray-400">Go to <a href="/profile" className="text-[#b88a92] underline">Profile</a> and enter your birth date, time, and location to unlock your full chart.</p>
       </div>
     </div>
   );
 
+  const elColor = { fire:'rose', earth:'amber', air:'sky', water:'violet' };
+  function elStyle(el) {
+    const c = elColor[el];
+    return c ? `bg-${c}-50 text-${c}-${el==='earth'?'600':'500'} border-${c}-200/50` : 'bg-gray-50 text-gray-400 border-gray-200/50';
+  }
+
   return (
     <div className="max-w-2xl mx-auto space-y-5 pb-12">
+      <InfoModal item={detail} onClose={() => setDetail(null)} />
 
-      {/* Header */}
       <div>
         <h1 className="font-playfair text-3xl text-gray-700">Your Cosmic Chart</h1>
         <p className="text-sm text-gray-400 mt-1">
@@ -348,104 +529,91 @@ export default function CosmicPage() {
         </p>
       </div>
 
-      {/* Tabs */}
       <div className="flex gap-2 flex-wrap">
         {TABS.map(t => (
-          <button
-            key={t.id}
-            onClick={() => setTab(t.id)}
-            className={`px-4 py-2 rounded-full text-xs font-medium transition-all ${
-              tab === t.id
-                ? 'btn-gradient text-white shadow-sm'
-                : 'bg-white/60 text-gray-500 border border-white/50 hover:bg-white/80'
-            }`}
-          >
+          <button key={t.id} onClick={()=>setTab(t.id)}
+            className={`px-4 py-2 rounded-full text-xs font-medium transition-all ${tab===t.id?'btn-gradient text-white shadow-sm':'bg-white/60 text-gray-500 border border-white/50 hover:bg-white/80'}`}>
             {t.label}
           </button>
         ))}
       </div>
 
-      {/* ════════════════ OVERVIEW ════════════════ */}
+      {/* ════ OVERVIEW ════ */}
       {tab === 'overview' && (
         <div className="space-y-4">
-
-          {/* Identity grid */}
           <div className="glass-card rounded-3xl p-6 space-y-4">
             <h2 className="font-playfair text-xl text-gray-700">{displayName || 'Your'} Cosmic Identity</h2>
+            <p className="text-xs text-gray-400">Tap any card to learn more.</p>
             <div className="grid grid-cols-2 gap-3">
               {sunSign && (
-                <div className="bg-white/50 rounded-2xl p-3 border border-white/40">
+                <button onClick={() => openPlanet('sun', sunSign)} className="bg-white/50 rounded-2xl p-3 border border-white/40 text-left hover:bg-white/70 transition-colors active:scale-[0.98]">
                   <p className="text-xs text-gray-400 uppercase tracking-widest">Sun Sign</p>
                   <p className="text-base font-medium text-gray-700 mt-0.5">{sunSign.symbol} {sunSign.name}</p>
                   <p className="text-xs text-gray-400 capitalize mt-0.5">{sunSign.element} · {sunSign.modality}</p>
-                </div>
+                </button>
               )}
               {moonSign && (
-                <div className="bg-white/50 rounded-2xl p-3 border border-white/40">
+                <button onClick={() => openPlanet('moon', moonSign)} className="bg-white/50 rounded-2xl p-3 border border-white/40 text-left hover:bg-white/70 transition-colors active:scale-[0.98]">
                   <p className="text-xs text-gray-400 uppercase tracking-widest">Moon Sign</p>
                   <p className="text-base font-medium text-gray-700 mt-0.5">☽ {moonSign.name}</p>
                   <p className="text-xs text-gray-400 capitalize mt-0.5">{moonSign.element} · {moonSign.modality}</p>
-                </div>
+                </button>
               )}
               {hdData?.type && (
-                <div className="bg-white/50 rounded-2xl p-3 border border-white/40">
+                <button onClick={() => setDetail({ title: cap(hdData.type.replace(/-/g,' ')), subtitle: 'Human Design Type', body: HD_TYPE[hdData.type] ?? '' })} className="bg-white/50 rounded-2xl p-3 border border-white/40 text-left hover:bg-white/70 transition-colors active:scale-[0.98]">
                   <p className="text-xs text-gray-400 uppercase tracking-widest">HD Type</p>
                   <p className="text-base font-medium text-gray-700 mt-0.5 capitalize">{hdData.type.replace(/-/g,' ')}</p>
                   <p className="text-xs text-gray-400 capitalize mt-0.5">{hdData.authority} authority</p>
-                </div>
+                </button>
               )}
               {hdData?.profile && (
-                <div className="bg-white/50 rounded-2xl p-3 border border-white/40">
+                <button onClick={() => setDetail({ title: `Profile ${hdData.profile}`, subtitle: `Line ${hdData.profileLine1} / Line ${hdData.profileLine2}`, body: [PROFILE[hdData.profileLine1], PROFILE[hdData.profileLine2]].filter(Boolean).join('\n\n') })} className="bg-white/50 rounded-2xl p-3 border border-white/40 text-left hover:bg-white/70 transition-colors active:scale-[0.98]">
                   <p className="text-xs text-gray-400 uppercase tracking-widest">Profile</p>
                   <p className="text-base font-medium text-gray-700 mt-0.5">{hdData.profile}</p>
-                  <p className="text-xs text-gray-400 mt-0.5">
-                    {PROFILE[hdData.profileLine1]?.split('—')[0].trim()} / {PROFILE[hdData.profileLine2]?.split('—')[0].trim()}
-                  </p>
-                </div>
+                  <p className="text-xs text-gray-400 mt-0.5">{PROFILE[hdData.profileLine1]?.split('—')[0].trim()} / {PROFILE[hdData.profileLine2]?.split('—')[0].trim()}</p>
+                </button>
               )}
               {lifePath && (
-                <div className="bg-white/50 rounded-2xl p-3 border border-white/40">
+                <button onClick={() => setDetail({ title: `Life Path ${lifePath} · ${LIFE_PATH[lifePath]?.title}`, subtitle: 'Numerology', body: LIFE_PATH[lifePath]?.desc ?? '' })} className="bg-white/50 rounded-2xl p-3 border border-white/40 text-left hover:bg-white/70 transition-colors active:scale-[0.98]">
                   <p className="text-xs text-gray-400 uppercase tracking-widest">Life Path</p>
                   <p className="text-base font-medium text-gray-700 mt-0.5">{lifePath}</p>
                   <p className="text-xs text-gray-400 mt-0.5">{LIFE_PATH[lifePath]?.title}</p>
-                </div>
+                </button>
               )}
               {personalYr && (
-                <div className="bg-white/50 rounded-2xl p-3 border border-white/40">
+                <button onClick={() => setDetail({ title: `Personal Year ${personalYr}`, subtitle: today.slice(0,4), body: PERSONAL_YEAR[personalYr] ?? '' })} className="bg-white/50 rounded-2xl p-3 border border-white/40 text-left hover:bg-white/70 transition-colors active:scale-[0.98]">
                   <p className="text-xs text-gray-400 uppercase tracking-widest">Personal Year</p>
                   <p className="text-base font-medium text-gray-700 mt-0.5">{personalYr}</p>
                   <p className="text-xs text-gray-400 mt-0.5 leading-tight">{PERSONAL_YEAR[personalYr]?.split('—')[0].trim()}</p>
-                </div>
+                </button>
               )}
             </div>
           </div>
 
-          {/* Today's sky */}
           {(transitSunSign || transitMoonSign) && (
             <div className="glass-card rounded-3xl p-6 space-y-3">
               <p className="text-xs font-medium text-gray-400 uppercase tracking-widest">Today's Sky — {fmtDate(today)}</p>
               {transitSunSign && (
-                <div className="flex items-center gap-3">
+                <button onClick={() => openTransitPlanet('sun', transitData.personality.sun.gate, transitData.personality.sun.line)} className="w-full flex items-center gap-3 text-left hover:bg-white/40 rounded-2xl p-2 -mx-2 transition-colors">
                   <span className="text-2xl w-8 text-center">{transitSunSign.symbol}</span>
                   <div>
                     <p className="text-sm font-medium text-gray-700">Sun in {transitSunSign.name}</p>
                     <p className="text-xs text-gray-400 capitalize">{transitSunSign.element} · {transitSunSign.modality} collective energy</p>
                   </div>
-                </div>
+                </button>
               )}
               {transitMoonSign && (
-                <div className="flex items-center gap-3">
+                <button onClick={() => openTransitPlanet('moon', transitData.personality.moon.gate, transitData.personality.moon.line)} className="w-full flex items-center gap-3 text-left hover:bg-white/40 rounded-2xl p-2 -mx-2 transition-colors">
                   <span className="text-2xl w-8 text-center">☽</span>
                   <div>
                     <p className="text-sm font-medium text-gray-700">Moon in {transitMoonSign.name}</p>
                     <p className="text-xs text-gray-400 capitalize">{transitMoonSign.element} · {transitMoonSign.modality} emotional undercurrent</p>
                   </div>
-                </div>
+                </button>
               )}
             </div>
           )}
 
-          {/* Synthesis */}
           {(hdData || lifePath) && (
             <div className="glass-card rounded-3xl p-6 space-y-4">
               <h2 className="font-playfair text-xl text-gray-700">Your Reading</h2>
@@ -463,25 +631,8 @@ export default function CosmicPage() {
               )}
               {lifePath && LIFE_PATH[lifePath] && (
                 <div className="space-y-1 pt-3 border-t border-white/30">
-                  <p className="text-xs font-medium text-gray-400 uppercase tracking-widest">Numerology · Life Path {lifePath}</p>
+                  <p className="text-xs font-medium text-gray-400 uppercase tracking-widest">Life Path {lifePath}</p>
                   <p className="text-sm text-gray-600 leading-relaxed">{LIFE_PATH[lifePath].desc}</p>
-                </div>
-              )}
-              {sunSign && hdData && (
-                <div className="space-y-1 pt-3 border-t border-white/30">
-                  <p className="text-xs font-medium text-gray-400 uppercase tracking-widest">Sun Sign + HD Type</p>
-                  <p className="text-sm text-gray-600 leading-relaxed">
-                    As a {sunSign.name} sun and {hdData.type.replace(/-/g,' ')}, you bring {sunSign.element} {sunSign.modality} energy through{' '}
-                    {hdData.type === 'generator' || hdData.type === 'manifesting-generator'
-                      ? 'the power of response and sacred satisfaction'
-                      : hdData.type === 'projector'
-                        ? 'the penetrating wisdom of seeing others clearly'
-                        : hdData.type === 'manifestor'
-                          ? 'the boldness of initiation and impact'
-                          : 'the mirror of reflection and communal wisdom'
-                    }.
-                    {moonSign && ` Your moon in ${moonSign.name} colors your emotional interior with ${moonSign.element} depth.`}
-                  </p>
                 </div>
               )}
             </div>
@@ -489,32 +640,26 @@ export default function CosmicPage() {
         </div>
       )}
 
-      {/* ════════════════ ASTROLOGY ════════════════ */}
+      {/* ════ ASTROLOGY ════ */}
       {tab === 'astrology' && (
         <div className="space-y-4">
-
-          {/* Natal planets */}
           <div className="glass-card rounded-3xl p-6 space-y-4">
             <div>
               <h2 className="font-playfair text-xl text-gray-700">Natal Planets</h2>
-              <p className="text-xs text-gray-400 mt-1">Planetary positions at the moment of your birth</p>
+              <p className="text-xs text-gray-400 mt-1">Tap any row to learn about that planet.</p>
             </div>
             {Object.keys(natalLons).length > 0 ? (
               <div className="divide-y divide-white/30">
                 {BODY_ORDER.filter(b => natalLons[b] != null).map(body => {
                   const sign = lonToSign(natalLons[body]);
                   return (
-                    <div key={body} className="flex items-center gap-3 py-2.5">
-                      <span className="text-base w-7 text-center text-gray-400 shrink-0" title={PLANET_LBL[body]}>{PLANET_SYM[body]}</span>
+                    <button key={body} onClick={() => openPlanet(body, sign)}
+                      className="w-full flex items-center gap-3 py-2.5 hover:bg-white/40 rounded-xl px-2 -mx-2 transition-colors text-left">
+                      <span className="text-base w-7 text-center text-gray-400 shrink-0">{PLANET_SYM[body]}</span>
                       <span className="text-sm text-gray-500 w-24 shrink-0">{PLANET_LBL[body]}</span>
                       <span className="text-sm font-medium text-gray-700 flex-1">{sign.symbol} {sign.name} {sign.degree}°</span>
-                      <span className={`text-xs px-2 py-0.5 rounded-full border ${
-                        sign.element === 'fire'  ? 'bg-rose-50   text-rose-400   border-rose-200/50'  :
-                        sign.element === 'earth' ? 'bg-amber-50  text-amber-600  border-amber-200/50' :
-                        sign.element === 'air'   ? 'bg-sky-50    text-sky-500    border-sky-200/50'   :
-                                                   'bg-violet-50 text-violet-500 border-violet-200/50'
-                      }`}>{sign.element}</span>
-                    </div>
+                      <span className={`text-xs px-2 py-0.5 rounded-full border ${elStyle(sign.element)}`}>{sign.element}</span>
+                    </button>
                   );
                 })}
               </div>
@@ -523,141 +668,126 @@ export default function CosmicPage() {
             )}
           </div>
 
-          {/* Aspects */}
           {natalAspects.length > 0 && (
             <div className="glass-card rounded-3xl p-6 space-y-4">
               <div>
                 <h2 className="font-playfair text-xl text-gray-700">Natal Aspects</h2>
-                <p className="text-xs text-gray-400 mt-1">Angular relationships between your natal planets</p>
+                <p className="text-xs text-gray-400 mt-1">Tap any aspect to learn what it means.</p>
               </div>
               <div className="divide-y divide-white/30">
                 {natalAspects.map((asp, i) => (
-                  <div key={i} className="flex items-center gap-2 py-2">
+                  <button key={i} onClick={() => openAspect(asp)}
+                    className="w-full flex items-center gap-2 py-2.5 hover:bg-white/40 rounded-xl px-2 -mx-2 transition-colors text-left">
                     <span className="text-sm text-gray-500 w-6 text-center">{PLANET_SYM[asp.planet1]}</span>
-                    <span className="text-sm font-bold w-5 text-center" style={{ color: asp.color }}>{asp.symbol}</span>
+                    <span className="text-sm font-bold w-5 text-center" style={{color:asp.color}}>{asp.symbol}</span>
                     <span className="text-sm text-gray-500 w-6 text-center">{PLANET_SYM[asp.planet2]}</span>
-                    <span className="text-xs text-gray-600 flex-1">
-                      {PLANET_LBL[asp.planet1]} {asp.name} {PLANET_LBL[asp.planet2]}
-                    </span>
+                    <span className="text-xs text-gray-600 flex-1">{PLANET_LBL[asp.planet1]} {asp.name} {PLANET_LBL[asp.planet2]}</span>
                     <span className="text-xs text-gray-300">{asp.orb}° orb</span>
-                  </div>
+                  </button>
                 ))}
               </div>
-              <div className="flex flex-wrap gap-2 pt-2 border-t border-white/20">
+              <div className="flex flex-wrap gap-3 pt-2 border-t border-white/20">
                 {ASPECT_DEFS.map(a => (
-                  <span key={a.name} className="text-xs text-gray-400">
-                    <span className="font-semibold" style={{ color: a.color }}>{a.symbol}</span> {a.name}
-                  </span>
+                  <button key={a.name} onClick={() => setDetail({ symbol:a.symbol, color:a.color, title:a.name, body:ASPECT_DESC[a.name]?.body??'' })}
+                    className="text-xs text-gray-400 hover:text-gray-600 transition-colors">
+                    <span className="font-semibold" style={{color:a.color}}>{a.symbol}</span> {a.name}
+                  </button>
                 ))}
               </div>
             </div>
           )}
 
-          {/* Design date */}
           {hdData?.designDate && (
             <div className="glass-card rounded-3xl p-6 space-y-2">
               <h2 className="font-playfair text-xl text-gray-700">Design Date</h2>
               <p className="text-sm text-gray-600">{fmtDate(hdData.designDate)}</p>
-              <p className="text-xs text-gray-400 leading-relaxed">
-                Your Design is calculated from when the Sun was 88° behind your birth Sun — approximately 88 days before you were born. This is when your unconscious (red) imprinting occurred.
-              </p>
+              <p className="text-xs text-gray-400 leading-relaxed">Approximately 88 days before your birth — when your unconscious (Design) imprinting occurred as the Sun transited 88° behind your birth Sun position.</p>
             </div>
           )}
         </div>
       )}
 
-      {/* ════════════════ HUMAN DESIGN ════════════════ */}
+      {/* ════ HUMAN DESIGN ════ */}
       {tab === 'hd' && (
         <div className="space-y-4">
           {hdData ? (
             <>
-              {/* Type summary */}
               <div className="glass-card rounded-3xl p-6 space-y-4">
                 <h2 className="font-playfair text-xl text-gray-700">Human Design</h2>
+                <p className="text-xs text-gray-400">Tap any card to learn more.</p>
                 <div className="grid grid-cols-2 gap-3">
                   {[
-                    { label: 'Type',      value: cap(hdData.type.replace(/-/g,' ')) },
-                    { label: 'Profile',   value: hdData.profile },
-                    { label: 'Authority', value: cap(hdData.authority) },
-                    { label: 'Strategy',  value: hdData.strategy },
-                    { label: 'Signature', value: hdData.signature },
-                    { label: 'Not-Self',  value: hdData.notSelf },
-                  ].map(({ label, value }) => (
-                    <div key={label} className="bg-white/50 rounded-2xl p-3 border border-white/40">
+                    { label:'Type',      value:cap(hdData.type.replace(/-/g,' ')), onClick:()=>setDetail({title:cap(hdData.type.replace(/-/g,' ')),subtitle:'Human Design Type',body:HD_TYPE[hdData.type]??''}) },
+                    { label:'Profile',   value:hdData.profile,                     onClick:()=>setDetail({title:`Profile ${hdData.profile}`,subtitle:`Line ${hdData.profileLine1} / Line ${hdData.profileLine2}`,body:[PROFILE[hdData.profileLine1],PROFILE[hdData.profileLine2]].filter(Boolean).join('\n\n')}) },
+                    { label:'Authority', value:cap(hdData.authority),              onClick:()=>setDetail({title:`${cap(hdData.authority)} Authority`,subtitle:'Inner Authority',body:AUTHORITY[hdData.authority]??''}) },
+                    { label:'Strategy',  value:hdData.strategy,                    onClick:()=>setDetail({title:'Strategy',subtitle:hdData.strategy,body:`Your strategy is to ${hdData.strategy.toLowerCase()}. This is the practical guidance for how to move through life in alignment with your design, reducing resistance and increasing the quality of your experiences.`}) },
+                    { label:'Signature', value:hdData.signature,                   onClick:()=>setDetail({title:'Signature',subtitle:hdData.signature,body:`${hdData.signature} is the feeling you experience when you are living in alignment with your design. When you feel ${hdData.signature.toLowerCase()}, it is a signal that you are on track — that your strategy and authority are being honored.`}) },
+                    { label:'Not-Self',  value:hdData.notSelf,                     onClick:()=>setDetail({title:'Not-Self Theme',subtitle:hdData.notSelf,body:`${hdData.notSelf} is the emotion that arises when you are not living in alignment with your design. It is a signal, not a judgment — an invitation to return to your strategy and authority rather than to continue forcing what is not correct for you.`}) },
+                  ].map(({label,value,onClick}) => (
+                    <button key={label} onClick={onClick} className="bg-white/50 rounded-2xl p-3 border border-white/40 text-left hover:bg-white/70 transition-colors active:scale-[0.98]">
                       <p className="text-xs text-gray-400 uppercase tracking-widest">{label}</p>
                       <p className="text-sm font-medium text-gray-700 mt-0.5">{value}</p>
-                    </div>
+                    </button>
                   ))}
                 </div>
               </div>
 
-              {/* Profile lines */}
               <div className="glass-card rounded-3xl p-6 space-y-3">
                 <h2 className="font-playfair text-xl text-gray-700">Profile Lines</h2>
-                {[
-                  { line: hdData.profileLine1, role: 'Conscious (Personality)' },
-                  { line: hdData.profileLine2, role: 'Unconscious (Design)' },
-                ].filter(({ line }) => line && PROFILE[line]).map(({ line, role }) => (
-                  <div key={line} className="bg-white/50 rounded-2xl p-4 border border-white/40 space-y-1">
-                    <p className="text-xs text-gray-400 uppercase tracking-widest">Line {line} · {role}</p>
-                    <p className="text-sm text-gray-600 leading-relaxed">{PROFILE[line]}</p>
-                  </div>
-                ))}
+                {[{line:hdData.profileLine1,role:'Conscious (Personality)'},{line:hdData.profileLine2,role:'Unconscious (Design)'}]
+                  .filter(({line})=>line&&PROFILE[line]).map(({line,role})=>(
+                    <button key={line} onClick={()=>setDetail({title:`Line ${line} · ${PROFILE[line]?.split('—')[0].trim()}`,subtitle:role,body:PROFILE[line]})}
+                      className="w-full bg-white/50 rounded-2xl p-4 border border-white/40 text-left space-y-1 hover:bg-white/70 transition-colors">
+                      <p className="text-xs text-gray-400 uppercase tracking-widest">Line {line} · {role}</p>
+                      <p className="text-sm text-gray-600 leading-relaxed">{PROFILE[line]}</p>
+                    </button>
+                  ))}
               </div>
 
-              {/* Energy centers */}
               <div className="glass-card rounded-3xl p-6 space-y-3">
                 <h2 className="font-playfair text-xl text-gray-700">Energy Centers</h2>
+                <p className="text-xs text-gray-400">Tap any center to understand what it means for you.</p>
                 <div className="space-y-2">
-                  {Object.entries(CENTER_META).map(([key, meta]) => {
+                  {Object.entries(CENTER_META).map(([key,meta])=>{
                     const defined = hdData.definedCenters?.includes(key);
                     return (
-                      <div
-                        key={key}
-                        className={`flex items-start gap-3 p-3 rounded-2xl border ${
-                          defined
-                            ? 'bg-gradient-to-r from-rose-50/80 to-violet-50/80 border-rose-200/50'
-                            : 'bg-white/30 border-white/30'
-                        }`}
-                      >
-                        <div className={`mt-1 w-3 h-3 rounded-full shrink-0 ${defined ? 'bg-gradient-to-br from-rose-400 to-violet-400' : 'bg-gray-200'}`} />
+                      <button key={key} onClick={()=>openCenter(key,defined)}
+                        className={`w-full flex items-start gap-3 p-3 rounded-2xl border text-left transition-colors ${defined?'bg-gradient-to-r from-rose-50/80 to-violet-50/80 border-rose-200/50 hover:from-rose-50 hover:to-violet-50':'bg-white/30 border-white/30 hover:bg-white/50'}`}>
+                        <div className={`mt-1 w-3 h-3 rounded-full shrink-0 ${defined?'bg-gradient-to-br from-rose-400 to-violet-400':'bg-gray-200'}`}/>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 flex-wrap">
                             <p className="text-sm font-medium text-gray-700">{meta.label}</p>
-                            <span className={`text-xs px-2 py-0.5 rounded-full ${defined ? 'bg-rose-100 text-rose-500' : 'bg-gray-100 text-gray-400'}`}>
-                              {defined ? 'Defined' : 'Open'}
-                            </span>
+                            <span className={`text-xs px-2 py-0.5 rounded-full ${defined?'bg-rose-100 text-rose-500':'bg-gray-100 text-gray-400'}`}>{defined?'Defined':'Open'}</span>
                           </div>
                           <p className="text-xs text-gray-400 mt-0.5">{meta.theme}</p>
                           <p className="text-xs text-gray-300 mt-0.5">Gates: {meta.gates.join(', ')}</p>
                         </div>
-                      </div>
+                      </button>
                     );
                   })}
                 </div>
               </div>
 
-              {/* Defined channels */}
               {hdData.definedChannels?.length > 0 && (
                 <div className="glass-card rounded-3xl p-6 space-y-3">
                   <h2 className="font-playfair text-xl text-gray-700">Defined Channels</h2>
-                  <p className="text-xs text-gray-400">These are your consistent, reliable energies — available to you every day.</p>
+                  <p className="text-xs text-gray-400">Your consistent, reliable energies. Tap to explore each one.</p>
                   <div className="space-y-2">
-                    {hdData.definedChannels.map(([g1, g2]) => (
-                      <div key={`${g1}-${g2}`} className="bg-white/50 rounded-2xl p-3 border border-white/40">
+                    {hdData.definedChannels.map(([g1,g2])=>(
+                      <button key={`${g1}-${g2}`} onClick={()=>openChannel([g1,g2])}
+                        className="w-full bg-white/50 rounded-2xl p-3 border border-white/40 text-left hover:bg-white/70 transition-colors">
                         <p className="text-xs font-semibold text-rose-400 mb-0.5">{g1} — {g2}</p>
-                        <p className="text-sm text-gray-600">{channelLabel([g1, g2])}</p>
-                      </div>
+                        <p className="text-sm text-gray-600">{channelLabel([g1,g2])}</p>
+                      </button>
                     ))}
                   </div>
                 </div>
               )}
 
-              {/* Gate activations table */}
               <div className="glass-card rounded-3xl p-6 space-y-4">
                 <div>
                   <h2 className="font-playfair text-xl text-gray-700">Gate Activations</h2>
-                  <p className="text-xs text-gray-400 mt-1">Personality = conscious (black) · Design = unconscious (red)</p>
+                  <p className="text-xs text-gray-400 mt-1">Tap any gate to learn its meaning.</p>
                 </div>
                 <div className="overflow-x-auto -mx-2">
                   <table className="w-full text-xs min-w-[300px]">
@@ -669,21 +799,29 @@ export default function CosmicPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {BODY_ORDER.filter(b => hdData.personality?.[b] || hdData.design?.[b]).map(body => {
-                        const p = hdData.personality?.[body];
-                        const d = hdData.design?.[body];
-                        const pInChannel = hdData.definedChannels?.some(([a,b2]) => a===p?.gate || b2===p?.gate);
-                        const dInChannel = hdData.definedChannels?.some(([a,b2]) => a===d?.gate || b2===d?.gate);
+                      {BODY_ORDER.filter(b=>hdData.personality?.[b]||hdData.design?.[b]).map(body=>{
+                        const p=hdData.personality?.[body];
+                        const d=hdData.design?.[body];
+                        const pInCh=hdData.definedChannels?.some(([a,b2])=>a===p?.gate||b2===p?.gate);
+                        const dInCh=hdData.definedChannels?.some(([a,b2])=>a===d?.gate||b2===d?.gate);
                         return (
                           <tr key={body} className="border-b border-white/20 last:border-0">
-                            <td className="py-2 px-2 text-gray-400">
-                              {PLANET_SYM[body]} {PLANET_LBL[body]}
+                            <td className="py-2 px-2 text-gray-400">{PLANET_SYM[body]} {PLANET_LBL[body]}</td>
+                            <td className="py-2 px-2">
+                              {p ? (
+                                <button onClick={()=>openGate(p.gate,p.line,`Personality ${PLANET_LBL[body]} · Line ${p.line}`)}
+                                  className={`font-semibold hover:underline ${pInCh?'text-gray-800':'text-gray-500'}`}>
+                                  {p.gate}.{p.line}
+                                </button>
+                              ) : <span className="text-gray-300">—</span>}
                             </td>
-                            <td className={`py-2 px-2 font-semibold ${pInChannel ? 'text-gray-800' : 'text-gray-500'}`}>
-                              {p ? `${p.gate}.${p.line}` : '—'}
-                            </td>
-                            <td className={`py-2 px-2 font-medium ${dInChannel ? 'text-rose-400' : 'text-gray-400'}`}>
-                              {d ? `${d.gate}.${d.line}` : '—'}
+                            <td className="py-2 px-2">
+                              {d ? (
+                                <button onClick={()=>openGate(d.gate,d.line,`Design ${PLANET_LBL[body]} · Line ${d.line}`)}
+                                  className={`font-medium hover:underline ${dInCh?'text-rose-400':'text-gray-400'}`}>
+                                  {d.gate}.{d.line}
+                                </button>
+                              ) : <span className="text-gray-300">—</span>}
                             </td>
                           </tr>
                         );
@@ -696,19 +834,15 @@ export default function CosmicPage() {
           ) : (
             <div className="glass-card rounded-3xl p-10 text-center space-y-3">
               <p className="text-gray-500 text-sm">HD chart data unavailable.</p>
-              <p className="text-xs text-gray-400">
-                Add your birth time and location on <a href="/profile" className="text-[#b88a92] underline">Profile</a> and save.
-              </p>
+              <p className="text-xs text-gray-400">Add your birth time and location on <a href="/profile" className="text-[#b88a92] underline">Profile</a> and save.</p>
             </div>
           )}
         </div>
       )}
 
-      {/* ════════════════ NUMEROLOGY ════════════════ */}
+      {/* ════ NUMEROLOGY ════ */}
       {tab === 'numerology' && (
         <div className="space-y-4">
-
-          {/* Life path */}
           {lifePath && LIFE_PATH[lifePath] && (
             <div className="glass-card rounded-3xl p-6 space-y-4">
               <div className="flex items-center gap-4">
@@ -721,14 +855,12 @@ export default function CosmicPage() {
               <p className="text-sm text-gray-600 leading-relaxed">{LIFE_PATH[lifePath].desc}</p>
             </div>
           )}
-
-          {/* Other numbers */}
           <div className="glass-card rounded-3xl p-6 space-y-3">
             <h2 className="font-playfair text-xl text-gray-700">Your Numbers</h2>
             <div className="space-y-3">
-
               {personalYr && (
-                <div className="bg-white/50 rounded-2xl p-4 border border-white/40 space-y-2">
+                <button onClick={()=>setDetail({title:`Personal Year ${personalYr}`,subtitle:today.slice(0,4),body:PERSONAL_YEAR[personalYr]??''})}
+                  className="w-full bg-white/50 rounded-2xl p-4 border border-white/40 text-left hover:bg-white/70 transition-colors">
                   <div className="flex items-center justify-between gap-3">
                     <div>
                       <p className="text-xs text-gray-400 uppercase tracking-widest">Personal Year {today.slice(0,4)}</p>
@@ -736,78 +868,59 @@ export default function CosmicPage() {
                     </div>
                     <NumBadge n={personalYr} sm />
                   </div>
-                </div>
+                </button>
               )}
-
               {birthdayNum && (
-                <div className="bg-white/50 rounded-2xl p-4 border border-white/40">
+                <button onClick={()=>setDetail({title:`Birthday Number ${birthdayNum}`,subtitle:'The gifts you were born with',body:`Your Birthday Number ${birthdayNum} describes the specific talents and gifts you carry into this life. It is derived from the day of the month you were born — a personal signature of energy that colors the way your Life Path expresses itself.`})}
+                  className="w-full bg-white/50 rounded-2xl p-4 border border-white/40 text-left hover:bg-white/70 transition-colors">
                   <div className="flex items-center justify-between gap-3">
                     <div>
                       <p className="text-xs text-gray-400 uppercase tracking-widest">Birthday Number</p>
-                      <p className="text-sm text-gray-600 mt-0.5">The talents and gifts you were born with on day {+birthData.date.split('-')[2]} of the month.</p>
+                      <p className="text-sm text-gray-600 mt-0.5">The gifts and talents you were born with</p>
                     </div>
                     <NumBadge n={birthdayNum} sm />
                   </div>
-                </div>
+                </button>
               )}
-
               {expressNum && LIFE_PATH[expressNum] && (
-                <div className="bg-white/50 rounded-2xl p-4 border border-white/40 space-y-1">
+                <button onClick={()=>setDetail({title:`Expression Number ${expressNum} · ${LIFE_PATH[expressNum]?.title}`,subtitle:'Based on your display name',body:`Your Expression Number ${expressNum} is calculated from the numerical values of all the letters in your name. It describes your natural abilities, the talents and skills you came into this life already carrying, and the way you naturally express yourself in the world.`})}
+                  className="w-full bg-white/50 rounded-2xl p-4 border border-white/40 text-left hover:bg-white/70 transition-colors">
                   <div className="flex items-center justify-between gap-3">
                     <div>
                       <p className="text-xs text-gray-400 uppercase tracking-widest">Expression Number</p>
                       <p className="text-sm font-medium text-gray-700 mt-0.5">{LIFE_PATH[expressNum].title}</p>
-                      <p className="text-xs text-gray-400">Based on the letters in your display name</p>
+                      <p className="text-xs text-gray-400">Based on your display name</p>
                     </div>
                     <NumBadge n={expressNum} sm />
                   </div>
-                </div>
+                </button>
               )}
             </div>
           </div>
 
-          {/* Cross-system */}
           {hdData && lifePath && sunSign && (
             <div className="glass-card rounded-3xl p-6 space-y-4">
               <h2 className="font-playfair text-xl text-gray-700">Cross-System Synthesis</h2>
-
               <div className="space-y-3">
                 <div className="bg-white/50 rounded-2xl p-4 border border-white/40 space-y-1">
                   <p className="text-xs font-medium text-gray-400 uppercase tracking-widest">Life Path + Profile</p>
                   <p className="text-sm text-gray-600 leading-relaxed">
                     Your Life Path {lifePath} ({LIFE_PATH[lifePath]?.title}) and your {hdData.profile} profile ({PROFILE[hdData.profileLine1]?.split('—')[0].trim()} / {PROFILE[hdData.profileLine2]?.split('—')[0].trim()}) describe a soul journey of{' '}
-                    {lifePath <= 3 ? 'emergence, expression, and finding your voice' :
-                     lifePath <= 6 ? 'building, serving, and learning to love fully' :
-                     lifePath <= 9 ? 'deep seeking, releasing, and wisdom earned through experience' :
-                     'mastery, mission, and service at the highest level'}.
+                    {lifePath<=3?'emergence, expression, and finding your voice':lifePath<=6?'building, serving, and learning to love fully':lifePath<=9?'deep seeking, releasing, and wisdom earned through experience':'mastery, mission, and service at the highest level'}.
                   </p>
                 </div>
-
                 <div className="bg-white/50 rounded-2xl p-4 border border-white/40 space-y-1">
                   <p className="text-xs font-medium text-gray-400 uppercase tracking-widest">Moon Sign + Authority</p>
                   <p className="text-sm text-gray-600 leading-relaxed">
-                    Your moon in {moonSign?.name} gives your emotional interior a {moonSign?.element} quality.
-                    Combined with your {hdData.authority} authority, your inner truth emerges{' '}
-                    {hdData.authority === 'emotional'  ? 'through the full arc of your emotional wave — never in the peak or the valley, but in the stillness between' :
-                     hdData.authority === 'sacral'     ? 'in the immediate gut response that your body knows before your mind catches up' :
-                     hdData.authority === 'splenic'    ? 'in the quiet first-moment knowing that speaks once and never repeats itself' :
-                     hdData.authority === 'ego'        ? 'through what your heart genuinely wants and is willing to commit to' :
-                     'through conversation, discernment, and moving through different environments'}.
+                    Your moon in {moonSign?.name} gives your emotional interior a {moonSign?.element} quality. Combined with your {hdData.authority} authority, your inner truth emerges{' '}
+                    {hdData.authority==='emotional'?'through the full arc of your emotional wave — never in the peak or the valley, but in the stillness between':hdData.authority==='sacral'?'in the immediate gut response that your body knows before your mind catches up':hdData.authority==='splenic'?'in the quiet first-moment knowing that speaks once and never repeats itself':'through conversation, discernment, and moving through different environments'}.
                   </p>
                 </div>
-
                 <div className="bg-white/50 rounded-2xl p-4 border border-white/40 space-y-1">
                   <p className="text-xs font-medium text-gray-400 uppercase tracking-widest">Sun Sign + HD Type</p>
                   <p className="text-sm text-gray-600 leading-relaxed">
                     The {sunSign.element} {sunSign.modality} energy of {sunSign.name} flows through the lens of your {hdData.type.replace(/-/g,' ')} design.
-                    {hdData.type === 'generator' || hdData.type === 'manifesting-generator'
-                      ? ' Your {sunSign.element} vitality is activated and amplified through response — when your sacral lights up, the world lights up with you.'
-                      : hdData.type === 'projector'
-                        ? ` Your ${sunSign.element} nature is channeled through deep perception — you guide others into what they cannot yet see in themselves.`
-                        : hdData.type === 'manifestor'
-                          ? ` Your ${sunSign.element} fire expresses itself through bold initiation — you don't need permission to begin.`
-                          : ` Your ${sunSign.element} nature samples and reflects the truth of the community around you.`
-                    }
+                    {hdData.type==='generator'||hdData.type==='manifesting-generator'?` Your ${sunSign.element} vitality is activated through response — when your sacral lights up, the world lights up with you.`:hdData.type==='projector'?` Your ${sunSign.element} nature is channeled through deep perception — you guide others into what they cannot yet see in themselves.`:` Your ${sunSign.element} fire expresses itself through bold initiation — you don't need permission to begin.`}
                   </p>
                 </div>
               </div>
@@ -816,90 +929,76 @@ export default function CosmicPage() {
         </div>
       )}
 
-      {/* ════════════════ TRANSITS ════════════════ */}
+      {/* ════ TRANSITS ════ */}
       {tab === 'transits' && (
         <div className="space-y-4">
-
-          {/* Current planet positions */}
           <div className="glass-card rounded-3xl p-6 space-y-4">
             <div>
               <h2 className="font-playfair text-xl text-gray-700">Current Planetary Positions</h2>
-              <p className="text-xs text-gray-400 mt-1">{fmtDate(today)}</p>
+              <p className="text-xs text-gray-400 mt-1">{fmtDate(today)} · Tap any planet to learn more.</p>
             </div>
             {transitData?.personality ? (
               <div className="divide-y divide-white/30">
-                {BODY_ORDER.filter(b => transitData.personality[b] != null).map(body => {
-                  const { gate, line } = transitData.personality[body];
-                  const sign = lonToSign(gateLineToLon(gate, line));
-                  const hitsNatal = hdData && (
-                    Object.values(hdData.personality ?? {}).some(a => a.gate === gate) ||
-                    Object.values(hdData.design ?? {}).some(a => a.gate === gate)
+                {BODY_ORDER.filter(b=>transitData.personality[b]!=null).map(body=>{
+                  const {gate,line}=transitData.personality[body];
+                  const sign=lonToSign(gateLineToLon(gate,line));
+                  const hitsNatal=hdData&&(
+                    Object.values(hdData.personality??{}).some(a=>a.gate===gate)||
+                    Object.values(hdData.design??{}).some(a=>a.gate===gate)
                   );
                   return (
-                    <div key={body} className="flex items-center gap-2 py-2.5">
+                    <button key={body} onClick={()=>openTransitPlanet(body,gate,line)}
+                      className="w-full flex items-center gap-2 py-2.5 hover:bg-white/40 rounded-xl px-2 -mx-2 transition-colors text-left">
                       <span className="text-sm w-6 text-center text-gray-400 shrink-0">{PLANET_SYM[body]}</span>
                       <span className="text-xs text-gray-500 w-20 shrink-0">{PLANET_LBL[body]}</span>
                       <span className="text-sm font-medium text-gray-700 flex-1">{sign.symbol} {sign.name}</span>
-                      <span className="text-xs text-gray-400">Gate {gate}.{line}</span>
-                      {hitsNatal && (
-                        <span className="text-xs px-1.5 py-0.5 rounded-full bg-rose-100 text-rose-500 shrink-0">↔ natal</span>
-                      )}
-                    </div>
+                      <button onClick={e=>{e.stopPropagation();openGate(gate,line,`Transit ${PLANET_LBL[body]}`);}}
+                        className="text-xs text-gray-400 hover:text-[#b88a92] transition-colors shrink-0 mr-1">Gate {gate}.{line}</button>
+                      {hitsNatal&&<span className="text-xs px-1.5 py-0.5 rounded-full bg-rose-100 text-rose-500 shrink-0">↔ natal</span>}
+                    </button>
                   );
                 })}
               </div>
-            ) : (
-              <p className="text-sm text-gray-400">Unable to load current positions.</p>
-            )}
+            ) : <p className="text-sm text-gray-400">Unable to load current positions.</p>}
           </div>
 
-          {/* Channel activations today */}
           {hdData?.definedChannels?.length > 0 && (
             <div className="glass-card rounded-3xl p-6 space-y-3">
               <h2 className="font-playfair text-xl text-gray-700">Your Channels Today</h2>
-              <p className="text-xs text-gray-400">When a transit planet activates a gate in your defined channels, that channel's energy is amplified.</p>
+              <p className="text-xs text-gray-400">When a transit planet enters a gate in your defined channels, that channel's energy is amplified. Tap to learn about each channel.</p>
               <div className="space-y-2">
-                {hdData.definedChannels.map(([g1, g2]) => {
-                  const g1Active = transitGateSet.has(g1);
-                  const g2Active = transitGateSet.has(g2);
-                  const active = g1Active || g2Active;
+                {hdData.definedChannels.map(([g1,g2])=>{
+                  const g1Active=transitGateSet.has(g1);
+                  const g2Active=transitGateSet.has(g2);
+                  const active=g1Active||g2Active;
                   return (
-                    <div
-                      key={`${g1}-${g2}`}
-                      className={`flex items-start gap-3 p-3 rounded-2xl border transition-all ${
-                        active ? 'bg-rose-50/60 border-rose-200/50' : 'bg-white/30 border-white/30'
-                      }`}
-                    >
-                      <div className={`mt-1 w-2 h-2 rounded-full shrink-0 ${active ? 'bg-rose-400' : 'bg-gray-200'}`} />
+                    <button key={`${g1}-${g2}`} onClick={()=>openChannel([g1,g2])}
+                      className={`w-full flex items-start gap-3 p-3 rounded-2xl border text-left transition-colors ${active?'bg-rose-50/60 border-rose-200/50 hover:bg-rose-50/80':'bg-white/30 border-white/30 hover:bg-white/50'}`}>
+                      <div className={`mt-1 w-2 h-2 rounded-full shrink-0 ${active?'bg-rose-400':'bg-gray-200'}`}/>
                       <div className="flex-1 min-w-0">
                         <p className="text-xs font-semibold text-gray-600">{g1} — {g2}</p>
-                        <p className="text-sm text-gray-600">{channelLabel([g1, g2])}</p>
-                        {active && (
-                          <p className="text-xs text-rose-400 mt-0.5">
-                            Gate {g1Active ? g1 : g2} lit up by transit
-                          </p>
-                        )}
+                        <p className="text-sm text-gray-600">{channelLabel([g1,g2])}</p>
+                        {active&&<p className="text-xs text-rose-400 mt-0.5">Gate {g1Active?g1:g2} lit up by transit</p>}
                       </div>
-                    </div>
+                    </button>
                   );
                 })}
               </div>
             </div>
           )}
 
-          {/* Transit aspects to natal */}
-          {hdData && (() => {
-            const innerPlanets = ['sun','moon','mercury','venus','mars'];
-            const aspects = [];
+          {hdData && (()=>{
+            const innerPlanets=['sun','moon','mercury','venus','mars'];
+            const aspects=[];
             for (const tb of innerPlanets) {
-              if (transitLons[tb] == null) continue;
-              for (const nb of BODY_ORDER.slice(0, 11)) {
-                if (natalLons[nb] == null) continue;
-                const diff  = ((transitLons[tb] - natalLons[nb]) % 360 + 360) % 360;
-                const angle = Math.min(diff, 360 - diff);
+              if (transitLons[tb]==null) continue;
+              for (const nb of BODY_ORDER.slice(0,11)) {
+                if (natalLons[nb]==null) continue;
+                const diff=((transitLons[tb]-natalLons[nb])%360+360)%360;
+                const angle=Math.min(diff,360-diff);
                 for (const asp of ASPECT_DEFS) {
-                  if (Math.abs(angle - asp.angle) <= asp.orb) {
-                    aspects.push({ transit: tb, natal: nb, ...asp, orb: Math.abs(angle - asp.angle).toFixed(1) });
+                  if (Math.abs(angle-asp.angle)<=asp.orb) {
+                    aspects.push({transit:tb,natal:nb,...asp,orb:Math.abs(angle-asp.angle).toFixed(1)});
                     break;
                   }
                 }
@@ -909,18 +1008,17 @@ export default function CosmicPage() {
             return (
               <div className="glass-card rounded-3xl p-6 space-y-3">
                 <h2 className="font-playfair text-xl text-gray-700">Transit Aspects to Your Chart</h2>
-                <p className="text-xs text-gray-400">Current planet positions aspecting your natal placements.</p>
+                <p className="text-xs text-gray-400">Tap any aspect to learn what it means.</p>
                 <div className="divide-y divide-white/30">
-                  {aspects.map((asp, i) => (
-                    <div key={i} className="flex items-center gap-2 py-2">
+                  {aspects.map((asp,i)=>(
+                    <button key={i} onClick={()=>openAspect({...asp,planet1:asp.transit,planet2:asp.natal})}
+                      className="w-full flex items-center gap-2 py-2.5 hover:bg-white/40 rounded-xl px-2 -mx-2 transition-colors text-left">
                       <span className="text-sm text-gray-500 w-5 text-center">{PLANET_SYM[asp.transit]}</span>
-                      <span className="text-sm font-bold w-5 text-center" style={{ color: asp.color }}>{asp.symbol}</span>
+                      <span className="text-sm font-bold w-5 text-center" style={{color:asp.color}}>{asp.symbol}</span>
                       <span className="text-sm text-gray-500 w-5 text-center">{PLANET_SYM[asp.natal]}</span>
-                      <span className="text-xs text-gray-600 flex-1">
-                        Transit {PLANET_LBL[asp.transit]} {asp.name} natal {PLANET_LBL[asp.natal]}
-                      </span>
+                      <span className="text-xs text-gray-600 flex-1">Transit {PLANET_LBL[asp.transit]} {asp.name} natal {PLANET_LBL[asp.natal]}</span>
                       <span className="text-xs text-gray-300">{asp.orb}°</span>
-                    </div>
+                    </button>
                   ))}
                 </div>
               </div>
@@ -928,7 +1026,6 @@ export default function CosmicPage() {
           })()}
         </div>
       )}
-
     </div>
   );
 }
