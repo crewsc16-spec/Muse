@@ -170,7 +170,7 @@ export default function DailyPage() {
           try { setAnimalImage(JSON.parse(cached)); } catch {}
         } else {
           try {
-            const query = ANIMAL_IMAGE_QUERIES[dailyContent.animal.name] ?? `${dailyContent.animal.name} watercolor art`;
+            const query = ANIMAL_IMAGE_QUERIES[dailyContent.animal.name] ?? `${dailyContent.animal.name} antique book illustration engraving`;
             const res = await fetch(`/api/unsplash?query=${encodeURIComponent(query)}&orientation=squarish`);
             const data = await res.json();
             if (data.photos?.length) {
