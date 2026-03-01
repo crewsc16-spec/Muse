@@ -914,9 +914,17 @@ export default function Home() {
                             );
                           })()}
                           {/* Caption */}
-                          {item.content && !isExpanded && (
-                            <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/35 to-transparent px-3 py-2">
-                              <p className="text-white text-xs leading-snug">{item.content}</p>
+                          {!isExpanded && (
+                            <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/40 to-transparent px-3 py-2">
+                              {item.content && <p className="text-white text-xs leading-snug">{item.content}</p>}
+                              {(() => {
+                                const entryDate = isCombined ? moodData.date : new Date(item.created_at).toISOString().split('T')[0];
+                                return (
+                                  <p className="text-white/60 text-[10px] mt-0.5">
+                                    {new Date(entryDate + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                  </p>
+                                );
+                              })()}
                             </div>
                           )}
                         </div>
@@ -945,6 +953,15 @@ export default function Home() {
                               {item.content}
                             </p>
                           )}
+                          {/* Always-visible date */}
+                          {!isExpanded && (() => {
+                            const entryDate = isCombined ? moodData.date : new Date(item.created_at).toISOString().split('T')[0];
+                            return (
+                              <p className="text-xs text-gray-300 mt-2">
+                                {new Date(entryDate + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                              </p>
+                            );
+                          })()}
                           {/* Reveal on click */}
                           {isExpanded && (() => {
                             const entryDate = isCombined ? moodData.date : new Date(item.created_at).toISOString().split('T')[0];
