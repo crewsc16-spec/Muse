@@ -20,6 +20,13 @@ const playfair = Playfair_Display({
 export const metadata = {
   title: "Muse",
   description: "Your personal mood journal and vision board",
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Muse",
+  },
+  formatDetection: { telephone: false },
 };
 
 export default function RootLayout({ children }) {
