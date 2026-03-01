@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { getLunarPhase } from './lib/astrology';
 import { getQuotes } from './lib/quotes';
+import { createClient } from './lib/supabase/client';
 
 // ─── Moon SVG ─────────────────────────────────────────────────────────────────
 
@@ -89,9 +90,12 @@ export default function HomePage() {
   const today = new Date().toISOString().split('T')[0];
 
   useEffect(() => {
-    // Name from localStorage (set during profile setup)
-    const stored = localStorage.getItem('displayName');
-    if (stored) setName(stored.split(' ')[0]);
+    // Name: read from Supabase first, fall back to localStorage cache
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      const dn = user?.user_metadata?.displayName ?? localStorage.getItem('displayName') ?? '';
+      if (dn) setName(dn.split(' ')[0]);
+    });
 
     // Moon phase
     setPhase(getLunarPhase(today));
