@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import BodyGraph from '@/app/components/BodyGraph';
+import NatalWheel from '@/app/components/NatalWheel';
 
 // ─── HD Gate Wheel ────────────────────────────────────────────────────────────
 const GATE_WHEEL = [
@@ -840,6 +842,21 @@ export default function CosmicPage() {
       {/* ════ ASTROLOGY ════ */}
       {tab === 'astrology' && (
         <div className="space-y-4">
+          {Object.keys(natalLons).length > 0 && (
+            <div className="glass-card rounded-3xl p-6 space-y-3">
+              <div>
+                <h2 className="font-playfair text-xl text-gray-700">Natal Chart</h2>
+                <p className="text-xs text-gray-400 mt-1">Tap any planet or aspect line to learn more.</p>
+              </div>
+              <NatalWheel
+                natalLons={natalLons}
+                natalAspects={natalAspects}
+                onPlanet={(body) => openPlanet(body, lonToSign(natalLons[body]))}
+                onAspect={(asp) => openAspect(asp)}
+              />
+            </div>
+          )}
+
           <div className="glass-card rounded-3xl p-6 space-y-4">
             <div>
               <h2 className="font-playfair text-xl text-gray-700">Natal Planets</h2>
@@ -909,6 +926,19 @@ export default function CosmicPage() {
         <div className="space-y-4">
           {hdData ? (
             <>
+              <div className="glass-card rounded-3xl p-6 space-y-3">
+                <div>
+                  <h2 className="font-playfair text-xl text-gray-700">Body Graph</h2>
+                  <p className="text-xs text-gray-400 mt-1">Tap any center or channel to learn more.</p>
+                </div>
+                <BodyGraph
+                  definedCenters={hdData.definedCenters ?? []}
+                  definedChannels={hdData.definedChannels ?? []}
+                  onCenter={(key, isDefined) => openCenter(key, isDefined)}
+                  onChannel={(pair) => openChannel(pair)}
+                />
+              </div>
+
               <div className="glass-card rounded-3xl p-6 space-y-4">
                 <h2 className="font-playfair text-xl text-gray-700">Human Design</h2>
                 <p className="text-xs text-gray-400">Tap any card to learn more.</p>
