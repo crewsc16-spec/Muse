@@ -11,6 +11,7 @@ import {
   uploadVisionImage,
 } from './lib/storage';
 import { getQuotes, QUOTE_CATEGORIES } from './lib/quotes';
+import { getLunarPhase } from './lib/astrology';
 import MoodFace from './components/MoodFace';
 
 const MOODS = [
@@ -57,6 +58,49 @@ const CATEGORY_BG = {
   personal:      '#faf0f5',
   travel:        '#faf5ee',
 };
+
+// ── Moon phase SVG ──
+function computeMoonT(dateStr) {
+  const SYNODIC = 29.53058867;
+  const ANCHOR  = new Date('2000-01-06T18:14:00Z');
+  const days    = (new Date(dateStr + 'T12:00:00Z') - ANCHOR) / 86400000;
+  return (((days % SYNODIC) + SYNODIC) % SYNODIC) / SYNODIC;
+}
+
+// Renders the moon disk as raw SVG elements — usable inside an <svg> or <g>
+function MoonSVGShape({ dateStr, cx, cy, r, dark = '#1f1535', light = '#ffffff' }) {
+  const t  = computeMoonT(dateStr);
+  const ex = (Math.abs(Math.cos(t * 2 * Math.PI)) * r).toFixed(3);
+  const top = `${cx},${cy - r}`;
+  const bot = `${cx},${cy + r}`;
+
+  let litPath;
+  if (t < 0.5) {
+    const ts = t < 0.25 ? 1 : 0;
+    litPath = `M ${top} A ${r},${r} 0 0,1 ${bot} A ${ex},${r} 0 0,${ts} ${top} Z`;
+  } else {
+    const ts = t < 0.75 ? 1 : 0;
+    litPath = `M ${top} A ${r},${r} 0 0,0 ${bot} A ${ex},${r} 0 0,${ts} ${top} Z`;
+  }
+
+  return (
+    <>
+      <circle cx={cx} cy={cy} r={r} fill={dark} />
+      <path d={litPath} fill={light} />
+    </>
+  );
+}
+
+// Standalone HTML-embeddable moon icon
+function MoonPhaseIcon({ dateStr, size = 20, dark = '#1f1535', light = '#ffffff' }) {
+  const r = size / 2 - 0.5;
+  const c = size / 2;
+  return (
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ display: 'block', flexShrink: 0 }}>
+      <MoonSVGShape dateStr={dateStr} cx={c} cy={c} r={r} dark={dark} light={light} />
+    </svg>
+  );
+}
 
 // ── Inline photo search ──
 function InlinePhotoSearch({ onSelect, sb }) {
@@ -216,6 +260,160 @@ function InlineQuoteSearch({ onSelect }) {
           ))
         }
       </div>
+    </div>
+  );
+}
+
+// ── Mood Trend Chart ──
+function MoodTrendChart({ entries }) {
+  const [range, setRange] = useState('30');
+  const [hovered, setHovered] = useState(null);
+
+  const sorted = [...entries].sort((a, b) => new Date(a.date) - new Date(b.date));
+
+  const filtered = range === 'all' ? sorted : sorted.filter(e => {
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - parseInt(range));
+    return new Date(e.date + 'T00:00:00') >= cutoff;
+  });
+
+  const showMoonRow = range === '7' || filtered.length <= 10;
+  const W = 320;
+  const H = showMoonRow ? 130 : 110;
+  const pad = { top: 10, right: 12, bottom: showMoonRow ? 42 : 28, left: 30 };
+  const cW = W - pad.left - pad.right;
+  const cH = H - pad.top - pad.bottom;
+
+  const xScale = i => filtered.length === 1 ? cW / 2 : (i / (filtered.length - 1)) * cW;
+  const yScale = v => cH - ((v - 1) / 4) * cH;
+
+  const pts = filtered.map((e, i) => ({
+    x: xScale(i), y: yScale(e.mood), entry: e,
+    moon: getLunarPhase(e.date),
+  }));
+
+  const linePath = pts.length < 2 ? '' : pts.reduce((acc, pt, i) => {
+    if (i === 0) return `M ${pt.x.toFixed(1)} ${pt.y.toFixed(1)}`;
+    const prev = pts[i - 1];
+    const cpx = ((prev.x + pt.x) / 2).toFixed(1);
+    return `${acc} C ${cpx} ${prev.y.toFixed(1)} ${cpx} ${pt.y.toFixed(1)} ${pt.x.toFixed(1)} ${pt.y.toFixed(1)}`;
+  }, '');
+
+  const fillPath = pts.length < 2 ? '' :
+    `${linePath} L ${pts[pts.length - 1].x.toFixed(1)} ${cH} L ${pts[0].x.toFixed(1)} ${cH} Z`;
+
+  const xLabelIndices = (() => {
+    if (pts.length <= 5) return pts.map((_, i) => i);
+    const step = Math.floor((pts.length - 1) / 4);
+    return [0, step, step * 2, step * 3, pts.length - 1];
+  })();
+
+  const yLabels = { 1: 'Rough', 3: 'Okay', 5: 'Great' };
+
+  function formatXLabel(dateStr) {
+    const d = new Date(dateStr + 'T00:00:00');
+    if (range === '7') return d.toLocaleDateString('en-US', { weekday: 'short' });
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  }
+
+  const hovEntry = hovered !== null ? pts[hovered]?.entry : null;
+
+  return (
+    <div className="glass-card rounded-3xl p-6">
+      <div className="flex items-center justify-between mb-3">
+        <h2 className="text-xs font-medium text-gray-400 uppercase tracking-widest">Mood Trend</h2>
+        <div className="flex gap-1">
+          {[['7', '7d'], ['30', '30d'], ['all', 'All']].map(([v, l]) => (
+            <button key={v} onClick={() => { setRange(v); setHovered(null); }}
+              className={`px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
+                range === v ? 'btn-gradient text-white' : 'bg-white/60 text-gray-400 hover:bg-white/80 border border-white/50'
+              }`}>
+              {l}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Hover tooltip row */}
+      <div className="min-h-[22px] mb-2 flex items-center gap-2">
+        {hovered !== null && pts[hovered] && (() => {
+          const pt = pts[hovered];
+          return (
+            <>
+              <MoodFace mood={pt.entry.mood} size={16} />
+              <span className="text-xs font-medium" style={{ color: MOODS[pt.entry.mood - 1]?.color }}>
+                {MOODS[pt.entry.mood - 1]?.label}
+              </span>
+              <span className="text-xs text-gray-300">·</span>
+              <MoonPhaseIcon dateStr={pt.entry.date} size={14} />
+              <span className="text-xs text-gray-400">{pt.moon.name}</span>
+              <span className="text-xs text-gray-300">·</span>
+              <span className="text-xs text-gray-400">
+                {new Date(pt.entry.date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+              </span>
+            </>
+          );
+        })()}
+      </div>
+
+      {filtered.length === 0 ? (
+        <p className="text-sm text-gray-300 py-4 text-center">No entries in this range.</p>
+      ) : filtered.length === 1 ? (
+        <div className="flex items-center justify-center gap-2 py-4">
+          <MoodFace mood={filtered[0].mood} size={28} />
+          <span className="text-sm text-gray-400">{MOODS[filtered[0].mood - 1]?.label}</span>
+        </div>
+      ) : (
+        <svg viewBox={`0 0 ${W} ${H}`} className="w-full" style={{ height: H }}>
+          <defs>
+            <linearGradient id="moodFill" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#c4929a" stopOpacity="0.25" />
+              <stop offset="100%" stopColor="#c4929a" stopOpacity="0" />
+            </linearGradient>
+          </defs>
+          <g transform={`translate(${pad.left}, ${pad.top})`}>
+            {/* Grid lines */}
+            {[1, 2, 3, 4, 5].map(v => (
+              <line key={v} x1={0} y1={yScale(v)} x2={cW} y2={yScale(v)}
+                stroke="#ecdde2" strokeWidth="0.5" strokeDasharray="3,3" />
+            ))}
+            {/* Gradient fill */}
+            <path d={fillPath} fill="url(#moodFill)" />
+            {/* Line */}
+            <path d={linePath} fill="none" stroke="#c4929a" strokeWidth="1.5"
+              strokeLinecap="round" strokeLinejoin="round" />
+            {/* Dots */}
+            {pts.map((pt, i) => (
+              <circle key={i} cx={pt.x} cy={pt.y}
+                r={hovered === i ? 4.5 : 2.5}
+                fill={hovered === i ? '#b88a92' : '#c4929a'}
+                stroke="white" strokeWidth={hovered === i ? 1.5 : 0}
+                style={{ cursor: 'pointer' }}
+                onMouseEnter={() => setHovered(i)}
+                onMouseLeave={() => setHovered(null)}
+              />
+            ))}
+            {/* Y-axis labels */}
+            {[1, 3, 5].map(v => (
+              <text key={v} x={-6} y={yScale(v) + 3.5} textAnchor="end"
+                fontSize="7.5" fill="#c4b4b8" fontFamily="sans-serif">
+                {yLabels[v]}
+              </text>
+            ))}
+            {/* Moon phase row — shown when ≤ 14 entries */}
+            {showMoonRow && pts.map((pt, i) => (
+              <MoonSVGShape key={i} dateStr={pt.entry.date} cx={pt.x} cy={cH + 10} r={5} />
+            ))}
+            {/* X-axis labels */}
+            {xLabelIndices.map(i => (
+              <text key={i} x={pts[i].x} y={cH + (showMoonRow ? 30 : 17)} textAnchor="middle"
+                fontSize="7.5" fill="#c4b4b8" fontFamily="sans-serif">
+                {formatXLabel(filtered[i].date)}
+              </text>
+            ))}
+          </g>
+        </svg>
+      )}
     </div>
   );
 }
@@ -383,8 +581,6 @@ export default function Home() {
     ...pureMoodEntries.map(e => ({ _kind: 'mood', _sortDate: e.created_at || e.date, ...e })),
   ].sort((a, b) => new Date(b._sortDate) - new Date(a._sortDate));
 
-  const last7 = entries.slice(0, 7).reverse();
-
   const greeting = () => {
     const h = new Date().getHours();
     if (h < 12) return 'Good morning';
@@ -468,7 +664,18 @@ export default function Home() {
 
       {/* ── Today's Entry — combined mood + board piece ── */}
       <div className="glass-card rounded-3xl p-6 space-y-5">
-        <h2 className="text-xs font-medium text-gray-400 uppercase tracking-widest">Today&apos;s Entry</h2>
+        <div className="flex items-center justify-between">
+          <h2 className="text-xs font-medium text-gray-400 uppercase tracking-widest">Today&apos;s Entry</h2>
+          {(() => {
+            const phase = getLunarPhase(today);
+            return (
+              <div className="flex items-center gap-1.5">
+                <MoonPhaseIcon dateStr={today} size={18} />
+                <span className="text-xs text-gray-400">{phase.name}</span>
+              </div>
+            );
+          })()}
+        </div>
 
         {/* Mood faces */}
         <div className="flex gap-2">
@@ -616,34 +823,8 @@ export default function Home() {
         </form>
       </div>
 
-      {/* ── 7-day chart ── */}
-      {last7.length > 0 && (
-        <div className="glass-card rounded-3xl p-6">
-          <h2 className="text-xs font-medium text-gray-400 uppercase tracking-widest mb-4">Last 7 Days</h2>
-          <div style={{ display: 'flex', alignItems: 'flex-end', gap: '8px', height: '64px' }}>
-            {last7.map(entry => {
-              const mood = MOODS.find(m => m.value === entry.mood);
-              return (
-                <div key={entry.id} style={{
-                  flex: 1, minHeight: '4px',
-                  height: `${(entry.mood / 5) * 100}%`,
-                  background: mood?.color ?? '#c5bcba',
-                  borderRadius: '4px 4px 0 0',
-                }} />
-              );
-            })}
-          </div>
-          <div className="flex gap-2 mt-2">
-            {last7.map(entry => (
-              <div key={entry.id} className="flex-1 text-center">
-                <span className="text-xs text-gray-400">
-                  {new Date(entry.date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short' })}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+      {/* ── Mood Trend ── */}
+      {entries.length > 0 && <MoodTrendChart entries={entries} />}
 
       {/* ── Board ── */}
       <div>
@@ -675,11 +856,11 @@ export default function Home() {
                     ✕
                   </button>
 
-                  {/* ── Combined vision card (click to reveal mood) ── */}
+                  {/* ── Vision card (click to reveal details) ── */}
                   {item._kind === 'vision' && (
                     <div
-                      onClick={() => isCombined && setExpandedId(isExpanded ? null : itemKey)}
-                      className={isCombined ? 'cursor-pointer' : ''}
+                      onClick={() => setExpandedId(isExpanded ? null : itemKey)}
+                      className="cursor-pointer"
                     >
                       {/* Image */}
                       {item.type === 'image' && item.image_url && (
@@ -703,20 +884,34 @@ export default function Home() {
                               </button>
                             ))}
                           </div>
-                          {/* Mood reveal overlay on click */}
-                          {isCombined && isExpanded && (
-                            <div className="absolute inset-x-0 bottom-0 bg-white/88 backdrop-blur-sm p-3 animate-in slide-in-from-bottom-2">
-                              <div className="flex items-center gap-2">
-                                <MoodFace mood={moodData.mood} size={26} />
-                                <span className="text-sm font-medium" style={{ color: MOODS[moodData.mood - 1]?.color }}>
-                                  {MOODS[moodData.mood - 1]?.label}
-                                </span>
+                          {/* Reveal overlay on click */}
+                          {isExpanded && (() => {
+                            const entryDate = isCombined ? moodData.date : new Date(item.created_at).toISOString().split('T')[0];
+                            const phase = getLunarPhase(entryDate);
+                            return (
+                              <div className="absolute inset-x-0 bottom-0 bg-white/88 backdrop-blur-sm p-3 animate-in slide-in-from-bottom-2">
+                                {isCombined && (
+                                  <div className="flex items-center gap-2">
+                                    <MoodFace mood={moodData.mood} size={26} />
+                                    <span className="text-sm font-medium" style={{ color: MOODS[moodData.mood - 1]?.color }}>
+                                      {MOODS[moodData.mood - 1]?.label}
+                                    </span>
+                                  </div>
+                                )}
+                                <div className="flex items-center gap-1.5 mt-1">
+                                  <MoonPhaseIcon dateStr={entryDate} size={16} />
+                                  <span className="text-xs text-gray-400">{phase.name}</span>
+                                  <span className="text-xs text-gray-300">·</span>
+                                  <span className="text-xs text-gray-400">
+                                    {new Date(entryDate + 'T00:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                                  </span>
+                                </div>
+                                {isCombined && moodData.notes && (
+                                  <p className="text-xs text-gray-500 mt-1.5 leading-relaxed">{moodData.notes}</p>
+                                )}
                               </div>
-                              {moodData.notes && (
-                                <p className="text-xs text-gray-500 mt-1.5 leading-relaxed">{moodData.notes}</p>
-                              )}
-                            </div>
-                          )}
+                            );
+                          })()}
                           {/* Caption */}
                           {item.content && !isExpanded && (
                             <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/35 to-transparent px-3 py-2">
@@ -737,20 +932,36 @@ export default function Home() {
                           <p className={`text-sm leading-relaxed ${item.type === 'quote' ? 'italic font-playfair text-base' : ''} text-gray-600`}>
                             {item.content}
                           </p>
-                          {/* Mood reveal on click */}
-                          {isCombined && isExpanded && (
-                            <div className="mt-3 pt-3 border-t border-white/60 flex items-center gap-2">
-                              <MoodFace mood={moodData.mood} size={22} />
-                              <div>
-                                <p className="text-xs font-medium" style={{ color: MOODS[moodData.mood - 1]?.color }}>
-                                  {MOODS[moodData.mood - 1]?.label}
-                                </p>
-                                {moodData.notes && (
-                                  <p className="text-xs text-gray-400 mt-0.5">{moodData.notes}</p>
+                          {/* Reveal on click */}
+                          {isExpanded && (() => {
+                            const entryDate = isCombined ? moodData.date : new Date(item.created_at).toISOString().split('T')[0];
+                            const phase = getLunarPhase(entryDate);
+                            return (
+                              <div className="mt-3 pt-3 border-t border-white/60">
+                                {isCombined && (
+                                  <div className="flex items-center gap-2 mb-1.5">
+                                    <MoodFace mood={moodData.mood} size={22} />
+                                    <div>
+                                      <p className="text-xs font-medium" style={{ color: MOODS[moodData.mood - 1]?.color }}>
+                                        {MOODS[moodData.mood - 1]?.label}
+                                      </p>
+                                      {moodData.notes && (
+                                        <p className="text-xs text-gray-400 mt-0.5">{moodData.notes}</p>
+                                      )}
+                                    </div>
+                                  </div>
                                 )}
+                                <div className="flex items-center gap-1.5">
+                                  <MoonPhaseIcon dateStr={entryDate} size={16} />
+                                  <span className="text-xs text-gray-400">{phase.name}</span>
+                                  <span className="text-xs text-gray-300">·</span>
+                                  <span className="text-xs text-gray-400">
+                                    {new Date(entryDate + 'T00:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                                  </span>
+                                </div>
                               </div>
-                            </div>
-                          )}
+                            );
+                          })()}
                         </div>
                       )}
                     </div>

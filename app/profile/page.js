@@ -3,23 +3,31 @@
 import { useState, useEffect, useRef } from 'react';
 import { createClient } from '@/app/lib/supabase/client';
 import { COLOR_SCHEMES, getSavedScheme, saveScheme } from '@/app/lib/color-schemes';
-import { calculateHDChart } from '@/app/lib/hd-chart';
+// HD calculation is done server-side via /api/hd-chart (uses VSOP87 ephemeris)
 
 const PROFILE_LINE_NAMES = {
   1: 'Investigator', 2: 'Hermit', 3: 'Martyr',
   4: 'Opportunist',  5: 'Heretic', 6: 'Role Model',
 };
 
-function utcLabel(offset) {
-  const sign = offset >= 0 ? '+' : '-';
-  const abs  = Math.abs(offset);
-  const h    = Math.floor(abs);
-  const m    = (abs % 1) === 0.5 ? '30' : '00';
-  return `UTC${sign}${String(h).padStart(2, '0')}:${m}`;
+// Compute UTC offset (hours) for a given IANA timezone on a specific date
+function getUtcOffset(tzName, dateStr) {
+  try {
+    const d = new Date((dateStr || new Date().toISOString().slice(0, 10)) + 'T12:00:00Z');
+    const utcMs = new Date(d.toLocaleString('en-US', { timeZone: 'UTC' }));
+    const tzMs  = new Date(d.toLocaleString('en-US', { timeZone: tzName }));
+    return (tzMs - utcMs) / 3600000;
+  } catch { return 0; }
 }
 
-const UTC_OPTIONS = [];
-for (let v = -12; v <= 14; v += 0.5) UTC_OPTIONS.push(v);
+// Format Nominatim result into a readable city label
+function formatNominatimPlace(p) {
+  const a = p.address ?? {};
+  const city    = a.city || a.town || a.village || a.county || p.name;
+  const region  = a.state || a.region;
+  const country = a.country;
+  return [city, region, country].filter(Boolean).join(', ');
+}
 
 export default function ProfilePage() {
   const [user, setUser]           = useState(null);
@@ -34,10 +42,20 @@ export default function ProfilePage() {
   // Astrology
   const [birthDate, setBirthDate] = useState('');
   const [birthTime, setBirthTime] = useState('');
-  const [utcOffset, setUtcOffset] = useState(0);
+  const [birthPlace, setBirthPlace] = useState('');
+  const [birthTimezone, setBirthTimezone] = useState('');
+  const [placeSuggestions, setPlaceSuggestions] = useState([]);
+  const [loadingSuggestions, setLoadingSuggestions] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const [astroSystem, setAstroSystem] = useState('tropical');
   const [hdCalc, setHdCalc] = useState(null);
   const [astroSaved, setAstroSaved] = useState(false);
+  const [hdLoading, setHdLoading] = useState(false);
+  const [hdError, setHdError] = useState('');
+  // Manual HD override
+  const [hdTypeOverride, setHdTypeOverride] = useState('');
+  const [hdProfileOverride, setHdProfileOverride] = useState('');
+  const [showHdOverride, setShowHdOverride] = useState(false);
 
   // Milestones
   const [milestones, setMilestones] = useState([]);
@@ -45,6 +63,7 @@ export default function ProfilePage() {
   const [newDate, setNewDate]       = useState('');
 
   const fileInputRef = useRef(null);
+  const debounceRef  = useRef(null);
 
   useEffect(() => {
     const supabase = createClient();
@@ -63,7 +82,8 @@ export default function ProfilePage() {
         const parsed = JSON.parse(bd);
         setBirthDate(parsed.date ?? '');
         setBirthTime(parsed.time ?? '');
-        setUtcOffset(parsed.utcOffset ?? 0);
+        setBirthPlace(parsed.birthPlace ?? '');
+        setBirthTimezone(parsed.birthTimezone ?? '');
         setAstroSystem(parsed.system ?? 'tropical');
         if (parsed.hdCalculated) {
           setHdCalc({
@@ -73,6 +93,8 @@ export default function ProfilePage() {
             profileLine2: parsed.hdProfileLine2,
           });
         }
+        if (parsed.hdTypeOverride) setHdTypeOverride(parsed.hdTypeOverride);
+        if (parsed.hdProfileOverride) setHdProfileOverride(parsed.hdProfileOverride);
       }
     } catch {}
   }, []);
@@ -113,13 +135,65 @@ export default function ProfilePage() {
     saveScheme(key);
   }
 
-  // ── Astrology ──
-  function handleSaveAstro() {
-    const base = { date: birthDate, time: birthTime, utcOffset, system: astroSystem };
-    let hdFields = {};
-    if (birthDate && birthTime && utcOffset != null) {
+  // ── Place search ──
+  function handlePlaceInput(val) {
+    setBirthPlace(val);
+    setBirthTimezone('');
+    clearTimeout(debounceRef.current);
+    if (val.length < 2) { setPlaceSuggestions([]); setShowSuggestions(false); return; }
+    debounceRef.current = setTimeout(async () => {
+      setLoadingSuggestions(true);
       try {
-        const result = calculateHDChart(birthDate, birthTime, utcOffset);
+        const res = await fetch(
+          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(val)}&format=json&limit=5&addressdetails=1`,
+          { headers: { 'Accept-Language': 'en-US,en' } }
+        );
+        const data = await res.json();
+        setPlaceSuggestions(data.slice(0, 5).map(p => ({
+          label: formatNominatimPlace(p),
+          lat: parseFloat(p.lat),
+          lon: parseFloat(p.lon),
+        })));
+        setShowSuggestions(true);
+      } catch {}
+      setLoadingSuggestions(false);
+    }, 400);
+  }
+
+  async function handlePlaceSelect(place) {
+    setBirthPlace(place.label);
+    setShowSuggestions(false);
+    setPlaceSuggestions([]);
+    try {
+      const res = await fetch(
+        `https://timeapi.io/api/TimeZone/coordinate?latitude=${place.lat}&longitude=${place.lon}`
+      );
+      const data = await res.json();
+      if (data.timeZone) setBirthTimezone(data.timeZone);
+    } catch {}
+  }
+
+  // ── Astrology ──
+  async function handleSaveAstro() {
+    // Always clear stale result first so the UI reflects the current save
+    setHdCalc(null);
+    setHdError('');
+
+    const utcOffset = birthTimezone ? getUtcOffset(birthTimezone, birthDate) : 0;
+    const base = { date: birthDate, time: birthTime, birthPlace, birthTimezone, utcOffset, system: astroSystem };
+    let hdFields = {};
+
+    if (birthDate && birthTime && birthTimezone) {
+      setHdLoading(true);
+      try {
+        const res = await fetch('/api/hd-chart', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ birthDate, birthTime, utcOffset }),
+        });
+        if (!res.ok) throw new Error(`Server error ${res.status}`);
+        const result = await res.json();
+        if (result.error) throw new Error(result.error);
         hdFields = {
           hdType:            result.type,
           hdProfile:         result.profile,
@@ -137,9 +211,62 @@ export default function ProfilePage() {
           profileLine1: result.profileLine1,
           profileLine2: result.profileLine2,
         });
-      } catch {}
+        console.log('[HD] calculated (VSOP87):', result.type, result.profile, {
+          definedCenters: result.definedCenters,
+          designDate: result.designDate,
+          utcOffset,
+        });
+      } catch (err) {
+        console.error('[HD] calculation failed:', err);
+        setHdError('Chart calculation failed — check your birth data and try again.');
+      } finally {
+        setHdLoading(false);
+      }
     }
-    localStorage.setItem('birthData', JSON.stringify({ ...base, ...hdFields }));
+
+    // Apply manual overrides on top of calculated values
+    if (hdTypeOverride) {
+      hdFields.hdType = hdTypeOverride;
+      if (hdFields.hdCalculated) {
+        setHdCalc(prev => prev ? { ...prev, type: hdTypeOverride } : null);
+      }
+    }
+    if (hdProfileOverride) {
+      const [l1, l2] = hdProfileOverride.split('/').map(Number);
+      hdFields.hdProfile = hdProfileOverride;
+      hdFields.hdProfileLine1 = l1 || hdFields.hdProfileLine1;
+      hdFields.hdProfileLine2 = l2 || hdFields.hdProfileLine2;
+      if (hdFields.hdCalculated) {
+        setHdCalc(prev => prev ? { ...prev, profile: hdProfileOverride, profileLine1: l1 || prev.profileLine1, profileLine2: l2 || prev.profileLine2 } : null);
+      }
+    }
+    // If no birth time/place but override exists, still show it
+    if ((hdTypeOverride || hdProfileOverride) && !hdFields.hdCalculated) {
+      const [l1, l2] = (hdProfileOverride || '').split('/').map(Number);
+      hdFields = {
+        ...hdFields,
+        hdType:         hdTypeOverride || '',
+        hdProfile:      hdProfileOverride || '',
+        hdProfileLine1: l1 || 0,
+        hdProfileLine2: l2 || 0,
+        hdCalculated:   !!(hdTypeOverride || hdProfileOverride),
+      };
+      if (hdTypeOverride || hdProfileOverride) {
+        setHdCalc({
+          type:         hdTypeOverride || '',
+          profile:      hdProfileOverride || '',
+          profileLine1: l1 || 0,
+          profileLine2: l2 || 0,
+        });
+      }
+    }
+
+    localStorage.setItem('birthData', JSON.stringify({
+      ...base,
+      ...hdFields,
+      hdTypeOverride,
+      hdProfileOverride,
+    }));
     setAstroSaved(true);
     setTimeout(() => setAstroSaved(false), 2000);
   }
@@ -326,10 +453,10 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      {/* ── Astrology ── */}
+      {/* ── Astrology & Human Design ── */}
       <div className="glass-card rounded-3xl p-6 space-y-5">
         <div>
-          <h2 className="text-xs font-medium text-gray-400 uppercase tracking-widest">Astrology</h2>
+          <h2 className="text-xs font-medium text-gray-400 uppercase tracking-widest">Astrology and Human Design</h2>
           <p className="text-xs text-gray-300 mt-1">Your birth data personalises your Daily Oracle pulls.</p>
         </div>
 
@@ -357,20 +484,41 @@ export default function ProfilePage() {
           />
         </div>
 
-        {/* Birth Timezone */}
-        <div className="space-y-2">
+        {/* Birth Place */}
+        <div className="space-y-2 relative">
           <label className="block text-xs font-medium text-gray-400 uppercase tracking-widest">
-            Birth Timezone (UTC±)
+            Birth Place <span className="normal-case font-normal">(for timezone — enables HD chart)</span>
           </label>
-          <select
-            value={utcOffset}
-            onChange={e => setUtcOffset(Number(e.target.value))}
-            className="w-full border border-white/50 bg-white/50 rounded-xl px-4 py-2 text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#d4adb6]/40"
-          >
-            {UTC_OPTIONS.map(v => (
-              <option key={v} value={v}>{utcLabel(v)}</option>
-            ))}
-          </select>
+          <input
+            type="text"
+            value={birthPlace}
+            onChange={e => handlePlaceInput(e.target.value)}
+            onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
+            onFocus={() => placeSuggestions.length > 0 && setShowSuggestions(true)}
+            placeholder="City, Country"
+            className="w-full border border-white/50 bg-white/50 rounded-xl px-4 py-2 text-sm text-gray-600 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#d4adb6]/40"
+          />
+          {loadingSuggestions && (
+            <p className="text-xs text-gray-300 px-1">Searching…</p>
+          )}
+          {birthTimezone && !loadingSuggestions && (
+            <p className="text-xs text-gray-300 px-1">🌍 {birthTimezone}</p>
+          )}
+          {showSuggestions && placeSuggestions.length > 0 && (
+            <ul className="absolute z-10 w-full mt-1 bg-white/95 backdrop-blur-sm border border-white/60 rounded-2xl shadow-lg overflow-hidden">
+              {placeSuggestions.map((p, i) => (
+                <li key={i}>
+                  <button
+                    type="button"
+                    onMouseDown={() => handlePlaceSelect(p)}
+                    className="w-full text-left px-4 py-2.5 text-sm text-gray-600 hover:bg-rose-50/80 truncate transition-colors"
+                  >
+                    {p.label}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
 
         {/* System selector */}
@@ -399,15 +547,19 @@ export default function ProfilePage() {
         {/* Save */}
         <button
           onClick={handleSaveAstro}
-          disabled={!birthDate}
+          disabled={!birthDate || hdLoading}
           className="btn-gradient text-white px-6 py-2 rounded-full text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed"
         >
-          {astroSaved ? '✓ Saved' : 'Save'}
+          {hdLoading ? 'Calculating…' : astroSaved ? '✓ Saved' : 'Save'}
         </button>
 
+        {hdError && <p className="text-xs text-red-400">{hdError}</p>}
+
         {/* HD results — shown after successful calculation */}
-        {birthDate && !birthTime && (
-          <p className="text-xs text-gray-300">Add birth time for HD chart calculation</p>
+        {birthDate && (!birthTime || !birthTimezone) && (
+          <p className="text-xs text-gray-300">
+            Add birth time and birth place for HD chart calculation
+          </p>
         )}
         {hdCalc && (
           <div className="space-y-3 pt-3 border-t border-white/40">
@@ -418,11 +570,58 @@ export default function ProfilePage() {
             <div className="flex justify-between items-center">
               <span className="text-xs text-gray-400">Profile</span>
               <span className="text-sm text-gray-600">
-                {hdCalc.profile} — {PROFILE_LINE_NAMES[hdCalc.profileLine1]} / {PROFILE_LINE_NAMES[hdCalc.profileLine2]}
+                {hdCalc.profile}{hdCalc.profileLine1 && hdCalc.profileLine2 ? ` — ${PROFILE_LINE_NAMES[hdCalc.profileLine1]} / ${PROFILE_LINE_NAMES[hdCalc.profileLine2]}` : ''}
               </span>
             </div>
           </div>
         )}
+
+        {/* Manual HD override */}
+        <div className="pt-2 border-t border-white/30">
+          <button
+            type="button"
+            onClick={() => setShowHdOverride(v => !v)}
+            className="text-xs text-gray-400 hover:text-gray-500 transition-colors"
+          >
+            {showHdOverride ? '▲ Hide' : '▼ I know my chart — enter it manually'}
+          </button>
+          {showHdOverride && (
+            <div className="mt-3 space-y-3">
+              <p className="text-xs text-gray-300">
+                If the calculated result doesn't match your official HD reading, enter your correct values below. These override the calculation when you Save.
+              </p>
+              <div className="space-y-1">
+                <label className="block text-xs text-gray-400 uppercase tracking-widest">HD Type</label>
+                <select
+                  value={hdTypeOverride}
+                  onChange={e => setHdTypeOverride(e.target.value)}
+                  className="w-full border border-white/50 bg-white/50 rounded-xl px-4 py-2 text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#d4adb6]/40"
+                >
+                  <option value="">— use calculated —</option>
+                  <option value="generator">Generator</option>
+                  <option value="manifesting-generator">Manifesting Generator</option>
+                  <option value="manifestor">Manifestor</option>
+                  <option value="projector">Projector</option>
+                  <option value="reflector">Reflector</option>
+                </select>
+              </div>
+              <div className="space-y-1">
+                <label className="block text-xs text-gray-400 uppercase tracking-widest">Profile</label>
+                <select
+                  value={hdProfileOverride}
+                  onChange={e => setHdProfileOverride(e.target.value)}
+                  className="w-full border border-white/50 bg-white/50 rounded-xl px-4 py-2 text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#d4adb6]/40"
+                >
+                  <option value="">— use calculated —</option>
+                  {['1/3','1/4','2/4','2/5','3/5','3/6','4/6','4/1','5/1','5/2','6/2','6/3'].map(p => (
+                    <option key={p} value={p}>{p}</option>
+                  ))}
+                </select>
+              </div>
+              <p className="text-xs text-gray-300">Hit Save above to apply.</p>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

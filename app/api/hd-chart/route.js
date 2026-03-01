@@ -8,12 +8,7 @@ export async function POST(req) {
       return NextResponse.json({ error: 'birthDate and birthTime required' }, { status: 400 });
     }
     const result = calculateHDChartServer(birthDate, birthTime, utcOffset ?? 0);
-    // Convert channel arrays and Sets to plain JSON-serializable values
-    const serialized = {
-      ...result,
-      definedChannels: result.definedChannels.map(pair => pair),
-    };
-    return NextResponse.json(serialized);
+    return NextResponse.json(result);
   } catch (err) {
     console.error('[hd-chart API]', err);
     return NextResponse.json({ error: err.message }, { status: 500 });

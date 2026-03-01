@@ -1,24 +1,16 @@
-// Human Design Chart Calculator
-// Astronomical accuracy:
-//   Sun:     ~0.001° (full Meeus equation-of-center + aberration/nutation)
+// Human Design Chart Calculator — Client-side (Keplerian accuracy)
+// Accuracy:
+//   Sun:     ~0.001° (Meeus equation-of-center + aberration/nutation)
 //   Moon:    ~0.05°  (Meeus simplified series, 17 terms)
-//   Planets: ~0.5–2° (Keplerian geocentric: orbital elements + Kepler's equation + Earth subtraction)
-//   Gate width 5.625° — planet-level accuracy is sufficient.
+//   Planets: ~0.5–2° (Keplerian geocentric; gate width 5.625° — sufficient)
+
+import {
+  toJDE, longitudeToGate, longitudeToLine,
+  CENTER_GATES, getDefinedChannels, getDefinedCenters, buildCenterAdj,
+  determineType, determineAuthority, TYPE_META, meanNodeLongitude,
+} from './hd-common.js';
 
 const J2000 = 2451545.0;
-
-// ─── Julian Date ────────────────────────────────────────────────────────────
-function toJDE(dateStr, timeStr, utcOffset) {
-  const [year, month, day] = dateStr.split('-').map(Number);
-  const [h, m] = (timeStr || '12:00').split(':').map(Number);
-  const utcHour = h - (utcOffset ?? 0) + m / 60;
-  const dayFrac = utcHour / 24;
-  let y = year, mo = month;
-  if (mo <= 2) { y--; mo += 12; }
-  const A = Math.floor(y / 100);
-  const B = 2 - A + Math.floor(A / 4);
-  return Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (mo + 1)) + day + B - 1524.5 + dayFrac;
-}
 
 // ─── Sun (Meeus, ~0.001°) ───────────────────────────────────────────────────
 function sunLongitude(jde) {
@@ -38,7 +30,6 @@ function sunLongitude(jde) {
 // ─── Moon (Meeus 17-term series, ~0.05°) ────────────────────────────────────
 function moonLongitude(jde) {
   const T = (jde - J2000) / 36525;
-  // Mean elements (degrees)
   const L   = ((218.3164477 + 481267.88123421 * T - 0.0015786 * T * T) % 360 + 360) % 360;
   const D   = ((297.8501921 + 445267.1114034  * T - 0.0018819 * T * T) % 360 + 360) % 360;
   const Ms  = ((357.5291092 +  35999.0502909  * T - 0.0001536 * T * T) % 360 + 360) % 360;
@@ -80,10 +71,8 @@ const _ORB = {
   Pluto:   { a:39.482117,    L0: 238.958116, L1:    145.6412000, e0: 0.24882730, e1:  0,         w0: 224.066769, w1:  0         },
 };
 
-// Earth uses the same orbital element structure for geocentric subtraction
 const _EARTH_ORB = { a: 1.000001018, L0: 100.466457, L1: 35999.3728565, e0: 0.01670862, e1: -4.2037e-5, w0: 102.937348, w1: 0.3225654 };
 
-// Iterative Kepler's equation solver: M = E - e·sin(E)
 function _solveKepler(M_deg, e) {
   let E = M_deg * (Math.PI / 180);
   for (let i = 0; i < 12; i++) {
@@ -91,10 +80,9 @@ function _solveKepler(M_deg, e) {
     E += dE;
     if (Math.abs(dE) < 1e-10) break;
   }
-  return E; // radians
+  return E;
 }
 
-// Heliocentric ecliptic longitude (°) and radius (AU) from Keplerian elements
 function _helioLonR(orb, T) {
   const { a, L0, L1, e0, e1, w0, w1 } = orb;
   const L = ((L0 + L1 * T) % 360 + 360) % 360;
@@ -102,7 +90,6 @@ function _helioLonR(orb, T) {
   const w = ((w0 + w1 * T) % 360 + 360) % 360;
   const M = ((L - w) % 360 + 360) % 360;
   const E = _solveKepler(M, e);
-  // True anomaly (numerically stable atan2 form)
   const v = 2 * Math.atan2(
     Math.sqrt(1 + e) * Math.sin(E / 2),
     Math.sqrt(1 - e) * Math.cos(E / 2)
@@ -112,14 +99,12 @@ function _helioLonR(orb, T) {
   return { lon, r };
 }
 
-// Geocentric ecliptic longitude of a planet (ignores ecliptic latitude — fine for gate accuracy)
 function planetLongitude(planet, jde) {
   const T = (jde - J2000) / 36525;
   const orb = _ORB[planet];
   if (!orb) return 0;
   const p = _helioLonR(orb, T);
   const earth = _helioLonR(_EARTH_ORB, T);
-  // 2-D heliocentric rectangular coordinates in the ecliptic plane
   const pR = p.lon * (Math.PI / 180);
   const eR = earth.lon * (Math.PI / 180);
   const gx = p.r * Math.cos(pR) - earth.r * Math.cos(eR);
@@ -127,31 +112,11 @@ function planetLongitude(planet, jde) {
   return ((Math.atan2(gy, gx) * 180 / Math.PI) % 360 + 360) % 360;
 }
 
-// ─── Gate / Line mapping ─────────────────────────────────────────────────────
-// 64 gates clockwise from ~302° ecliptic (empirically verified offset)
-const GATE_WHEEL = [
-  41,19,13,49,30,55,37,63,22,36,25,17,21,51,42,3,27,24,2,23,
-  8,20,16,35,45,12,15,52,39,53,62,56,31,33,7,4,29,59,40,64,
-  47,6,46,18,48,57,32,50,28,44,1,43,14,34,9,5,26,11,10,58,
-  38,54,61,60,
-];
-
-function longitudeToGate(lon) {
-  const pos = ((lon - 302 + 360) % 360) / 5.625;
-  return GATE_WHEEL[Math.floor(pos) % 64];
-}
-
-function longitudeToLine(lon) {
-  const withinGate = ((lon - 302 + 360) % 360) % 5.625;
-  return Math.min(6, Math.floor(withinGate / 0.9375) + 1);
-}
-
 // ─── Design time (Sun 88° earlier) ──────────────────────────────────────────
 function getDesignJDE(birthJDE, birthSunLon) {
   const SUN_RATE = 0.9856; // °/day
   const targetLon = ((birthSunLon - 88 + 360) % 360);
   let jde = birthJDE - 88 / SUN_RATE;
-  // Two Newton-Raphson iterations for better convergence
   for (let i = 0; i < 2; i++) {
     let diff = targetLon - sunLongitude(jde);
     if (diff > 180) diff -= 360;
@@ -159,111 +124,6 @@ function getDesignJDE(birthJDE, birthSunLon) {
     jde += diff / SUN_RATE;
   }
   return jde;
-}
-
-// ─── Centers & Channels ─────────────────────────────────────────────────────
-const CENTER_GATES = {
-  Head:        [64, 61, 63],
-  Ajna:        [47, 24, 4, 11, 43, 17],
-  Throat:      [62, 23, 56, 35, 12, 45, 33, 8, 31, 20, 16],
-  G:           [1, 13, 25, 46, 2, 15, 10, 7],
-  Will:        [26, 51, 21, 40],
-  Sacral:      [9, 3, 42, 14, 29, 59, 27, 34, 5],
-  SolarPlexus: [36, 22, 37, 55, 30, 49, 6],
-  Spleen:      [48, 57, 44, 50, 32, 28, 18],
-  Root:        [19, 39, 52, 53, 60, 58, 38, 54, 41],
-};
-
-const CHANNELS = [
-  [64,47],[61,24],[63,4],
-  [17,62],[43,23],[11,56],
-  [7,31],[1,8],[13,33],[10,20],
-  [25,51],
-  [2,14],[5,15],[29,46],[20,34],
-  [21,45],[26,44],[37,40],
-  [12,22],[35,36],[16,48],
-  [27,50],[34,57],[6,59],
-  [3,60],[9,52],[42,53],
-  [18,58],[28,38],[32,54],
-  [19,49],[39,55],[30,41],
-];
-
-// Build gate → center lookup once
-const _GATE_CENTER = {};
-for (const [center, gates] of Object.entries(CENTER_GATES)) {
-  for (const g of gates) _GATE_CENTER[g] = center;
-}
-
-function getDefinedChannels(allGates) {
-  const gateSet = new Set(allGates);
-  return CHANNELS.filter(([g1, g2]) => gateSet.has(g1) && gateSet.has(g2));
-}
-
-function getDefinedCenters(definedChannels) {
-  const defined = new Set();
-  for (const [g1, g2] of definedChannels) {
-    if (_GATE_CENTER[g1]) defined.add(_GATE_CENTER[g1]);
-    if (_GATE_CENTER[g2]) defined.add(_GATE_CENTER[g2]);
-  }
-  return [...defined];
-}
-
-function buildCenterAdj(definedChannels) {
-  const adj = {};
-  for (const [g1, g2] of definedChannels) {
-    const c1 = _GATE_CENTER[g1], c2 = _GATE_CENTER[g2];
-    if (!c1 || !c2 || c1 === c2) continue;
-    (adj[c1] = adj[c1] || new Set()).add(c2);
-    (adj[c2] = adj[c2] || new Set()).add(c1);
-  }
-  return adj;
-}
-
-function isConnectedVia(adj, from, to) {
-  if (from === to) return true;
-  const visited = new Set([from]);
-  const queue = [from];
-  while (queue.length) {
-    const curr = queue.shift();
-    if (curr === to) return true;
-    for (const next of (adj[curr] ?? [])) {
-      if (!visited.has(next)) { visited.add(next); queue.push(next); }
-    }
-  }
-  return false;
-}
-
-// ─── Type & Authority ────────────────────────────────────────────────────────
-function determineType(definedCenters, centerAdj) {
-  if (definedCenters.length === 0) return 'reflector';
-  const dc = new Set(definedCenters);
-  const sacral = dc.has('Sacral');
-  const throat = dc.has('Throat');
-  // MG = Sacral defined + any motor (Sacral, Will, SolarPlexus, Root) connected to Throat
-  const motorToThroat = ['Sacral', 'Will', 'SolarPlexus', 'Root']
-    .some(m => dc.has(m) && throat && isConnectedVia(centerAdj, m, 'Throat'));
-  if (sacral) {
-    return motorToThroat ? 'manifesting-generator' : 'generator';
-  }
-  return motorToThroat ? 'manifestor' : 'projector';
-}
-
-function determineAuthority(definedCenters) {
-  const dc = new Set(definedCenters);
-  if (dc.has('SolarPlexus')) return 'emotional';
-  if (dc.has('Sacral'))      return 'sacral';
-  if (dc.has('Spleen'))      return 'splenic';
-  if (dc.has('Will'))        return 'ego';
-  if (dc.has('G'))           return 'self-projected';
-  if (dc.has('Ajna'))        return 'mental';
-  return 'lunar';
-}
-
-// ─── Mean Lunar Node ─────────────────────────────────────────────────────────
-function meanNodeLongitude(jde) {
-  const T = (jde - J2000) / 36525;
-  const omega = 125.0445479 - 1934.1362608 * T + 0.0020754 * T * T + T * T * T / 467441;
-  return ((omega % 360) + 360) % 360;
 }
 
 // ─── Gate activations for all bodies at a given JDE ─────────────────────────
@@ -285,14 +145,6 @@ function gateActivations(jde) {
   }
   return result;
 }
-
-const TYPE_META = {
-  'generator':             { strategy: 'Respond',                 signature: 'Satisfaction', notSelf: 'Frustration'    },
-  'manifesting-generator': { strategy: 'Respond, then Inform',    signature: 'Satisfaction', notSelf: 'Frustration'    },
-  'manifestor':            { strategy: 'Inform',                  signature: 'Peace',        notSelf: 'Anger'          },
-  'projector':             { strategy: 'Wait for the Invitation', signature: 'Success',      notSelf: 'Bitterness'     },
-  'reflector':             { strategy: 'Wait a Lunar Cycle',      signature: 'Surprise',     notSelf: 'Disappointment' },
-};
 
 // ─── Main export ─────────────────────────────────────────────────────────────
 export function calculateHDChart(birthDate, birthTime, utcOffset) {

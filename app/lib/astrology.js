@@ -51,7 +51,7 @@ function getMoonSignApprox(dateStr, timeStr) {
 
 // ─── Lunar phase ──────────────────────────────────────────────────────────────
 // Moon phase shifts every 3–4 days — primary source of daily variation
-function getLunarPhase(todayStr) {
+export function getLunarPhase(todayStr) {
   const SYNODIC_MONTH = 29.53058867;
   const KNOWN_NEW_MOON = new Date('2000-01-06T18:14:00Z');
   const today = new Date(todayStr + 'T12:00:00Z');
