@@ -346,7 +346,7 @@ export default function DailyPage() {
                 >
                   <p className="text-sm font-medium text-gray-700 leading-snug">{item.title}</p>
                   {item.snippet && (
-                    <p className="text-xs text-gray-400 mt-1 leading-relaxed line-clamp-2">{item.snippet}</p>
+                    <p className="text-xs text-gray-400 mt-1 leading-relaxed">{item.snippet}</p>
                   )}
                 </a>
               ))}
