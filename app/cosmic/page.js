@@ -847,6 +847,42 @@ export default function CosmicPage() {
         ))}
       </div>
 
+      {/* ════ CHART CHAT ════ */}
+      <div className="bg-gradient-to-br from-rose-50/60 to-violet-50/40 backdrop-blur-md border border-white/40 rounded-3xl shadow-sm shadow-rose-100/30 p-6 space-y-4">
+        <div>
+          <h2 className="font-playfair text-xl text-gray-700">✦ Ask your chart anything</h2>
+          <p className="text-xs text-gray-400 mt-0.5">Claude reads your full chart data and answers personally.</p>
+        </div>
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={chatQuestion}
+            onChange={e => setChatQuestion(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && askChart()}
+            placeholder="e.g. Why do I feel drained by social situations?"
+            className="flex-1 bg-white/60 border border-white/50 rounded-2xl px-4 py-2.5 text-sm text-gray-700 placeholder-gray-300 focus:outline-none focus:ring-1 focus:ring-rose-200"
+            disabled={chatLoading}
+          />
+          <button
+            onClick={askChart}
+            disabled={chatLoading || !chatQuestion.trim()}
+            className="btn-gradient text-white text-sm font-medium px-5 py-2.5 rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed shrink-0 flex items-center gap-1.5"
+          >
+            {chatLoading ? (
+              <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/>
+              </svg>
+            ) : 'Ask →'}
+          </button>
+        </div>
+        {chatResponse && (
+          <div className="bg-white/40 rounded-2xl p-4 border border-white/40">
+            <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-wrap">{chatResponse}</p>
+          </div>
+        )}
+      </div>
+
       {/* ════ OVERVIEW ════ */}
       {tab === 'overview' && (
         <div className="space-y-4">
@@ -1364,41 +1400,6 @@ export default function CosmicPage() {
         </div>
       )}
 
-      {/* ════ CHART CHAT ════ */}
-      <div className="glass-card rounded-3xl p-6 space-y-4">
-        <div>
-          <h2 className="font-playfair text-xl text-gray-700">Ask your chart anything</h2>
-          <p className="text-xs text-gray-400 mt-0.5">Claude reads your full chart data and answers personally.</p>
-        </div>
-        <div className="flex gap-2">
-          <input
-            type="text"
-            value={chatQuestion}
-            onChange={e => setChatQuestion(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && askChart()}
-            placeholder="e.g. Why do I feel drained by social situations?"
-            className="flex-1 bg-white/60 border border-white/50 rounded-2xl px-4 py-2.5 text-sm text-gray-700 placeholder-gray-300 focus:outline-none focus:ring-1 focus:ring-rose-200"
-            disabled={chatLoading}
-          />
-          <button
-            onClick={askChart}
-            disabled={chatLoading || !chatQuestion.trim()}
-            className="btn-gradient text-white text-sm font-medium px-5 py-2.5 rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed shrink-0 flex items-center gap-1.5"
-          >
-            {chatLoading ? (
-              <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/>
-              </svg>
-            ) : 'Ask →'}
-          </button>
-        </div>
-        {chatResponse && (
-          <div className="bg-white/40 rounded-2xl p-4 border border-white/40">
-            <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-wrap">{chatResponse}</p>
-          </div>
-        )}
-      </div>
     </div>
   );
 }

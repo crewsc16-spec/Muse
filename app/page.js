@@ -179,6 +179,29 @@ export default function HomePage() {
           ))}
         </div>
 
+        {/* ── Chart chat callout ── */}
+        <Link
+          href="/cosmic"
+          className="block bg-gradient-to-br from-violet-50 to-rose-50 border border-violet-100 rounded-2xl p-6 hover:shadow-md hover:scale-[1.01] transition-all duration-200 group"
+        >
+          <div className="flex items-center justify-between gap-4">
+            <div className="space-y-1">
+              <h2 className="font-playfair text-xl text-gray-800 group-hover:text-[#b88a92] transition-colors">
+                ✦ Ask Claude about your chart
+              </h2>
+              <p className="text-xs text-gray-500 leading-relaxed">
+                Your Human Design, astrology, and numerology — ask anything and get a personal answer.
+              </p>
+            </div>
+            <div className="shrink-0 flex items-center gap-1 text-sm font-medium text-rose-400">
+              Ask now
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </div>
+          </div>
+        </Link>
+
       </div>
     </div>
   );
