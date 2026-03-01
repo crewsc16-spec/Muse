@@ -8,7 +8,7 @@ const ALL_CHANNELS = [
   [34,57],[35,36],[37,40],[39,55],[42,53],[43,23],[47,64],[61,24],[63,4],
 ];
 
-// Gate → Center mapping (from CENTER_META gates arrays)
+// Gate → Center mapping
 const GATE_CENTER = {
   64:'Head', 61:'Head', 63:'Head',
   47:'Ajna', 24:'Ajna', 4:'Ajna', 11:'Ajna', 43:'Ajna', 17:'Ajna',
@@ -26,15 +26,15 @@ const GATE_CENTER = {
 
 // Center positions and shapes (viewBox: 0 0 360 450)
 const CTR = {
-  Head:        { x:180, y:48,  shape:'tri-up',   r:30,      label:'Head'   },
-  Ajna:        { x:180, y:114, shape:'tri-down',  r:30,      label:'Ajna'   },
-  Throat:      { x:180, y:175, shape:'rect',      w:56, h:28, label:'Throat' },
-  G:           { x:180, y:250, shape:'diamond',   r:38,      label:'G'      },
-  Will:        { x:264, y:224, shape:'tri-down',  r:22,      label:'Will'   },
-  Sacral:      { x:180, y:328, shape:'rect',      w:64, h:36, label:'Sacral' },
-  SolarPlexus: { x:271, y:354, shape:'tri-up',    r:25,      label:'SP'     },
-  Spleen:      { x:89,  y:354, shape:'tri-up',    r:25,      label:'Spleen' },
-  Root:        { x:180, y:416, shape:'rect',      w:64, h:28, label:'Root'   },
+  Head:        { x:180, y:48,  shape:'tri-up',   r:32,       label:'Head'   },
+  Ajna:        { x:180, y:114, shape:'tri-down',  r:32,       label:'Ajna'   },
+  Throat:      { x:180, y:175, shape:'rect',      w:62, h:32, label:'Throat' },
+  G:           { x:180, y:250, shape:'diamond',   r:42,       label:'G'      },
+  Will:        { x:264, y:224, shape:'tri-down',  r:26,       label:'Will'   },
+  Sacral:      { x:180, y:328, shape:'rect',      w:70, h:40, label:'Sacral' },
+  SolarPlexus: { x:271, y:354, shape:'tri-up',    r:28,       label:'SP'     },
+  Spleen:      { x:89,  y:354, shape:'tri-up',    r:28,       label:'Spleen' },
+  Root:        { x:180, y:416, shape:'rect',      w:70, h:32, label:'Root'   },
 };
 
 function triPts(cx, cy, r, up) {
@@ -48,7 +48,13 @@ function diamondPts(cx, cy, r) {
   return `${cx},${cy - r} ${cx + r},${cy} ${cx},${cy + r} ${cx - r},${cy}`;
 }
 
-// Returns N parallel lines between two points, offset perpendicularly
+// Generous tap-target radius for each center
+function hitRadius(c) {
+  if (c.shape === 'rect')    return Math.max(c.w / 2, c.h / 2) + 14;
+  if (c.shape === 'diamond') return c.r + 12;
+  return c.r + 12; // triangles
+}
+
 function parallelLines(x1, y1, x2, y2, n, s = 3) {
   const dx = x2 - x1, dy = y2 - y1;
   const len = Math.sqrt(dx * dx + dy * dy);
@@ -64,10 +70,7 @@ function parallelLines(x1, y1, x2, y2, n, s = 3) {
 export default function BodyGraph({ definedCenters = [], definedChannels = [], onCenter, onChannel }) {
   const defCSet = new Set(definedCenters);
   const defChSet = new Set(
-    definedChannels.map(([a, b]) => {
-      const [x, y] = [a, b].sort((p, q) => p - q);
-      return `${x}-${y}`;
-    })
+    definedChannels.map(([a, b]) => { const [x, y] = [a, b].sort((p, q) => p - q); return `${x}-${y}`; })
   );
 
   function isDefCh(g1, g2) {
@@ -75,7 +78,6 @@ export default function BodyGraph({ definedCenters = [], definedChannels = [], o
     return defChSet.has(`${a}-${b}`);
   }
 
-  // Group all channels by sorted center-pair key
   const groups = {};
   for (const [g1, g2] of ALL_CHANNELS) {
     const c1 = GATE_CENTER[g1], c2 = GATE_CENTER[g2];
@@ -88,7 +90,7 @@ export default function BodyGraph({ definedCenters = [], definedChannels = [], o
   const GRAD = 'url(#bgGrd)';
 
   return (
-    <svg viewBox="0 0 360 450" width="100%" style={{ maxWidth: 300, display: 'block', margin: '0 auto' }}>
+    <svg viewBox="0 0 360 450" width="100%" style={{ maxWidth: 320, display: 'block', margin: '0 auto' }}>
       <defs>
         <linearGradient id="bgGrd" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%"   stopColor="#fb7185" />
@@ -108,12 +110,12 @@ export default function BodyGraph({ definedCenters = [], definedChannels = [], o
           const ck = [g1, g2].sort((a, b) => a - b).join('-');
           return (
             <g key={ck} onClick={() => onChannel?.([g1, g2])} style={{ cursor: 'pointer' }}>
-              {/* Wide invisible hit area */}
-              <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="transparent" strokeWidth={14} />
+              {/* Generous invisible hit area */}
+              <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="transparent" strokeWidth={24} />
               <line
                 x1={x1} y1={y1} x2={x2} y2={y2}
                 stroke={def ? '#d4adb6' : '#e5e7eb'}
-                strokeWidth={def ? 2.5 : 1.5}
+                strokeWidth={def ? 3 : 2}
                 strokeLinecap="round"
               />
             </g>
@@ -123,7 +125,7 @@ export default function BodyGraph({ definedCenters = [], definedChannels = [], o
 
       {/* Centers — rendered above channels */}
       {Object.entries(CTR).map(([key, c]) => {
-        const def  = defCSet.has(key);
+        const def    = defCSet.has(key);
         const fill   = def ? GRAD : 'white';
         const stroke = def ? '#d4adb6' : '#d1d5db';
         const tc     = def ? 'white' : '#9ca3af';
@@ -137,10 +139,10 @@ export default function BodyGraph({ definedCenters = [], definedChannels = [], o
               <rect
                 x={c.x - c.w / 2} y={c.y - c.h / 2}
                 width={c.w} height={c.h}
-                rx={3} fill={fill} stroke={stroke} strokeWidth={sw}
+                rx={4} fill={fill} stroke={stroke} strokeWidth={sw}
               />
               <text x={c.x} y={c.y} textAnchor="middle" dominantBaseline="middle"
-                fontSize={7} fill={tc} style={textStyle}>
+                fontSize={8} fill={tc} style={textStyle}>
                 {c.label}
               </text>
             </>
@@ -150,7 +152,7 @@ export default function BodyGraph({ definedCenters = [], definedChannels = [], o
             <>
               <polygon points={diamondPts(c.x, c.y, c.r)} fill={fill} stroke={stroke} strokeWidth={sw} />
               <text x={c.x} y={c.y} textAnchor="middle" dominantBaseline="middle"
-                fontSize={9} fill={tc} style={textStyle}>
+                fontSize={10} fill={tc} style={textStyle}>
                 {c.label}
               </text>
             </>
@@ -161,7 +163,7 @@ export default function BodyGraph({ definedCenters = [], definedChannels = [], o
             <>
               <polygon points={triPts(c.x, c.y, c.r, up)} fill={fill} stroke={stroke} strokeWidth={sw} />
               <text x={c.x} y={c.y} textAnchor="middle" dominantBaseline="middle"
-                fontSize={7} fill={tc} style={textStyle}>
+                fontSize={8} fill={tc} style={textStyle}>
                 {c.label}
               </text>
             </>
@@ -171,6 +173,8 @@ export default function BodyGraph({ definedCenters = [], definedChannels = [], o
         return (
           <g key={key} onClick={() => onCenter?.(key, def)} style={{ cursor: 'pointer' }}>
             {inner}
+            {/* Large transparent circle ensures the whole center area is tappable */}
+            <circle cx={c.x} cy={c.y} r={hitRadius(c)} fill="transparent" />
           </g>
         );
       })}
