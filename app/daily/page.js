@@ -3,7 +3,89 @@
 import { useEffect, useState } from 'react';
 import { createClient } from '@/app/lib/supabase/client';
 import { getDailyContent, TAROT_IMAGES, ANIMAL_IMAGE_QUERIES } from '@/app/lib/daily-content';
-import { computeChart } from '@/app/lib/astrology';
+import { computeChart, getLunarPhase } from '@/app/lib/astrology';
+import { saveVisionItem } from '@/app/lib/storage';
+
+const VIBE_DATA = {
+  fire: {
+    palette: ['#f97316', '#e11d48', '#f59e0b'],
+    taglines: ['Spark Something New', 'Strike While You\'re Ready', 'Blaze & Shine', 'Let the Fire Transform'],
+    keywords: ['Courage', 'Momentum', 'Passion', 'Initiative', 'Vitality'],
+    description: 'Fire energy fuels courage and momentum today. Move with intention, let your passion lead, and don\'t be afraid to take up space.',
+    leanInto: 'Bold decisions, starting something new, physical movement, creative fire',
+    watchFor: 'Impatience, impulsivity, burning yourself out before noon',
+  },
+  earth: {
+    palette: ['#84cc16', '#a16207', '#d4a76a'],
+    taglines: ['Plant & Prepare', 'Build & Tend', 'Harvest & Celebrate', 'Rest & Restore'],
+    keywords: ['Stability', 'Patience', 'Grounding', 'Nourishment', 'Presence'],
+    description: 'Earth energy calls you home to yourself. Slow down, tend to what\'s real, and trust the steady process unfolding beneath your feet.',
+    leanInto: 'Practical tasks, nourishing your body, time in nature, finishing what you started',
+    watchFor: 'Rigidity, resistance to change, over-scheduling yourself',
+  },
+  air: {
+    palette: ['#818cf8', '#a78bfa', '#93c5fd'],
+    taglines: ['Dream & Imagine', 'Think & Act', 'Speak & Connect', 'Let Thoughts Settle'],
+    keywords: ['Clarity', 'Curiosity', 'Connection', 'Ideas', 'Perspective'],
+    description: 'Air energy sharpens your mind and opens channels of communication. This is a day for ideas, honest conversations, and following your curiosity.',
+    leanInto: 'Writing, meaningful conversations, learning, creative brainstorming',
+    watchFor: 'Scattered thinking, over-analysis, losing touch with how you feel',
+  },
+  water: {
+    palette: ['#7c3aed', '#0891b2', '#6366f1'],
+    taglines: ['Set Your Intentions', 'Dive Deeper', 'Feel Everything', 'Let It Flow Through'],
+    keywords: ['Intuition', 'Emotion', 'Depth', 'Healing', 'Receptivity'],
+    description: 'Water energy runs deep today. Your intuition is heightened — trust what you sense even when you can\'t fully explain it.',
+    leanInto: 'Journaling, rest, creative expression, emotional honesty, solitude',
+    watchFor: 'Absorbing others\' emotions, avoidance, mistaking feelings for facts',
+  },
+};
+
+const PHASE_TO_IDX = {
+  seeding: 0, intention: 0,
+  action: 1, refinement: 1,
+  illumination: 2, gratitude: 2,
+  release: 3, surrender: 3,
+};
+
+function TodaysVibe({ chartData, dateStr }) {
+  const lunarPhase = chartData?.lunarPhase ?? getLunarPhase(dateStr);
+  const element    = chartData?.dailyBlend?.[0] ?? lunarPhase?.element ?? 'water';
+  const vibe       = VIBE_DATA[element] ?? VIBE_DATA.water;
+  const tagline    = vibe.taglines[PHASE_TO_IDX[lunarPhase?.energy] ?? 0];
+  const moonSign   = chartData?.transitMoonSign?.sign;
+
+  return (
+    <section className="glass-card rounded-3xl p-5">
+      <div className="flex items-center justify-between mb-3">
+        <p className="text-xs uppercase tracking-widest text-gray-400">Today&apos;s Vibe</p>
+        <div className="flex items-center gap-1.5">
+          {vibe.palette.map((color, i) => (
+            <div key={i} className="w-4 h-4 rounded-full" style={{ background: color }} />
+          ))}
+          <span className="text-xs text-gray-400 capitalize ml-1">{element}</span>
+        </div>
+      </div>
+
+      <h2 className="font-playfair text-xl text-gray-800 mb-1">{tagline}</h2>
+
+      {moonSign && (
+        <p className="text-xs text-gray-400 mb-3">Moon in {moonSign}{lunarPhase ? ` · ${lunarPhase.name}` : ''}</p>
+      )}
+
+      <p className="text-gray-600 text-sm leading-relaxed mb-3">{vibe.description}</p>
+
+      <div className="flex flex-wrap gap-1.5">
+        {vibe.keywords.map(k => (
+          <span key={k} className="text-xs px-2.5 py-0.5 rounded-full bg-white/60 border border-white/50 text-gray-400">{k}</span>
+        ))}
+        {lunarPhase && (
+          <span className="text-xs px-2.5 py-0.5 rounded-full bg-white/60 border border-white/50 text-gray-400 capitalize">{lunarPhase.energy}</span>
+        )}
+      </div>
+    </section>
+  );
+}
 
 function getTodayStr() {
   const d = new Date();
@@ -14,8 +96,16 @@ export default function DailyPage() {
   const [content, setContent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [animalImage, setAnimalImage] = useState(null);
+  const [answer, setAnswer] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  const dateStr = getTodayStr();
 
   useEffect(() => {
+    setAnswer(localStorage.getItem(`daily-reflection-${dateStr}`) ?? '');
+    setSaved(localStorage.getItem(`daily-reflection-saved-${dateStr}`) === 'true');
+
     const supabase = createClient();
     supabase.auth.getUser().then(async ({ data: { user } }) => {
       if (user) {
@@ -39,6 +129,30 @@ export default function DailyPage() {
       setLoading(false);
     });
   }, []);
+
+  function handleAnswerChange(val) {
+    setAnswer(val);
+    localStorage.setItem(`daily-reflection-${dateStr}`, val);
+  }
+
+  async function handleSaveToBoard() {
+    if (!answer.trim() || !content?.question) return;
+    setSaving(true);
+    try {
+      const supabase = createClient();
+      await saveVisionItem(supabase, {
+        type: 'reflection',
+        category: 'reflection',
+        content: `${content.question}\n\n${answer.trim()}`,
+      });
+      localStorage.setItem(`daily-reflection-saved-${dateStr}`, 'true');
+      setSaved(true);
+    } catch (err) {
+      console.error('[save reflection]', err);
+    } finally {
+      setSaving(false);
+    }
+  }
 
   if (loading) {
     return (
@@ -108,6 +222,9 @@ export default function DailyPage() {
             </div>
           )}
         </div>
+
+        {/* Today's Vibe */}
+        <TodaysVibe chartData={content.chartData} dateStr={getTodayStr()} />
 
         {/* 1. Tarot Card */}
         <section
@@ -214,9 +331,30 @@ export default function DailyPage() {
         </section>
 
         {/* 5. Philosophical Question */}
-        <section className="glass-card rounded-3xl p-8 text-center">
-          <p className="text-xs uppercase tracking-widest text-gray-400 mb-6">Today's Question</p>
-          <p className="font-playfair text-xl text-gray-800 italic leading-relaxed">{question}</p>
+        <section className="glass-card rounded-3xl p-8">
+          <p className="text-xs uppercase tracking-widest text-gray-400 mb-5 text-center">Today&apos;s Question</p>
+          <p className="font-playfair text-xl text-gray-800 italic leading-relaxed text-center mb-6">{question}</p>
+          <textarea
+            value={answer}
+            onChange={e => handleAnswerChange(e.target.value)}
+            placeholder="Write your reflection here…"
+            rows={4}
+            className="w-full bg-white/50 border border-white/60 rounded-2xl px-4 py-3 text-sm text-gray-700 placeholder-gray-300 leading-relaxed resize-none focus:outline-none focus:ring-1 focus:ring-rose-200"
+          />
+          <div className="flex items-center justify-between mt-3">
+            <p className="text-xs text-gray-300">{answer.trim() ? 'Draft saved' : ''}</p>
+            {answer.trim() && (
+              <button
+                onClick={handleSaveToBoard}
+                disabled={saving || saved}
+                className={`text-xs px-4 py-2 rounded-full font-medium transition-all ${
+                  saved ? 'bg-green-100 text-green-600' : 'btn-gradient text-white hover:opacity-90 disabled:opacity-60'
+                }`}
+              >
+                {saved ? 'Saved to board ✓' : saving ? 'Saving…' : 'Save to Board'}
+              </button>
+            )}
+          </div>
         </section>
 
         {/* 6. Lucky Number */}

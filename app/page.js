@@ -57,6 +57,7 @@ const CATEGORY_BG = {
   relationships: '#faf0f0',
   personal:      '#faf0f5',
   travel:        '#faf5ee',
+  reflection:    '#f5f0fa',
 };
 
 // ── Moon phase SVG ──
@@ -929,9 +930,21 @@ export default function Home() {
                               <MoodFace mood={moodData.mood} size={20} />
                             </div>
                           )}
-                          <p className={`text-sm leading-relaxed ${item.type === 'quote' ? 'italic font-playfair text-base' : ''} text-gray-600`}>
-                            {item.content}
-                          </p>
+                          {item.type === 'reflection' ? (() => {
+                            const parts = item.content?.split('\n\n') ?? [];
+                            const q = parts[0] ?? '';
+                            const a = parts.slice(1).join('\n\n');
+                            return (
+                              <>
+                                <p className="text-xs text-gray-400 italic mb-2">{q}</p>
+                                <p className="text-sm leading-relaxed text-gray-600 whitespace-pre-line">{a}</p>
+                              </>
+                            );
+                          })() : (
+                            <p className={`text-sm leading-relaxed ${item.type === 'quote' ? 'italic font-playfair text-base' : ''} text-gray-600`}>
+                              {item.content}
+                            </p>
+                          )}
                           {/* Reveal on click */}
                           {isExpanded && (() => {
                             const entryDate = isCombined ? moodData.date : new Date(item.created_at).toISOString().split('T')[0];
