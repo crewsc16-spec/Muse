@@ -620,6 +620,21 @@ export default function CosmicPage() {
       setDisplayName(meta.displayName ?? localStorage.getItem('displayName') ?? '');
       let bd = null;
       try { bd = meta.birthData ?? JSON.parse(localStorage.getItem('birthData') ?? 'null'); } catch {}
+      // Auto-geocode birthPlace if lat/lon were never saved
+      if (bd?.birthPlace && (bd.birthLat == null || bd.birthLon == null)) {
+        try {
+          const geoRes = await fetch(
+            `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(bd.birthPlace)}&format=json&limit=1`,
+            { headers: { 'Accept-Language': 'en-US,en' } }
+          );
+          const geoData = await geoRes.json();
+          if (geoData[0]) {
+            bd = { ...bd, birthLat: parseFloat(geoData[0].lat), birthLon: parseFloat(geoData[0].lon) };
+            localStorage.setItem('birthData', JSON.stringify(bd));
+          }
+        } catch {}
+      }
+
       setBirthData(bd);
       const fetchHD = (date, time, utcOffset, lat, lon) =>
         fetch('/api/hd-chart',{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({birthDate:date,birthTime:time,utcOffset,lat,lon}) })
