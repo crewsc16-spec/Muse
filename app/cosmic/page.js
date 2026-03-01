@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import BodyGraph from '@/app/components/BodyGraph';
 import NatalWheel from '@/app/components/NatalWheel';
 import { createClient } from '@/app/lib/supabase/client';
+import { createJournalEntry } from '@/app/lib/storage';
 
 // ─── HD Gate Wheel ────────────────────────────────────────────────────────────
 const GATE_WHEEL = [
@@ -566,6 +567,8 @@ export default function CosmicPage() {
   const [chatQuestion, setChatQuestion] = useState('');
   const [chatResponse, setChatResponse] = useState('');
   const [chatLoading,  setChatLoading]  = useState(false);
+  const [chatAsked,    setChatAsked]    = useState('');
+  const [chatSaved,    setChatSaved]    = useState(false);
   const [today] = useState(() => new Date().toISOString().slice(0,10));
 
   useEffect(() => {
@@ -769,7 +772,10 @@ export default function CosmicPage() {
   async function askChart() {
     const q = chatQuestion.trim();
     if (!q || chatLoading) return;
+    setChatAsked(q);
+    setChatQuestion('');
     setChatResponse('');
+    setChatSaved(false);
     setChatLoading(true);
     try {
       const res = await fetch('/api/cosmic-chat', {
@@ -877,8 +883,37 @@ export default function CosmicPage() {
           </button>
         </div>
         {chatResponse && (
-          <div className="bg-white/40 rounded-2xl p-4 border border-white/40">
+          <div className="bg-white/40 rounded-2xl p-4 border border-white/40 space-y-3">
+            {chatAsked && <p className="text-xs text-gray-400 italic">"{chatAsked}"</p>}
             <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-wrap">{chatResponse}</p>
+            {!chatLoading && (
+              <div className="flex items-center gap-2 pt-1">
+                <button
+                  onClick={async () => {
+                    if (chatSaved) return;
+                    try {
+                      const supabase = createClient();
+                      const today = new Date().toISOString().slice(0, 10);
+                      await createJournalEntry(supabase, {
+                        date: today,
+                        content: `**Q:** ${chatAsked}\n\n${chatResponse}`,
+                        prompt: 'Chart Insight',
+                      });
+                      setChatSaved(true);
+                    } catch { /* silent */ }
+                  }}
+                  className={`text-xs font-medium px-3 py-1.5 rounded-full transition-all ${chatSaved ? 'bg-emerald-50 text-emerald-500 border border-emerald-200/50' : 'bg-white/60 text-gray-500 border border-white/50 hover:bg-white/80 hover:text-violet-500'}`}
+                >
+                  {chatSaved ? '✓ Saved to journal' : '↓ Save to journal'}
+                </button>
+                <button
+                  onClick={() => { setChatResponse(''); setChatAsked(''); setChatSaved(false); }}
+                  className="text-xs font-medium px-3 py-1.5 rounded-full bg-white/60 text-gray-400 border border-white/50 hover:bg-white/80 hover:text-gray-600 transition-all"
+                >
+                  ✕ Dismiss
+                </button>
+              </div>
+            )}
           </div>
         )}
       </div>
