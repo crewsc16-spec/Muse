@@ -4,7 +4,8 @@ import Link from 'next/link';
 
 const FEATURES = [
   { label: 'Your birth chart', desc: 'Astrology, Human Design, and numerology tailored to you' },
-  { label: 'Daily guidance', desc: 'Tarot pulls, moon phases, and a vibe matched to your energy' },
+  { label: 'Daily guidance', desc: 'Moon phases, spirit animals, and a vibe matched to your energy' },
+  { label: 'Mood & cycle tracking', desc: 'Log how you feel each day and track your cycle with insights and predictions' },
   { label: 'Journal & vision board', desc: 'Track your moods, reflect, and visualize your intentions' },
 ];
 

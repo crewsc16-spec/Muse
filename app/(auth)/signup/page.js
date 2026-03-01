@@ -63,10 +63,10 @@ export default function Signup() {
           <p className="text-gray-400 text-sm mb-4">Start your Muse journey</p>
           <div className="bg-white/40 border border-white/50 rounded-2xl p-4 text-left space-y-2">
             <p className="text-sm text-gray-600 leading-relaxed">
-              Muse is your personal space for cosmic self-discovery — astrology, human design, numerology, tarot, and journaling all in one place.
+              Muse is your personal space for cosmic self-discovery — astrology, human design, numerology, mood tracking, and journaling all in one place.
             </p>
             <div className="flex flex-wrap gap-1.5 pt-1">
-              {['Daily guidance','Birth chart','Human Design','Tarot pulls','Vision board','Journal'].map(t => (
+              {['Daily guidance','Birth chart','Human Design','Mood tracker','Cycle tracker','Vision board','Journal'].map(t => (
                 <span key={t} className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-violet-50/80 text-violet-400 border border-violet-100/50">{t}</span>
               ))}
             </div>
