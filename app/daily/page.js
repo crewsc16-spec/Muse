@@ -120,6 +120,7 @@ export default function DailyPage() {
   const [saved, setSaved]   = useState({});
   const [saving, setSaving] = useState({});
   const [journalEntryId, setJournalEntryId] = useState(null);
+  const [goodNews, setGoodNews] = useState([]);
   const journalSaveTimer = useRef(null);
 
   const dateStr = getTodayStr();
@@ -179,6 +180,23 @@ export default function DailyPage() {
           } catch {}
         }
       }
+
+      // Good news — cached per day
+      const newsCacheKey = `daily-good-news-${dateStr}`;
+      const cachedNews = localStorage.getItem(newsCacheKey);
+      if (cachedNews) {
+        try { setGoodNews(JSON.parse(cachedNews)); } catch {}
+      } else {
+        try {
+          const newsRes = await fetch('/api/good-news');
+          const newsData = await newsRes.json();
+          if (newsData.headlines?.length) {
+            setGoodNews(newsData.headlines);
+            localStorage.setItem(newsCacheKey, JSON.stringify(newsData.headlines));
+          }
+        } catch {}
+      }
+
       setLoading(false);
     });
   }, []);
@@ -312,6 +330,30 @@ export default function DailyPage() {
 
         {/* Today's Vibe */}
         <TodaysVibe chartData={content.chartData} dateStr={getTodayStr()} />
+
+        {/* Good News */}
+        {goodNews.length > 0 && (
+          <section className="glass-card rounded-3xl p-6">
+            <p className="text-xs uppercase tracking-widest text-gray-400 mb-4">Good News Today</p>
+            <div className="space-y-3">
+              {goodNews.map((item, i) => (
+                <a
+                  key={i}
+                  href={item.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block bg-white/40 border border-white/50 rounded-2xl px-4 py-3 hover:bg-white/60 transition-colors"
+                >
+                  <p className="text-sm font-medium text-gray-700 leading-snug">{item.title}</p>
+                  {item.snippet && (
+                    <p className="text-xs text-gray-400 mt-1 leading-relaxed line-clamp-2">{item.snippet}</p>
+                  )}
+                </a>
+              ))}
+            </div>
+            <p className="text-[10px] text-gray-300 mt-3 text-right">via Good News Network</p>
+          </section>
+        )}
 
         {/* 1. Tarot Card */}
         <section
