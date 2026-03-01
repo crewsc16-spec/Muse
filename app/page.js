@@ -847,14 +847,25 @@ export default function Home() {
               const moodData = item._kind === 'vision' ? item.mood_entries : null;
               const isCombined = !!moodData;
 
+              const isWide = itemSizes[itemKey] === 'wide';
+
               return (
-                <div key={itemKey} className="break-inside-avoid overflow-hidden relative group">
+                <div key={itemKey} className="break-inside-avoid overflow-hidden relative group"
+                  style={isWide ? { columnSpan: 'all' } : {}}>
 
                   {/* Delete */}
                   <button
                     onClick={() => item._kind === 'mood' ? handleDeleteMoodEntry(item.date) : handleDeleteItem(item.id)}
                     className="absolute top-2 right-2 z-10 w-6 h-6 flex items-center justify-center rounded-full opacity-0 group-hover:opacity-100 bg-black/20 text-white hover:bg-red-400/60 transition-all text-xs">
                     ✕
+                  </button>
+
+                  {/* Resize toggle */}
+                  <button
+                    onClick={e => { e.stopPropagation(); setItemSize(itemKey, isWide ? 'normal' : 'wide'); }}
+                    className="absolute top-2 right-9 z-10 w-6 h-6 flex items-center justify-center rounded-full opacity-0 group-hover:opacity-100 bg-black/20 text-white hover:bg-black/40 transition-all text-xs"
+                    title={isWide ? 'Make smaller' : 'Make wider'}>
+                    {isWide ? '⊟' : '⊞'}
                   </button>
 
                   {/* ── Vision card (click to reveal details) ── */}
