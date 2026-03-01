@@ -4,6 +4,7 @@ import "./globals.css";
 import Navbar from "./components/Navbar";
 import ThemeInitializer from "./components/ThemeInitializer";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Analytics } from "@vercel/analytics/next";
 
 const geist = Geist({
   variable: "--font-geist-sans",
@@ -28,6 +29,7 @@ export default function RootLayout({ children }) {
         <ThemeInitializer />
         <Navbar />
         <SpeedInsights />
+        <Analytics />
         <main className="max-w-4xl mx-auto px-4 py-8 pb-24 md:pb-8">
           {children}
         </main>
