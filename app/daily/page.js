@@ -469,7 +469,7 @@ export default function DailyPage() {
             onChange={e => handleAnswerChange(e.target.value)}
             placeholder="Write your reflection here…"
             rows={4}
-            className="w-full bg-white/50 border border-white/60 rounded-2xl px-4 py-3 text-sm text-gray-700 placeholder-gray-300 leading-relaxed resize-none focus:outline-none focus:ring-1 focus:ring-rose-200"
+            className="w-full bg-white/50 border border-white/60 rounded-2xl px-4 py-3 text-base text-gray-700 placeholder-gray-300 leading-relaxed resize-none focus:outline-none focus:ring-1 focus:ring-rose-200"
           />
           <div className="flex items-center justify-between mt-3">
             <p className="text-xs text-gray-300">{answer.trim() ? 'Draft saved' : ''}</p>

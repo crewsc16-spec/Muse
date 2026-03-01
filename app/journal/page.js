@@ -268,7 +268,7 @@ export default function JournalPage() {
             onChange={e => handleDraftChange(e.target.value)}
             placeholder="Start writing…"
             rows={6}
-            className="w-full bg-white/50 border border-white/60 rounded-2xl px-4 py-3 text-sm text-gray-700 placeholder-gray-300 leading-relaxed resize-none focus:outline-none focus:ring-1 focus:ring-rose-200"
+            className="w-full bg-white/50 border border-white/60 rounded-2xl px-4 py-3 text-base text-gray-700 placeholder-gray-300 leading-relaxed resize-none focus:outline-none focus:ring-1 focus:ring-rose-200"
             style={{ minHeight: '140px' }}
           />
 
@@ -334,7 +334,7 @@ export default function JournalPage() {
                           value={expandedContent[entry.id] ?? entry.content}
                           onChange={e => handleExpandedChange(entry.id, e.target.value)}
                           rows={5}
-                          className="w-full bg-white/50 border border-white/60 rounded-2xl px-4 py-3 text-sm text-gray-700 placeholder-gray-300 leading-relaxed resize-none focus:outline-none focus:ring-1 focus:ring-rose-200"
+                          className="w-full bg-white/50 border border-white/60 rounded-2xl px-4 py-3 text-base text-gray-700 placeholder-gray-300 leading-relaxed resize-none focus:outline-none focus:ring-1 focus:ring-rose-200"
                           autoFocus
                         />
                         <div className="flex justify-end mt-1.5 h-4">
