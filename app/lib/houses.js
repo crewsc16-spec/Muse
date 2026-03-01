@@ -67,7 +67,9 @@ export function calcPlacidusHouses(jd, latDeg, lonDeg) {
       const D     = Math.acos(cosD);
       const semi  = nocturnal ? (Math.PI - D) : D;
 
-      const targetRAr = RAMCr + (nocturnal ? Math.PI : 0) + frac * semi;
+      const targetRAr = nocturnal
+        ? RAMCr + Math.PI - frac * semi   // go BACKWARD from IC toward ASC
+        : RAMCr + frac * semi;            // go FORWARD from MC toward ASC
       const newλ = norm360(
         Math.atan2(Math.sin(targetRAr), Math.cos(targetRAr) * Math.cos(εR)) * RAD
       );
@@ -83,8 +85,8 @@ export function calcPlacidusHouses(jd, latDeg, lonDeg) {
   const h12 = solveCusp(2 / 3, false);
 
   // Lower hemisphere (below horizon): H2, H3
-  const h2 = solveCusp(1 / 3, true);
-  const h3 = solveCusp(2 / 3, true);
+  const h2 = solveCusp(2 / 3, true);  // 2/3 from IC toward ASC → H2
+  const h3 = solveCusp(1 / 3, true);  // 1/3 from IC toward ASC → H3
 
   // Opposite cusps
   const h5 = norm360(h11 + 180);
