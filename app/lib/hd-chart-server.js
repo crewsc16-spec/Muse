@@ -29,6 +29,7 @@ import {
   CENTER_GATES, getDefinedChannels, getDefinedCenters, buildCenterAdj,
   determineType, determineAuthority, TYPE_META, meanNodeLongitude,
 } from './hd-common.js';
+import { calcPlacidusHouses, getHouseNum } from './houses.js';
 
 // Instantiate planets once (module-level, reused per request)
 const _earth   = new Planet(vsopEarth);
@@ -106,7 +107,7 @@ function _activations(lons) {
 }
 
 // ─── Main export ─────────────────────────────────────────────────────────────
-export function calculateHDChartServer(birthDate, birthTime, utcOffset) {
+export function calculateHDChartServer(birthDate, birthTime, utcOffset, lat, lon) {
   const birthJDE  = toJDE(birthDate, birthTime, utcOffset ?? 0);
   const birthLons = _allLongitudes(birthJDE);
   const birthSunLon = birthLons.sun;
@@ -137,6 +138,34 @@ export function calculateHDChartServer(birthDate, birthTime, utcOffset) {
 
   const designDate = new Date((designJDE - 2440587.5) * 86400000).toISOString().slice(0, 10);
 
+  // ── Retrograde detection: compare planet longitudes today vs yesterday ────
+  const RETROGRADE_BODIES = ['mercury','venus','mars','jupiter','saturn','uranus','neptune','pluto'];
+  const lonsYest = _allLongitudes(birthJDE - 1);
+  const retrograde = {};
+  for (const body of RETROGRADE_BODIES) {
+    let delta = birthLons[body] - lonsYest[body];
+    if (delta >  180) delta -= 360;
+    if (delta < -180) delta += 360;
+    retrograde[body] = delta < 0;
+  }
+
+  // ── Placidus houses (only if lat/lon provided) ───────────────────────────
+  let houses        = null;
+  let housePlacements = null;
+  if (lat != null && lon != null) {
+    try {
+      houses = calcPlacidusHouses(birthJDE, lat, lon);
+      housePlacements = {};
+      // Place personality (natal) planets into houses
+      for (const [body, lon_] of Object.entries(birthLons)) {
+        housePlacements[body] = getHouseNum(lon_, houses.cusps);
+      }
+    } catch (e) {
+      // Non-fatal — houses remain null
+      console.warn('[houses] Placidus calculation failed:', e.message);
+    }
+  }
+
   return {
     personality,
     design,
@@ -153,5 +182,8 @@ export function calculateHDChartServer(birthDate, birthTime, utcOffset) {
     strategy: meta.strategy,
     signature: meta.signature,
     notSelf:   meta.notSelf,
+    retrograde,
+    houses,
+    housePlacements,
   };
 }

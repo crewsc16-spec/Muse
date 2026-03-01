@@ -44,6 +44,8 @@ export default function ProfilePage() {
   const [birthTime, setBirthTime] = useState('');
   const [birthPlace, setBirthPlace] = useState('');
   const [birthTimezone, setBirthTimezone] = useState('');
+  const [birthLat, setBirthLat] = useState(null);
+  const [birthLon, setBirthLon] = useState(null);
   const [placeSuggestions, setPlaceSuggestions] = useState([]);
   const [loadingSuggestions, setLoadingSuggestions] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -109,6 +111,8 @@ export default function ProfilePage() {
         setBirthTime(bd.time ?? '');
         setBirthPlace(bd.birthPlace ?? '');
         setBirthTimezone(bd.birthTimezone ?? '');
+        if (bd.birthLat != null) setBirthLat(bd.birthLat);
+        if (bd.birthLon != null) setBirthLon(bd.birthLon);
         setAstroSystem(bd.system ?? 'tropical');
         if (bd.hdCalculated) {
           setHdCalc({
@@ -192,6 +196,8 @@ export default function ProfilePage() {
 
   async function handlePlaceSelect(place) {
     setBirthPlace(place.label);
+    setBirthLat(place.lat);
+    setBirthLon(place.lon);
     setShowSuggestions(false);
     setPlaceSuggestions([]);
     try {
@@ -210,7 +216,7 @@ export default function ProfilePage() {
     setHdError('');
 
     const utcOffset = birthTimezone ? getUtcOffset(birthTimezone, birthDate) : 0;
-    const base = { date: birthDate, time: birthTime, birthPlace, birthTimezone, utcOffset, system: astroSystem };
+    const base = { date: birthDate, time: birthTime, birthPlace, birthTimezone, utcOffset, system: astroSystem, birthLat, birthLon };
     let hdFields = {};
 
     if (birthDate && birthTime && birthTimezone) {
@@ -219,7 +225,7 @@ export default function ProfilePage() {
         const res = await fetch('/api/hd-chart', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ birthDate, birthTime, utcOffset }),
+          body: JSON.stringify({ birthDate, birthTime, utcOffset, lat: birthLat, lon: birthLon }),
         });
         if (!res.ok) throw new Error(`Server error ${res.status}`);
         const result = await res.json();

@@ -33,15 +33,19 @@ function gateLineToLon(gate, line) {
 
 // ─── Aspects ──────────────────────────────────────────────────────────────────
 const ASPECT_DEFS = [
-  { name: 'Conjunction', symbol: '☌', color: '#f59e0b', angle:   0, orb: 8 },
-  { name: 'Sextile',     symbol: '⚹', color: '#34d399', angle:  60, orb: 4 },
-  { name: 'Square',      symbol: '□', color: '#f87171', angle:  90, orb: 6 },
-  { name: 'Trine',       symbol: '△', color: '#60a5fa', angle: 120, orb: 6 },
-  { name: 'Opposition',  symbol: '☍', color: '#c084fc', angle: 180, orb: 8 },
+  { name: 'Conjunction',    symbol: '☌', color: '#f59e0b', angle:   0, orb: 8 },
+  { name: 'Semisextile',    symbol: '⚺', color: '#a8c8a0', angle:  30, orb: 2 },
+  { name: 'Semisquare',     symbol: '∠', color: '#e0b060', angle:  45, orb: 2 },
+  { name: 'Sextile',        symbol: '⚹', color: '#34d399', angle:  60, orb: 4 },
+  { name: 'Square',         symbol: '□', color: '#f87171', angle:  90, orb: 6 },
+  { name: 'Trine',          symbol: '△', color: '#60a5fa', angle: 120, orb: 6 },
+  { name: 'Sesquiquadrate', symbol: '⚼', color: '#e08060', angle: 135, orb: 2 },
+  { name: 'Quincunx',       symbol: '⚻', color: '#c0a0e0', angle: 150, orb: 3 },
+  { name: 'Opposition',     symbol: '☍', color: '#c084fc', angle: 180, orb: 8 },
 ];
 
 function computeAspects(lonMap) {
-  const bodies = Object.entries(lonMap).filter(([k]) => !['northNode','southNode','earth'].includes(k));
+  const bodies = Object.entries(lonMap);
   const aspects = [];
   for (let i = 0; i < bodies.length; i++) {
     for (let j = i + 1; j < bodies.length; j++) {
@@ -58,6 +62,39 @@ function computeAspects(lonMap) {
     }
   }
   return aspects;
+}
+
+function computeCrossAspects(natalLons, transitLons) {
+  const natalEntries   = Object.entries(natalLons);
+  const transitEntries = Object.entries(transitLons);
+  const aspects = [];
+  for (const [transitBody, tLon] of transitEntries) {
+    for (const [natalBody, nLon] of natalEntries) {
+      const diff  = ((tLon - nLon) % 360 + 360) % 360;
+      const angle = Math.min(diff, 360 - diff);
+      for (const asp of ASPECT_DEFS) {
+        if (Math.abs(angle - asp.angle) <= asp.orb) {
+          aspects.push({ transit: transitBody, natal: natalBody, ...asp, orb: Math.abs(angle - asp.angle).toFixed(1), type: 'transit' });
+          break;
+        }
+      }
+    }
+  }
+  return aspects;
+}
+
+// ─── House constants ──────────────────────────────────────────────────────────
+const HOUSE_THEMES = {
+  1:  'Self & Identity',        2:  'Resources & Values',     3:  'Communication & Mind',
+  4:  'Home & Roots',           5:  'Creativity & Play',      6:  'Health & Service',
+  7:  'Partnerships',           8:  'Transformation & Depth', 9:  'Philosophy & Expansion',
+  10: 'Career & Public Life',   11: 'Community & Ideals',     12: 'Solitude & Transcendence',
+};
+
+function nth(n) {
+  const s = ['th','st','nd','rd'];
+  const v = n % 100;
+  return n + (s[(v - 20) % 10] || s[v] || s[0]);
 }
 
 // ─── Numerology ───────────────────────────────────────────────────────────────
@@ -178,11 +215,15 @@ function planetSignBody(body, sign) {
 
 // ─── Aspect descriptions ──────────────────────────────────────────────────────
 const ASPECT_DESC = {
-  Conjunction: { symbol: '☌', color: '#f59e0b', body: 'A conjunction occurs when two planets occupy nearly the same degree of the zodiac, merging their energies into a unified force. This is the most powerful and intimate aspect — the two planets cannot be separated; they intensify, color, and reinforce one another. Conjunctions can be powerfully creative or intensely overwhelming, depending on the planets involved.' },
-  Sextile:     { symbol: '⚹', color: '#34d399', body: 'A sextile forms when two planets are approximately 60 degrees apart, creating a harmonious and naturally supportive connection. It represents opportunity — a flowing affinity between two energies that, when consciously engaged, produces ease, talent, and graceful momentum. Sextiles reward initiative; they are gifts that ask to be activated.' },
-  Square:      { symbol: '□', color: '#f87171', body: 'A square forms when two planets are 90 degrees apart, creating dynamic friction, tension, and challenge. It is the aspect of growth through difficulty — the two energies are fundamentally at odds and must be consciously integrated rather than avoided. Squares are among the most powerful drivers of achievement and transformation in any chart.' },
-  Trine:       { symbol: '△', color: '#60a5fa', body: 'A trine forms when two planets are 120 degrees apart, creating a flow of natural ease and harmonious alignment. It represents innate talent — areas where things come effortlessly, where gifts feel natural, where energy moves without resistance. Trines are the blessings in a chart; their gifts are most fully realized when actively engaged rather than taken for granted.' },
-  Opposition:  { symbol: '☍', color: '#c084fc', body: 'An opposition forms when two planets sit directly across the zodiac from one another, creating a polarity of competing energies that each carry a truth. It represents the tension between two forces seeking integration — the invitation is to hold both rather than collapsing into one. Oppositions often manifest through relationships, where we encounter our own disowned qualities mirrored in others.' },
+  Conjunction:    { symbol: '☌', color: '#f59e0b', body: 'A conjunction occurs when two planets occupy nearly the same degree of the zodiac, merging their energies into a unified force. This is the most powerful and intimate aspect — the two planets cannot be separated; they intensify, color, and reinforce one another. Conjunctions can be powerfully creative or intensely overwhelming, depending on the planets involved.' },
+  Semisextile:    { symbol: '⚺', color: '#a8c8a0', body: 'A semisextile forms when two planets are 30 degrees apart — adjacent signs. It represents a gentle, slightly awkward awareness between two energies that don\'t naturally speak each other\'s language. There is potential for cooperation, but it requires conscious effort to bridge the gap. When engaged with curiosity rather than force, semisextiles become surprisingly rich sources of growth.' },
+  Semisquare:     { symbol: '∠', color: '#e0b060', body: 'A semisquare forms when two planets are 45 degrees apart, creating a mild but persistent friction between two energies. Less intense than a square, it nonetheless represents a recurring tension point — a low-level irritation that, when consciously addressed, becomes a motivating source of drive and incremental growth.' },
+  Sextile:        { symbol: '⚹', color: '#34d399', body: 'A sextile forms when two planets are approximately 60 degrees apart, creating a harmonious and naturally supportive connection. It represents opportunity — a flowing affinity between two energies that, when consciously engaged, produces ease, talent, and graceful momentum. Sextiles reward initiative; they are gifts that ask to be activated.' },
+  Square:         { symbol: '□', color: '#f87171', body: 'A square forms when two planets are 90 degrees apart, creating dynamic friction, tension, and challenge. It is the aspect of growth through difficulty — the two energies are fundamentally at odds and must be consciously integrated rather than avoided. Squares are among the most powerful drivers of achievement and transformation in any chart.' },
+  Trine:          { symbol: '△', color: '#60a5fa', body: 'A trine forms when two planets are 120 degrees apart, creating a flow of natural ease and harmonious alignment. It represents innate talent — areas where things come effortlessly, where gifts feel natural, where energy moves without resistance. Trines are the blessings in a chart; their gifts are most fully realized when actively engaged rather than taken for granted.' },
+  Sesquiquadrate: { symbol: '⚼', color: '#e08060', body: 'A sesquiquadrate forms when two planets are 135 degrees apart, creating a stressful, agitating energy that demands release. Related to the square in its tense quality, this aspect produces restlessness and urgency — a persistent push toward action or some form of resolution. It is a minor but real source of friction that, when channeled, can generate significant momentum.' },
+  Quincunx:       { symbol: '⚻', color: '#c0a0e0', body: 'A quincunx (or inconjunct) forms when two planets are 150 degrees apart. The two signs involved share no element, modality, or polarity — they literally speak different languages. The result is an awkward, adjusting energy that requires constant recalibration. Growth comes through learning to hold these two very different parts of yourself without forcing them into a false harmony.' },
+  Opposition:     { symbol: '☍', color: '#c084fc', body: 'An opposition forms when two planets sit directly across the zodiac from one another, creating a polarity of competing energies that each carry a truth. It represents the tension between two forces seeking integration — the invitation is to hold both rather than collapsing into one. Oppositions often manifest through relationships, where we encounter our own disowned qualities mirrored in others.' },
 };
 
 // ─── Aspect planet-pair specific body text ────────────────────────────────────
@@ -580,11 +621,11 @@ export default function CosmicPage() {
       let bd = null;
       try { bd = meta.birthData ?? JSON.parse(localStorage.getItem('birthData') ?? 'null'); } catch {}
       setBirthData(bd);
-      const fetchHD = (date, time, utcOffset) =>
-        fetch('/api/hd-chart',{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({birthDate:date,birthTime:time,utcOffset}) })
+      const fetchHD = (date, time, utcOffset, lat, lon) =>
+        fetch('/api/hd-chart',{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({birthDate:date,birthTime:time,utcOffset,lat,lon}) })
           .then(r => r.ok ? r.json() : null).catch(()=>null);
       const [natal, transit] = await Promise.all([
-        bd?.date && bd?.time && bd?.utcOffset != null ? fetchHD(bd.date, bd.time, bd.utcOffset) : Promise.resolve(null),
+        bd?.date && bd?.time && bd?.utcOffset != null ? fetchHD(bd.date, bd.time, bd.utcOffset, bd.birthLat, bd.birthLon) : Promise.resolve(null),
         fetchHD(today,'12:00',0),
       ]);
       setHdData(natal);
@@ -755,7 +796,46 @@ export default function CosmicPage() {
     lines.push(nums.join(' | '));
     lines.push('');
 
+    // Houses
+    if (hdData?.houses) {
+      lines.push('');
+      lines.push('## Houses (Placidus)');
+      const ascSign = lonToSign(hdData.houses.asc);
+      const mcSign  = lonToSign(hdData.houses.mc);
+      lines.push(`Ascendant: ${ascSign.name} ${ascSign.degree}°  |  Midheaven: ${mcSign.name} ${mcSign.degree}°`);
+      const cuspStr = hdData.houses.cusps
+        .map((c, i) => { const s = lonToSign(c); return `H${i+1}=${s.name} ${s.degree}°`; })
+        .join(', ');
+      lines.push(cuspStr);
+      if (hdData.housePlacements) {
+        const hp = Object.entries(hdData.housePlacements)
+          .map(([p, h]) => `${PLANET_LBL[p] ?? p} in H${h}`)
+          .join(', ');
+        lines.push(`Planet placements: ${hp}`);
+      }
+    }
+
+    // Retrograde
+    if (hdData?.retrograde) {
+      lines.push('');
+      lines.push('## Retrograde Planets at Birth');
+      const rxList = Object.entries(hdData.retrograde).filter(([, rx]) => rx).map(([p]) => `${PLANET_LBL[p] ?? p} (Rx)`);
+      lines.push(rxList.length > 0 ? rxList.join(', ') : 'None');
+    }
+
+    // Minor aspects
+    const MINOR_NAMES = new Set(['Semisextile','Semisquare','Sesquiquadrate','Quincunx']);
+    const minorAspects = natalAspects.filter(a => MINOR_NAMES.has(a.name));
+    if (minorAspects.length > 0) {
+      lines.push('');
+      lines.push('## Minor Aspects');
+      for (const a of minorAspects) {
+        lines.push(`${PLANET_LBL[a.planet1] ?? a.planet1} ${a.symbol} ${PLANET_LBL[a.planet2] ?? a.planet2} (${a.name}, orb ${a.orb}°)`);
+      }
+    }
+
     if (transitData?.personality) {
+      lines.push('');
       lines.push(`Today's Transits (${today})`);
       for (const [body, { gate, line }] of Object.entries(transitData.personality)) {
         const natalHits = [];
@@ -1047,12 +1127,15 @@ export default function CosmicPage() {
               <div className="divide-y divide-white/30">
                 {BODY_ORDER.filter(b => natalLons[b] != null).map(body => {
                   const sign = lonToSign(natalLons[body]);
+                  const isRx = hdData?.retrograde?.[body];
+                  const hNum = hdData?.housePlacements?.[body];
                   return (
                     <button key={body} onClick={() => openPlanet(body, sign)}
                       className="w-full flex items-center gap-3 py-2.5 hover:bg-white/40 rounded-xl px-2 -mx-2 transition-colors text-left">
                       <span className="text-base w-7 text-center text-gray-400 shrink-0">{PLANET_SYM[body]}</span>
-                      <span className="text-sm text-gray-500 w-24 shrink-0">{PLANET_LBL[body]}</span>
+                      <span className="text-sm text-gray-500 w-20 shrink-0">{PLANET_LBL[body]}{isRx && <em className="text-xs text-amber-500 not-italic ml-1">Rx</em>}</span>
                       <span className="text-sm font-medium text-gray-700 flex-1">{sign.symbol} {sign.name} {sign.degree}°</span>
+                      {hNum && <span className="text-xs text-gray-300 shrink-0 mr-1">H{hNum}</span>}
                       <span className={`text-xs px-2 py-0.5 rounded-full border ${elStyle(sign.element)}`}>{sign.element}</span>
                     </button>
                   );
@@ -1060,6 +1143,47 @@ export default function CosmicPage() {
               </div>
             ) : (
               <p className="text-sm text-gray-400">Save your birth data on <a href="/profile" className="text-[#b88a92] underline">Profile</a> to see your natal planets.</p>
+            )}
+          </div>
+
+          <div className="glass-card rounded-3xl p-6 space-y-4">
+            <div>
+              <h2 className="font-playfair text-xl text-gray-700">Houses (Placidus)</h2>
+              <p className="text-xs text-gray-400 mt-1">Your chart divided into 12 life domains. Tap any row to learn more.</p>
+            </div>
+            {hdData?.houses ? (
+              <div className="divide-y divide-white/30">
+                {hdData.houses.cusps.map((cusp, i) => {
+                  const hNum = i + 1;
+                  const sign = lonToSign(cusp);
+                  const planetsHere = Object.entries(hdData.housePlacements ?? {})
+                    .filter(([, h]) => h === hNum)
+                    .map(([p]) => PLANET_SYM[p])
+                    .join('');
+                  const angleLabel = { 1: 'ASC', 4: 'IC', 7: 'DC', 10: 'MC' }[hNum];
+                  return (
+                    <button key={hNum}
+                      onClick={() => setDetail({
+                        title: `House ${hNum} — ${HOUSE_THEMES[hNum]}`,
+                        subtitle: `${sign.symbol} ${sign.name} ${sign.degree}°`,
+                        tags: [sign.name, cap(sign.element), cap(sign.modality)],
+                        body: `The ${nth(hNum)} house covers the domain of ${HOUSE_THEMES[hNum].toLowerCase()}. With ${sign.name} on the cusp, you experience this area of life through a ${SIGN_Q[sign.name]?.themes ?? sign.name} lens — the qualities of ${SIGN_Q[sign.name]?.domain ?? 'this sign'} color how this domain unfolds for you.`,
+                      })}
+                      className="w-full flex items-center gap-3 py-2.5 hover:bg-white/40 rounded-xl px-2 -mx-2 transition-colors text-left">
+                      <span className={`text-xs w-10 shrink-0 ${angleLabel ? 'font-semibold text-rose-400' : 'text-gray-400'}`}>
+                        {angleLabel ? `${angleLabel}` : `H${hNum}`}
+                      </span>
+                      <span className="text-sm text-gray-700 flex-1">{sign.symbol} {sign.name} {sign.degree}°</span>
+                      {planetsHere && <span className="text-sm text-gray-400 shrink-0">{planetsHere}</span>}
+                      <span className="text-xs text-gray-300 shrink-0 hidden sm:block">{HOUSE_THEMES[hNum]}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            ) : (
+              <p className="text-sm text-gray-400">
+                Add your birth city in <a href="/profile" className="text-[#b88a92] underline">Profile</a> to unlock house placements.
+              </p>
             )}
           </div>
 
