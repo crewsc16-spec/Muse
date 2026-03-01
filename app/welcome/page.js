@@ -2,22 +2,10 @@
 
 import Link from 'next/link';
 
-const STEPS = [
-  {
-    icon: '1',
-    title: 'Set up your profile',
-    desc: 'Add your name, birth date, time, and location so Muse can calculate your chart.',
-  },
-  {
-    icon: '2',
-    title: 'Explore your cosmic chart',
-    desc: 'Astrology, Human Design, numerology — all personalized to you.',
-  },
-  {
-    icon: '3',
-    title: 'Check in daily',
-    desc: 'Tarot pulls, moon phases, journal prompts, and a daily vibe curated for your energy.',
-  },
+const FEATURES = [
+  { label: 'Your birth chart', desc: 'Astrology, Human Design, and numerology tailored to you' },
+  { label: 'Daily guidance', desc: 'Tarot pulls, moon phases, and a vibe matched to your energy' },
+  { label: 'Journal & vision board', desc: 'Track your moods, reflect, and visualize your intentions' },
 ];
 
 export default function WelcomePage() {
@@ -28,19 +16,18 @@ export default function WelcomePage() {
           <p className="text-4xl">✦</p>
           <h1 className="font-playfair text-3xl text-gray-800">Welcome to Muse</h1>
           <p className="text-sm text-gray-500 leading-relaxed">
-            Your personal space for cosmic self-discovery. Here&apos;s how to get the most out of it.
+            To unlock everything Muse has to offer, we need a few details first — your name, birth date, time, and location. This is what powers your entire experience.
           </p>
         </div>
 
-        <div className="space-y-3">
-          {STEPS.map(s => (
-            <div key={s.icon} className="glass-card rounded-2xl p-5 flex gap-4 items-start">
-              <span className="shrink-0 w-8 h-8 rounded-full btn-gradient text-white text-sm font-bold flex items-center justify-center">
-                {s.icon}
-              </span>
+        <div className="glass-card rounded-2xl p-5 space-y-3">
+          <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">What you'll unlock</p>
+          {FEATURES.map(f => (
+            <div key={f.label} className="flex gap-3 items-start">
+              <span className="shrink-0 mt-0.5 w-1.5 h-1.5 rounded-full bg-gradient-to-br from-rose-400 to-violet-400" />
               <div>
-                <p className="text-sm font-semibold text-gray-700">{s.title}</p>
-                <p className="text-xs text-gray-400 mt-0.5 leading-relaxed">{s.desc}</p>
+                <p className="text-sm font-medium text-gray-700">{f.label}</p>
+                <p className="text-xs text-gray-400 leading-relaxed">{f.desc}</p>
               </div>
             </div>
           ))}
@@ -51,13 +38,6 @@ export default function WelcomePage() {
           className="btn-gradient block w-full py-3.5 rounded-full text-white font-medium text-sm text-center shadow-sm"
         >
           Set up my profile
-        </Link>
-
-        <Link
-          href="/"
-          className="block text-center text-xs text-gray-400 hover:text-gray-500 transition-colors"
-        >
-          Skip for now
         </Link>
       </div>
     </div>
