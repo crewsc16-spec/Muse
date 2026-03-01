@@ -867,6 +867,7 @@ export default function Home() {
                       {item.type === 'image' && item.image_url && (
                         <div className={`relative w-full ${IMG_ASPECTS[itemSizes[itemKey] ?? 'md']}`}>
                           <Image src={item.image_url} alt={item.content || 'Vision'} fill
+                            unoptimized={item.image_url?.startsWith('/api/')}
                             className="object-cover" sizes="(max-width: 640px) 50vw, 400px" />
                           {/* Mood hint — small face in corner when combined */}
                           {isCombined && (
