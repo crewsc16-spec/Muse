@@ -178,6 +178,7 @@ export default function Navbar() {
                   <Link
                     key={item.href}
                     href={item.href}
+                    prefetch={false}
                     className={`flex items-center gap-1.5 text-sm font-medium transition-colors bg-white/60 border border-white/40 rounded-full px-3 py-1.5 ${
                       isActive(item) ? 'text-[#b88a92]' : 'text-gray-600 hover:text-[#b88a92]'
                     }`}
@@ -227,6 +228,7 @@ export default function Navbar() {
                 <Link
                   key={item.href}
                   href={item.href}
+                  prefetch={false}
                   className={`flex-1 flex flex-col items-center justify-center gap-1 py-4 transition-colors ${
                     active ? 'text-[#b88a92]' : 'text-gray-400'
                   }`}

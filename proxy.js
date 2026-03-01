@@ -9,10 +9,9 @@ export async function proxy(request) {
     // is large and gets split into multiple sb-*-auth-token.N cookies.
     // Bypassing the SSR client here avoids chunked-cookie reconstruction
     // issues in the edge runtime — individual pages do the real auth check.
-    const cookies = request.cookies.getAll();
-    const hasSession = cookies.some(
-      c => c.name.includes('-auth-token') && !c.name.includes('code-verifier') && c.value
-    );
+    // Check raw Cookie header in case Next.js cookie parsing is dropping chunks
+    const cookieHeader = request.headers.get('cookie') ?? '';
+    const hasSession = cookieHeader.includes('-auth-token') && !cookieHeader.includes('code-verifier');
 
     if (!hasSession) {
       const url = request.nextUrl.clone();
