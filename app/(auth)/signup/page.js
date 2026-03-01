@@ -58,9 +58,19 @@ export default function Signup() {
   return (
     <div className="min-h-screen flex items-center justify-center px-4">
       <div className="glass-card w-full max-w-md p-8 rounded-3xl">
-        <div className="text-center mb-8">
+        <div className="text-center mb-6">
           <h1 className="font-playfair text-3xl text-gray-800 mb-2">Create account</h1>
-          <p className="text-gray-400 text-sm">Start your Muse journey</p>
+          <p className="text-gray-400 text-sm mb-4">Start your Muse journey</p>
+          <div className="bg-white/40 border border-white/50 rounded-2xl p-4 text-left space-y-2">
+            <p className="text-sm text-gray-600 leading-relaxed">
+              Muse is your personal space for cosmic self-discovery — astrology, human design, numerology, tarot, and journaling all in one place.
+            </p>
+            <div className="flex flex-wrap gap-1.5 pt-1">
+              {['Daily guidance','Birth chart','Human Design','Tarot pulls','Vision board','Journal'].map(t => (
+                <span key={t} className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-violet-50/80 text-violet-400 border border-violet-100/50">{t}</span>
+              ))}
+            </div>
+          </div>
         </div>
 
         {error && (
