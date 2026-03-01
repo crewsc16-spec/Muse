@@ -3,6 +3,7 @@ import { Playfair_Display } from "next/font/google";
 import "./globals.css";
 import Navbar from "./components/Navbar";
 import ThemeInitializer from "./components/ThemeInitializer";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const geist = Geist({
   variable: "--font-geist-sans",
@@ -26,6 +27,7 @@ export default function RootLayout({ children }) {
       <body className={`${geist.variable} ${playfair.variable} antialiased`}>
         <ThemeInitializer />
         <Navbar />
+        <SpeedInsights />
         <main className="max-w-4xl mx-auto px-4 py-8 pb-24 md:pb-8">
           {children}
         </main>
