@@ -1,6 +1,7 @@
 'use client';
 
-// All 33 unique HD channels as [g1, g2] gate pairs
+import { useState } from 'react';
+
 const ALL_CHANNELS = [
   [1,8],[2,14],[3,60],[4,63],[5,15],[6,59],[7,31],[9,52],[10,20],
   [11,56],[12,22],[13,33],[16,48],[17,62],[18,58],[19,49],[20,34],
@@ -8,7 +9,6 @@ const ALL_CHANNELS = [
   [34,57],[35,36],[37,40],[39,55],[42,53],[43,23],[47,64],[61,24],[63,4],
 ];
 
-// Gate → Center mapping
 const GATE_CENTER = {
   64:'Head', 61:'Head', 63:'Head',
   47:'Ajna', 24:'Ajna', 4:'Ajna', 11:'Ajna', 43:'Ajna', 17:'Ajna',
@@ -24,7 +24,6 @@ const GATE_CENTER = {
   19:'Root', 39:'Root', 52:'Root', 53:'Root', 60:'Root', 58:'Root', 38:'Root', 54:'Root', 41:'Root',
 };
 
-// Center positions and shapes (viewBox: 0 0 360 450)
 const CTR = {
   Head:        { x:180, y:48,  shape:'tri-up',   r:32,       label:'Head'   },
   Ajna:        { x:180, y:114, shape:'tri-down',  r:32,       label:'Ajna'   },
@@ -48,11 +47,9 @@ function diamondPts(cx, cy, r) {
   return `${cx},${cy - r} ${cx + r},${cy} ${cx},${cy + r} ${cx - r},${cy}`;
 }
 
-// Generous tap-target radius for each center
 function hitRadius(c) {
-  if (c.shape === 'rect')    return Math.max(c.w / 2, c.h / 2) + 14;
-  if (c.shape === 'diamond') return c.r + 12;
-  return c.r + 12; // triangles
+  if (c.shape === 'rect') return Math.max(c.w / 2, c.h / 2) + 14;
+  return c.r + 12;
 }
 
 function parallelLines(x1, y1, x2, y2, n, s = 3) {
@@ -68,6 +65,9 @@ function parallelLines(x1, y1, x2, y2, n, s = 3) {
 }
 
 export default function BodyGraph({ definedCenters = [], definedChannels = [], onCenter, onChannel }) {
+  const [hovC,  setHovC]  = useState(null);
+  const [hovCh, setHovCh] = useState(null);
+
   const defCSet = new Set(definedCenters);
   const defChSet = new Set(
     definedChannels.map(([a, b]) => { const [x, y] = [a, b].sort((p, q) => p - q); return `${x}-${y}`; })
@@ -98,7 +98,7 @@ export default function BodyGraph({ definedCenters = [], definedChannels = [], o
         </linearGradient>
       </defs>
 
-      {/* Channel lines — rendered under centers */}
+      {/* Channel lines */}
       {Object.entries(groups).flatMap(([key, chans]) => {
         const [c1n, c2n] = key.split('|');
         const c1 = CTR[c1n], c2 = CTR[c2n];
@@ -108,29 +108,37 @@ export default function BodyGraph({ definedCenters = [], definedChannels = [], o
           const def = isDefCh(g1, g2);
           const { x1, y1, x2, y2 } = lines[i];
           const ck = [g1, g2].sort((a, b) => a - b).join('-');
+          const hov = hovCh === ck;
           return (
-            <g key={ck} onClick={() => onChannel?.([g1, g2])} style={{ cursor: 'pointer' }}>
-              {/* Generous invisible hit area */}
+            <g key={ck}
+              onClick={() => onChannel?.([g1, g2])}
+              onMouseEnter={() => setHovCh(ck)}
+              onMouseLeave={() => setHovCh(null)}
+              style={{ cursor: 'pointer' }}
+            >
               <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="transparent" strokeWidth={24} />
               <line
                 x1={x1} y1={y1} x2={x2} y2={y2}
-                stroke={def ? '#d4adb6' : '#e5e7eb'}
-                strokeWidth={def ? 3 : 2}
+                stroke={hov ? '#b88a92' : (def ? '#d4adb6' : '#e5e7eb')}
+                strokeWidth={hov ? 4.5 : (def ? 3 : 2)}
                 strokeLinecap="round"
+                style={{ transition: 'stroke 0.12s, stroke-width 0.12s' }}
               />
             </g>
           );
         });
       })}
 
-      {/* Centers — rendered above channels */}
+      {/* Centers */}
       {Object.entries(CTR).map(([key, c]) => {
         const def    = defCSet.has(key);
-        const fill   = def ? GRAD : 'white';
-        const stroke = def ? '#d4adb6' : '#d1d5db';
-        const tc     = def ? 'white' : '#9ca3af';
-        const sw     = def ? 1 : 0.8;
-        const textStyle = { userSelect: 'none', fontFamily: 'system-ui,sans-serif', pointerEvents: 'none' };
+        const hov    = hovC === key;
+        const fill   = def ? GRAD : (hov ? '#fff0f2' : 'white');
+        const stroke = hov ? '#b88a92' : (def ? '#d4adb6' : '#d1d5db');
+        const sw     = hov ? 2 : (def ? 1 : 0.8);
+        const tc     = def ? 'white' : (hov ? '#b88a92' : '#9ca3af');
+        const glowFilter = hov ? 'drop-shadow(0 0 6px rgba(180,100,120,0.55))' : undefined;
+        const textStyle  = { userSelect: 'none', fontFamily: 'system-ui,sans-serif', pointerEvents: 'none' };
 
         let inner;
         if (c.shape === 'rect') {
@@ -140,40 +148,43 @@ export default function BodyGraph({ definedCenters = [], definedChannels = [], o
                 x={c.x - c.w / 2} y={c.y - c.h / 2}
                 width={c.w} height={c.h}
                 rx={4} fill={fill} stroke={stroke} strokeWidth={sw}
+                style={{ filter: glowFilter, transition: 'stroke 0.12s' }}
               />
               <text x={c.x} y={c.y} textAnchor="middle" dominantBaseline="middle"
-                fontSize={8} fill={tc} style={textStyle}>
-                {c.label}
-              </text>
+                fontSize={8} fill={tc} style={textStyle}>{c.label}</text>
             </>
           );
         } else if (c.shape === 'diamond') {
           inner = (
             <>
-              <polygon points={diamondPts(c.x, c.y, c.r)} fill={fill} stroke={stroke} strokeWidth={sw} />
+              <polygon points={diamondPts(c.x, c.y, c.r)}
+                fill={fill} stroke={stroke} strokeWidth={sw}
+                style={{ filter: glowFilter, transition: 'stroke 0.12s' }} />
               <text x={c.x} y={c.y} textAnchor="middle" dominantBaseline="middle"
-                fontSize={10} fill={tc} style={textStyle}>
-                {c.label}
-              </text>
+                fontSize={10} fill={tc} style={textStyle}>{c.label}</text>
             </>
           );
         } else {
           const up = c.shape === 'tri-up';
           inner = (
             <>
-              <polygon points={triPts(c.x, c.y, c.r, up)} fill={fill} stroke={stroke} strokeWidth={sw} />
+              <polygon points={triPts(c.x, c.y, c.r, up)}
+                fill={fill} stroke={stroke} strokeWidth={sw}
+                style={{ filter: glowFilter, transition: 'stroke 0.12s' }} />
               <text x={c.x} y={c.y} textAnchor="middle" dominantBaseline="middle"
-                fontSize={8} fill={tc} style={textStyle}>
-                {c.label}
-              </text>
+                fontSize={8} fill={tc} style={textStyle}>{c.label}</text>
             </>
           );
         }
 
         return (
-          <g key={key} onClick={() => onCenter?.(key, def)} style={{ cursor: 'pointer' }}>
+          <g key={key}
+            onClick={() => onCenter?.(key, def)}
+            onMouseEnter={() => setHovC(key)}
+            onMouseLeave={() => setHovC(null)}
+            style={{ cursor: 'pointer' }}
+          >
             {inner}
-            {/* Large transparent circle ensures the whole center area is tappable */}
             <circle cx={c.x} cy={c.y} r={hitRadius(c)} fill="transparent" />
           </g>
         );
