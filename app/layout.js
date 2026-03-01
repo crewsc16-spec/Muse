@@ -3,6 +3,7 @@ import { Playfair_Display } from "next/font/google";
 import "./globals.css";
 import Navbar from "./components/Navbar";
 import ThemeInitializer from "./components/ThemeInitializer";
+import InstallBanner from "./components/InstallBanner";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/next";
 
@@ -35,6 +36,7 @@ export default function RootLayout({ children }) {
       <body className={`${geist.variable} ${playfair.variable} antialiased`}>
         <ThemeInitializer />
         <Navbar />
+        <InstallBanner />
         <SpeedInsights />
         <Analytics />
         <main className="max-w-4xl mx-auto px-4 py-8 pb-24 md:pb-8">

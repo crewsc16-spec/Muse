@@ -224,7 +224,7 @@ export default function Navbar() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex-1 flex flex-col items-center justify-center gap-1 py-2.5 transition-colors ${
+                  className={`flex-1 flex flex-col items-center justify-center gap-1 py-4 transition-colors ${
                     active ? 'text-[#b88a92]' : 'text-gray-400'
                   }`}
                   title={item.label}
