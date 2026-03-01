@@ -130,10 +130,11 @@ export default function DailyPage() {
     supabase.auth.getUser().then(async ({ data: { user } }) => {
       if (user) {
         const dateStr = getTodayStr();
+        const meta = user.user_metadata ?? {};
         let chartData = null;
         try {
-          const raw = localStorage.getItem('birthData');
-          if (raw) chartData = computeChart(JSON.parse(raw), dateStr);
+          const bd = meta.birthData ?? JSON.parse(localStorage.getItem('birthData') ?? 'null');
+          if (bd) chartData = computeChart(bd, dateStr);
         } catch {}
         const dailyContent = getDailyContent(user.id, dateStr, chartData);
         setContent({ ...dailyContent, chartData });

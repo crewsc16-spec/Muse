@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import { createClient } from '@/app/lib/supabase/client';
 import { applyScheme } from '@/app/lib/color-schemes';
 
-const USER_LS_KEYS = ['displayName', 'profilePhotoUrl', 'birthData', 'milestones', 'colorScheme'];
+const USER_LS_KEYS = ['displayName', 'profilePhotoUrl', 'birthData', 'milestones', 'colorScheme', 'boardSizes', 'quiz-embeds'];
 
 function syncMetaToLocalStorage(meta) {
   if (!meta) return;

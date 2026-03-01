@@ -435,6 +435,24 @@ const QUIZZES = [
           { label: 'A beautiful, terrifying paradox I don\'t know how to win', value: 'fearful' },
         ],
       },
+      {
+        text: 'When someone you love goes through something hard, you…',
+        options: [
+          { label: 'Show up consistently — not perfectly, but steadily, for as long as it takes', value: 'secure' },
+          { label: 'Pour everything into supporting them while quietly worrying it still isn\'t enough', value: 'anxious' },
+          { label: 'Offer practical help and space — I\'m there, but emotional presence is harder for me', value: 'avoidant' },
+          { label: 'Desperately want to be the one they turn to, but panic that I might get it wrong', value: 'fearful' },
+        ],
+      },
+      {
+        text: 'The thing you\'re still learning in love is…',
+        options: [
+          { label: 'That presence is sometimes the whole point — you don\'t need to fix everything', value: 'secure' },
+          { label: 'That I am worthy of love even when I stop monitoring and performing love perfectly', value: 'anxious' },
+          { label: 'That needing someone isn\'t weakness — it is one of the most human things there is', value: 'avoidant' },
+          { label: 'That I can want closeness and still be safe — both truths can coexist', value: 'fearful' },
+        ],
+      },
     ],
     results: {
       secure: {
@@ -591,12 +609,12 @@ const QUIZZES = [
     description: 'The Enneagram maps nine distinct personality structures — each with its own gifts, fears, and path toward wholeness.',
     questions: [
       {
-        text: 'Your primary motivation in life is…',
+        text: 'When something you worked hard on doesn\'t go as planned, you…',
         options: [
-          { label: 'To do what is right, ethical, and correct at all times', value: 'type1' },
-          { label: 'To be genuinely loved and to help those who matter to me', value: 'type2' },
-          { label: 'To succeed, be admired, and achieve something that matters', value: 'type3' },
-          { label: 'To express my authentic self and find deep meaning in my life', value: 'type4' },
+          { label: 'Immediately look for what could have been done better and what still needs correcting', value: 'type1' },
+          { label: 'Check in with the people involved to see how they\'re feeling and what they need', value: 'type2' },
+          { label: 'Reframe quickly and focus on what can still be achieved from where you are', value: 'type3' },
+          { label: 'Sit with the disappointment — this mattered, and you need to feel that before moving on', value: 'type4' },
         ],
       },
       {
@@ -627,21 +645,21 @@ const QUIZZES = [
         ],
       },
       {
-        text: 'Your core fear is…',
+        text: 'In a relationship where you feel genuinely safe, you become…',
         options: [
-          { label: 'Being controlled, violated, or stripped of my power', value: 'type8' },
-          { label: 'Conflict, disharmony, and losing my sense of inner peace', value: 'type9' },
-          { label: 'Being wrong, flawed, or morally compromised', value: 'type1' },
-          { label: 'Being unwanted or unloved for who I truly am underneath', value: 'type2' },
+          { label: 'Softer, warmer, and more openly generous than most people would ever guess', value: 'type8' },
+          { label: 'Deeply content — presence and ease are your most natural state', value: 'type9' },
+          { label: 'More relaxed about imperfection, and freer to simply enjoy without needing to improve', value: 'type1' },
+          { label: 'At ease, because you can give without fear of what happens if you stop', value: 'type2' },
         ],
       },
       {
-        text: 'The shadow pattern you most wish you could change is…',
+        text: 'The comment or observation that lands hardest for you is…',
         options: [
-          { label: 'Losing myself in roles, performance, and chasing others\' approval', value: 'type3' },
-          { label: 'Getting lost in melancholy and comparing my insides to others\' outsides', value: 'type4' },
-          { label: 'Hoarding energy and knowledge rather than fully engaging with life', value: 'type5' },
-          { label: 'Anxiety spirals and defaulting to worst-case-scenario thinking', value: 'type6' },
+          { label: '"You\'re trying too hard — you don\'t have to impress everyone"', value: 'type3' },
+          { label: '"You\'re being dramatic — it\'s really not that deep"', value: 'type4' },
+          { label: '"You\'re too much in your head — just be present"', value: 'type5' },
+          { label: '"You\'re overthinking it — just trust yourself"', value: 'type6' },
         ],
       },
       {
@@ -669,6 +687,33 @@ const QUIZZES = [
           { label: 'Freedom, adventure, and a partner who doesn\'t limit my possibilities', value: 'type7' },
           { label: 'Honesty, respect, and someone who can handle my full intensity', value: 'type8' },
           { label: 'Peace, acceptance, and ease — a relationship that doesn\'t demand too much', value: 'type9' },
+        ],
+      },
+      {
+        text: 'When you come home after a long, draining day, you tend to…',
+        options: [
+          { label: 'Tidy or organise something — bringing order to the environment resets my mind', value: 'type1' },
+          { label: 'Decompress in quiet solitude before I can be present with anyone else', value: 'type5' },
+          { label: 'Check in with people I love — I want to make sure everyone is okay', value: 'type2' },
+          { label: 'Settle into a familiar, predictable routine — it helps me feel safe and grounded', value: 'type6' },
+        ],
+      },
+      {
+        text: 'The compliment that means the most to you is…',
+        options: [
+          { label: '"What you\'ve built here is genuinely impressive — you should be proud"', value: 'type3' },
+          { label: '"You see things no one else sees and express them in a way only you could"', value: 'type4' },
+          { label: '"You make everything more alive — the whole energy shifts when you\'re here"', value: 'type7' },
+          { label: '"You\'re the person I\'d call in a crisis — you\'re unshakeable"', value: 'type8' },
+        ],
+      },
+      {
+        text: 'The pattern in your own life you most want to change is…',
+        options: [
+          { label: 'The way I drift and agree to things that aren\'t truly mine', value: 'type9' },
+          { label: 'The performance — always managing how I come across to others', value: 'type3' },
+          { label: 'The loop of worry that plays on repeat, especially at night', value: 'type6' },
+          { label: 'The restlessness — jumping to the next thing before this one is complete', value: 'type7' },
         ],
       },
     ],
@@ -1245,6 +1290,24 @@ const QUIZZES = [
           { label: 'A silent retreat alone in nature with no one else around', value: 'solitude' },
         ],
       },
+      {
+        text: 'What depletes your energy fastest is…',
+        options: [
+          { label: 'A packed schedule with no breathing room between demands', value: 'rest' },
+          { label: 'Sitting still for too long — stagnation makes everything in me worse', value: 'movement' },
+          { label: 'Going days without any meaningful contact or real conversation', value: 'connection' },
+          { label: 'Constant noise, company, and zero time that is truly my own', value: 'solitude' },
+        ],
+      },
+      {
+        text: 'You would describe your current nervous system state as…',
+        options: [
+          { label: 'Exhausted at a level that sleep hasn\'t fully resolved', value: 'rest' },
+          { label: 'Restless, wound up, or carrying tension I can\'t fully discharge', value: 'movement' },
+          { label: 'Disconnected — longing to feel genuinely close to someone', value: 'connection' },
+          { label: 'Overstimulated — I can\'t find my own signal in the noise of everything', value: 'solitude' },
+        ],
+      },
     ],
     results: {
       rest: {
@@ -1353,6 +1416,24 @@ const QUIZZES = [
           { label: 'Someone greets you with a real hug and reaches for your hand', value: 'touch' },
           { label: 'A friend tells you, unprompted, how much you truly mean to them', value: 'words' },
           { label: 'Someone shows up for you practically, without needing to be asked', value: 'acts' },
+        ],
+      },
+      {
+        text: 'You feel most invisible in a relationship when…',
+        options: [
+          { label: 'There\'s been no unsolicited appreciation or affirmation in weeks', value: 'words' },
+          { label: 'You\'re carrying everything practical alone, with no one offering to help', value: 'acts' },
+          { label: 'Physical affection has quietly disappeared from your everyday life', value: 'touch' },
+          { label: 'Every moment together is rushed or distracted — never fully yours', value: 'time' },
+        ],
+      },
+      {
+        text: 'Your most natural way of showing love to someone you care about is…',
+        options: [
+          { label: 'Telling them — often and specifically — what you love about them', value: 'words' },
+          { label: 'Noticing what they need and quietly handling it before they ask', value: 'acts' },
+          { label: 'Tracking what they love and surprising them with it at just the right moment', value: 'gifts' },
+          { label: 'Reaching for them — a touch on the arm, a hand squeeze, a long hug', value: 'touch' },
         ],
       },
     ],
@@ -1470,6 +1551,24 @@ const QUIZZES = [
           { label: 'Receive as generously as you give, and name your needs without shame', value: 'martyr' },
           { label: 'Allow yourself to be vulnerable and trust others with your soft underbelly', value: 'tyrant' },
           { label: 'Stay present with discomfort long enough to let it actually transform you', value: 'escapist' },
+        ],
+      },
+      {
+        text: 'What you find hardest to say out loud is…',
+        options: [
+          { label: '"This is good enough — I\'m done"', value: 'perfectionist' },
+          { label: '"I need help — this is more than I can carry alone"', value: 'martyr' },
+          { label: '"I was wrong, and I\'m sorry"', value: 'tyrant' },
+          { label: '"I\'m struggling — and I\'m not going to pretend otherwise"', value: 'escapist' },
+        ],
+      },
+      {
+        text: 'When you\'re functioning at your shadow\'s worst, the people closest to you…',
+        options: [
+          { label: 'Feel like they can\'t do anything right and walk on eggshells around you', value: 'perfectionist' },
+          { label: 'Don\'t even know you\'re hurting because you\'ve hidden it so completely', value: 'martyr' },
+          { label: 'Feel managed, steamrolled, or quietly afraid to push back', value: 'tyrant' },
+          { label: 'Can\'t reach you — you\'re physically present but emotionally elsewhere', value: 'escapist' },
         ],
       },
     ],
@@ -1742,10 +1841,17 @@ export default function QuizzesPage() {
   useEffect(() => {
     const client = createClient();
     setSb(client);
-    try {
-      const stored = localStorage.getItem('quiz-embeds');
-      if (stored) setEmbeds(JSON.parse(stored));
-    } catch {}
+    client.auth.getUser().then(({ data: { user } }) => {
+      const meta = user?.user_metadata ?? {};
+      if (meta.quizEmbeds) {
+        setEmbeds(meta.quizEmbeds);
+      } else {
+        try {
+          const stored = localStorage.getItem('quiz-embeds');
+          if (stored) setEmbeds(JSON.parse(stored));
+        } catch {}
+      }
+    });
   }, []);
 
   // ─── Quiz logic ────────────────────────────────────────────────────────────
@@ -1814,14 +1920,14 @@ export default function QuizzesPage() {
     if (!url) return;
     const next = [...embeds, { id: Date.now(), title, url }];
     setEmbeds(next);
-    localStorage.setItem('quiz-embeds', JSON.stringify(next));
+    sb?.auth.updateUser({ data: { quizEmbeds: next } });
     setEmbedInput({ title: '', url: '' });
   }
 
   function removeEmbed(id) {
     const next = embeds.filter(e => e.id !== id);
     setEmbeds(next);
-    localStorage.setItem('quiz-embeds', JSON.stringify(next));
+    sb?.auth.updateUser({ data: { quizEmbeds: next } });
   }
 
   // ─── Render ────────────────────────────────────────────────────────────────

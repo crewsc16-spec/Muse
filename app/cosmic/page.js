@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import BodyGraph from '@/app/components/BodyGraph';
 import NatalWheel from '@/app/components/NatalWheel';
+import { createClient } from '@/app/lib/supabase/client';
 
 // ─── HD Gate Wheel ────────────────────────────────────────────────────────────
 const GATE_WHEEL = [
@@ -565,10 +566,13 @@ export default function CosmicPage() {
   const [today] = useState(() => new Date().toISOString().slice(0,10));
 
   useEffect(() => {
-    setDisplayName(localStorage.getItem('displayName') ?? '');
     async function load() {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      const meta = user?.user_metadata ?? {};
+      setDisplayName(meta.displayName ?? localStorage.getItem('displayName') ?? '');
       let bd = null;
-      try { bd = JSON.parse(localStorage.getItem('birthData') ?? 'null'); } catch {}
+      try { bd = meta.birthData ?? JSON.parse(localStorage.getItem('birthData') ?? 'null'); } catch {}
       setBirthData(bd);
       const fetchHD = (date, time, utcOffset) =>
         fetch('/api/hd-chart',{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({birthDate:date,birthTime:time,utcOffset}) })

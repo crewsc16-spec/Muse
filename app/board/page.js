@@ -453,12 +453,6 @@ export default function Home() {
   const today = new Date().toISOString().split('T')[0];
 
   useEffect(() => {
-    try {
-      const savedSizes = localStorage.getItem('boardSizes');
-      if (savedSizes) setItemSizes(JSON.parse(savedSizes));
-      const savedMilestones = localStorage.getItem('milestones');
-      if (savedMilestones) setMilestones(JSON.parse(savedMilestones));
-    } catch {}
     const ticker = setInterval(() => setNow(new Date()), 30000);
     return () => clearInterval(ticker);
   }, []);
@@ -468,11 +462,22 @@ export default function Home() {
     setSb(supabase);
     supabase.auth.getUser().then(({ data: { user } }) => {
       setUser(user);
-      if (user) loadAll(supabase);
+      if (user) {
+        // Load milestones and boardSizes from Supabase metadata
+        const meta = user.user_metadata ?? {};
+        if (meta.milestones) setMilestones(meta.milestones);
+        if (meta.boardSizes) setItemSizes(meta.boardSizes);
+        loadAll(supabase);
+      }
     });
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
       setUser(session?.user ?? null);
-      if (session?.user) loadAll(supabase);
+      if (session?.user) {
+        const meta = session.user.user_metadata ?? {};
+        if (meta.milestones) setMilestones(meta.milestones);
+        if (meta.boardSizes) setItemSizes(meta.boardSizes);
+        loadAll(supabase);
+      }
     });
     return () => subscription.unsubscribe();
   }, []);
@@ -568,7 +573,7 @@ export default function Home() {
   function setItemSize(key, size) {
     setItemSizes(prev => {
       const next = { ...prev, [key]: size };
-      localStorage.setItem('boardSizes', JSON.stringify(next));
+      sb?.auth.updateUser({ data: { boardSizes: next } });
       return next;
     });
   }
