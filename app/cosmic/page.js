@@ -417,6 +417,34 @@ const PERSONAL_YEAR = {
   8: 'A year of power and abundance — material matters rise, claim your worth, and step into authority.',
   9: 'A year of completion — release what no longer serves to clear the way for all that is coming next.',
 };
+const BIRTHDAY_NUM = {
+  1:  { title: 'The Initiator',       desc: 'Birthday Number 1 marks you as a born leader with fierce independence and original ideas. You have natural courage to forge new paths where none exist. Your creative spark ignites projects, movements, and fresh directions. You thrive when you trust your own vision and step out ahead of the crowd.' },
+  2:  { title: 'The Diplomat',        desc: 'Birthday Number 2 gives you an extraordinary gift for sensing what others feel and need. You are a natural mediator who brings opposing sides into balance. Your strength lives in cooperation, patience, and quiet influence. The world opens for you when you trust the power of your gentle persistence.' },
+  3:  { title: 'The Communicator',    desc: 'Birthday Number 3 blesses you with expressive talent — words, art, humor, and charm flow through you effortlessly. You light up rooms and inspire others simply by being yourself. Joy is your medicine and creativity is your compass. When you share your gifts openly, abundance follows.' },
+  4:  { title: 'The Builder',         desc: 'Birthday Number 4 gives you a rare ability to turn ideas into lasting structures. You are disciplined, reliable, and deeply practical. Others trust you because you follow through. Your greatest power is showing that mastery comes from consistent, devoted effort — one brick at a time.' },
+  5:  { title: 'The Freedom Seeker',  desc: 'Birthday Number 5 fills you with restless curiosity and a hunger for experience. Change is not something that happens to you — it is something you create. You are magnetic, versatile, and adaptable. Your gift is showing others that growth requires the courage to let go of the familiar.' },
+  6:  { title: 'The Caretaker',       desc: 'Birthday Number 6 makes you a natural healer and guardian of beauty. You carry deep responsibility for those you love and create harmony wherever you go. Home, family, and community thrive under your care. Remember: the love you give so freely to others is meant for you too.' },
+  7:  { title: 'The Analyst',         desc: 'Birthday Number 7 gives you a penetrating mind and a soul that craves deep understanding. You are naturally drawn to hidden truths, spiritual questions, and inner exploration. Solitude is where your greatest insights are born. Trust that your need to go deep is itself a gift to the world.' },
+  8:  { title: 'The Powerhouse',      desc: 'Birthday Number 8 gives you executive vision and the drive to achieve real-world results. You understand money, power, and influence on an instinctive level. Your ambition is matched by an innate sense of fairness. When you wield your authority with integrity, you build legacies that outlast you.' },
+  9:  { title: 'The Old Soul',        desc: 'Birthday Number 9 carries the wisdom of someone who has lived and loved deeply. You are compassionate, idealistic, and naturally drawn to serve the greater good. Letting go comes easier to you than to most — because you understand that release creates space for what is truly meant for you.' },
+  11: { title: 'The Intuitive',       desc: 'Birthday Number 11 is a master number that amplifies your spiritual sensitivity and psychic awareness. You receive impressions, ideas, and inspiration from a source beyond logic. You are a channel for higher truths. When you learn to ground this electric energy, you become a beacon for others.' },
+  22: { title: 'The Architect',       desc: 'Birthday Number 22 is the master builder — you were born with the ability to manifest grand visions into tangible reality. Your dreams are not small, and neither is your capacity to realize them. You bridge the spiritual and material worlds. Discipline and patience turn your potential into legacy.' },
+  33: { title: 'The Healer',          desc: 'Birthday Number 33 is the master healer number — you carry an extraordinary capacity for selfless love and spiritual service. Your mere presence can uplift and transform. Teaching, healing, and nurturing come as naturally as breathing. Your path is to embody compassion so fully that it becomes contagious.' },
+};
+const EXPRESSION_NUM = {
+  1:  { title: 'The Pioneer',         desc: 'Expression Number 1 means you naturally express yourself through leadership, originality, and bold action. You are most alive when forging your own path. Others look to you to go first and show what is possible. Your voice carries authority because it comes from authentic self-trust.' },
+  2:  { title: 'The Peacemaker',      desc: 'Expression Number 2 means you express yourself through harmony, sensitivity, and the art of connection. You have a rare talent for making others feel truly seen and heard. Your natural diplomacy draws people together. You communicate with a gentleness that disarms even the most guarded hearts.' },
+  3:  { title: 'The Performer',       desc: 'Expression Number 3 means you express yourself through creativity, wit, and infectious enthusiasm. Words, stories, and artistic vision pour through you like water. You are a natural entertainer and mood-lifter. When you stop censoring your joy, the world leans in to listen.' },
+  4:  { title: 'The Organizer',       desc: 'Expression Number 4 means you express yourself through structure, dependability, and meticulous craftsmanship. You bring order to chaos and make complex things simple. People trust you because your word means something. Your talent is making the difficult look effortless through quiet, steady mastery.' },
+  5:  { title: 'The Adventurer',      desc: 'Expression Number 5 means you express yourself through versatility, curiosity, and magnetic energy. You are a natural storyteller who has lived enough to have something real to say. Change and variety fuel you. You inspire others by showing them how to embrace the unknown with excitement instead of fear.' },
+  6:  { title: 'The Nurturer',        desc: 'Expression Number 6 means you express yourself through love, beauty, and devoted service. You have a gift for creating environments where people feel safe enough to bloom. Your aesthetic sense and emotional warmth are felt by everyone around you. You teach by loving — and you love without conditions.' },
+  7:  { title: 'The Philosopher',     desc: 'Expression Number 7 means you express yourself through deep thought, research, and spiritual insight. You are naturally drawn to the questions others avoid. Your mind is both analytical and mystical. When you share the truths you have discovered in your solitude, you offer others a rare kind of clarity.' },
+  8:  { title: 'The Executive',       desc: 'Expression Number 8 means you express yourself through ambition, strategic thinking, and material mastery. You have a natural command presence that others respect. Business, finance, and leadership are languages you speak fluently. Your gift is showing that power and compassion can coexist beautifully.' },
+  9:  { title: 'The Humanitarian',    desc: 'Expression Number 9 means you express yourself through compassion, wisdom, and a desire to serve humanity. You see the big picture where others see only their own corner. Art, healing, and global awareness call to you. You are most fulfilled when your gifts reach beyond yourself to uplift the whole.' },
+  11: { title: 'The Visionary',       desc: 'Expression Number 11 is a master number — you express yourself through spiritual insight, inspiration, and illumination. You receive ideas and creative downloads that feel channeled from a higher source. Your nervous system is finely tuned to subtle frequencies. When grounded, your words and art can shift collective consciousness.' },
+  22: { title: 'The Master Planner',  desc: 'Expression Number 22 is a master number — you express yourself through visionary planning and the ability to manifest ideas on a grand scale. You think in systems, structures, and legacies. Your talent is taking the impossible and making it inevitable. You are here to build something that outlasts your lifetime.' },
+  33: { title: 'The Master Healer',   desc: 'Expression Number 33 is a master number — you express yourself through unconditional love, spiritual teaching, and profound compassion. Your presence alone can be healing. You communicate truth with a gentleness that reaches the deepest wounds. You are here to demonstrate that love itself is the most powerful force in existence.' },
+};
 const HD_TYPE = {
   'generator':             'You are a Generator — the life force of this world. You are designed to respond to life, not initiate it. When something lights you up with a deep gut "uh-huh," that is your sacral wisdom speaking. Wait to respond, and watch your path illuminate.',
   'manifesting-generator': 'You are a Manifesting Generator — a powerhouse of energy and multi-passionate creation. You respond first, then inform others of your chosen path. You move fast, skip steps others need, and do it your own way. This is not a flaw — it is your design.',
@@ -900,6 +928,7 @@ export default function CosmicPage() {
     {id:'astrology',  label:'Astrology'},
     {id:'hd',         label:'Human Design'},
     {id:'numerology', label:'Numerology'},
+    {id:'synthesis',  label:'Synthesis'},
     {id:'transits',   label:'Transits'},
   ];
 
@@ -1417,25 +1446,26 @@ export default function CosmicPage() {
                   </div>
                 </button>
               )}
-              {birthdayNum && (
-                <button onClick={()=>setDetail({title:`Birthday Number ${birthdayNum}`,subtitle:'The gifts you were born with',body:`Your Birthday Number ${birthdayNum} describes the specific talents and gifts you carry into this life. It is derived from the day of the month you were born — a personal signature of energy that colors the way your Life Path expresses itself.`})}
+              {birthdayNum && BIRTHDAY_NUM[birthdayNum] && (
+                <button onClick={()=>setDetail({title:`Birthday Number ${birthdayNum} · ${BIRTHDAY_NUM[birthdayNum].title}`,subtitle:'The gifts you were born with',body:BIRTHDAY_NUM[birthdayNum].desc})}
                   className="w-full bg-white/50 rounded-2xl p-4 border border-white/40 text-left hover:bg-white/70 transition-colors">
                   <div className="flex items-center justify-between gap-3">
                     <div>
                       <p className="text-xs text-gray-400 uppercase tracking-widest">Birthday Number</p>
-                      <p className="text-sm text-gray-600 mt-0.5">The gifts and talents you were born with</p>
+                      <p className="text-sm font-medium text-gray-700 mt-0.5">{BIRTHDAY_NUM[birthdayNum].title}</p>
+                      <p className="text-xs text-gray-400">The gifts you were born with</p>
                     </div>
                     <NumBadge n={birthdayNum} sm />
                   </div>
                 </button>
               )}
-              {expressNum && LIFE_PATH[expressNum] && (
-                <button onClick={()=>setDetail({title:`Expression Number ${expressNum} · ${LIFE_PATH[expressNum]?.title}`,subtitle:'Based on your display name',body:`Your Expression Number ${expressNum} is calculated from the numerical values of all the letters in your name. It describes your natural abilities, the talents and skills you came into this life already carrying, and the way you naturally express yourself in the world.`})}
+              {expressNum && EXPRESSION_NUM[expressNum] && (
+                <button onClick={()=>setDetail({title:`Expression Number ${expressNum} · ${EXPRESSION_NUM[expressNum].title}`,subtitle:'Based on your display name',body:EXPRESSION_NUM[expressNum].desc})}
                   className="w-full bg-white/50 rounded-2xl p-4 border border-white/40 text-left hover:bg-white/70 transition-colors">
                   <div className="flex items-center justify-between gap-3">
                     <div>
                       <p className="text-xs text-gray-400 uppercase tracking-widest">Expression Number</p>
-                      <p className="text-sm font-medium text-gray-700 mt-0.5">{LIFE_PATH[expressNum].title}</p>
+                      <p className="text-sm font-medium text-gray-700 mt-0.5">{EXPRESSION_NUM[expressNum].title}</p>
                       <p className="text-xs text-gray-400">Based on your display name</p>
                     </div>
                     <NumBadge n={expressNum} sm />
@@ -1445,9 +1475,16 @@ export default function CosmicPage() {
             </div>
           </div>
 
-          {hdData && lifePath && sunSign && (
+        </div>
+      )}
+
+      {/* ════ SYNTHESIS ════ */}
+      {tab === 'synthesis' && (
+        <div className="space-y-4">
+          {hdData && lifePath && sunSign ? (
             <div className="glass-card rounded-3xl p-6 space-y-4">
               <h2 className="font-playfair text-xl text-gray-700">Cross-System Synthesis</h2>
+              <p className="text-xs text-gray-400">Where your astrology, numerology, and Human Design weave together.</p>
               <div className="space-y-3">
                 <div className="bg-white/50 rounded-2xl p-4 border border-white/40 space-y-1">
                   <p className="text-xs font-medium text-gray-400 uppercase tracking-widest">Life Path + Profile</p>
@@ -1471,6 +1508,11 @@ export default function CosmicPage() {
                   </p>
                 </div>
               </div>
+            </div>
+          ) : (
+            <div className="glass-card rounded-3xl p-10 text-center space-y-3">
+              <p className="text-gray-500 text-sm">Synthesis requires your birth chart and numerology data.</p>
+              <p className="text-xs text-gray-400">Add your birth details on <a href="/profile" className="text-[#b88a92] underline">Profile</a> to unlock cross-system insights.</p>
             </div>
           )}
         </div>
