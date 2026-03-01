@@ -865,27 +865,16 @@ export default function Home() {
                     >
                       {/* Image */}
                       {item.type === 'image' && item.image_url && (
-                        <div className={`relative w-full ${IMG_ASPECTS[itemSizes[itemKey] ?? 'md']}`}>
-                          <Image src={item.image_url} alt={item.content || 'Vision'} fill
-                            unoptimized={item.image_url?.startsWith('/api/')}
-                            className="object-cover" sizes="(max-width: 640px) 50vw, 400px" />
+                        <div className="relative w-full">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={item.image_url} alt={item.content || 'Vision'}
+                            className="w-full h-auto block" />
                           {/* Mood hint — small face in corner when combined */}
                           {isCombined && (
                             <div className="absolute top-2 left-2 opacity-70">
                               <MoodFace mood={moodData.mood} size={22} />
                             </div>
                           )}
-                          {/* Size control — bottom-left on hover */}
-                          <div className="absolute bottom-2 left-2 z-10 opacity-0 group-hover:opacity-100 flex gap-0.5 bg-black/30 rounded-full px-1 py-0.5 backdrop-blur-sm transition-opacity">
-                            {['sm', 'md', 'lg'].map(s => (
-                              <button key={s} onClick={e => { e.stopPropagation(); setItemSize(itemKey, s); }}
-                                className={`w-5 h-5 rounded-full text-[9px] font-bold flex items-center justify-center transition-colors ${
-                                  (itemSizes[itemKey] ?? 'md') === s ? 'bg-white text-gray-700' : 'text-white/80 hover:bg-white/20'
-                                }`}>
-                                {s[0].toUpperCase()}
-                              </button>
-                            ))}
-                          </div>
                           {/* Reveal overlay on click */}
                           {isExpanded && (() => {
                             const entryDate = isCombined ? moodData.date : new Date(item.created_at).toISOString().split('T')[0];
