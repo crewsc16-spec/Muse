@@ -54,6 +54,15 @@ export default function Navbar() {
                 Chart
               </Link>
               <Link
+                href="/quizzes"
+                className="flex items-center gap-1.5 text-sm text-gray-600 hover:text-[#b88a92] transition-colors font-medium bg-white/60 border border-white/40 rounded-full px-3 py-1.5"
+              >
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" className="text-[#b88a92] flex-shrink-0">
+                  <path d="M12 2l1.5 4.5H18l-3.75 2.72 1.43 4.41L12 11.35l-3.68 2.28 1.43-4.41L6 6.5h4.5z M5 15l1 3H3zm14 0l1 3h-2zm-7 2l1 3h-2z"/>
+                </svg>
+                Quizzes
+              </Link>
+              <Link
                 href="/profile"
                 className="flex items-center gap-1.5 text-sm text-gray-600 hover:text-[#b88a92] transition-colors font-medium bg-white/60 border border-white/40 rounded-full px-3 py-1.5"
               >
