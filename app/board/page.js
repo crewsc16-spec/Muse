@@ -526,6 +526,7 @@ export default function Home() {
       }
 
       setContent(''); setImageUrl(''); setShowBoardPiece(false);
+      setNotes(''); setSelectedMood(null);
       setMoodSaved(true);
       setTimeout(() => setMoodSaved(false), 2500);
     } finally {
