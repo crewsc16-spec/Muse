@@ -175,17 +175,16 @@ export default function Navbar() {
               {/* Desktop nav — hidden on mobile */}
               <div className="hidden md:flex items-center gap-2">
                 {NAV_ITEMS.map(item => (
-                  <Link
+                  <a
                     key={item.href}
                     href={item.href}
-                    prefetch={false}
                     className={`flex items-center gap-1.5 text-sm font-medium transition-colors bg-white/60 border border-white/40 rounded-full px-3 py-1.5 ${
                       isActive(item) ? 'text-[#b88a92]' : 'text-gray-600 hover:text-[#b88a92]'
                     }`}
                   >
                     {item.iconSm}
                     {item.label}
-                  </Link>
+                  </a>
                 ))}
                 <button
                   onClick={handleLogout}
@@ -225,10 +224,9 @@ export default function Navbar() {
             {NAV_ITEMS.map(item => {
               const active = isActive(item);
               return (
-                <Link
+                <a
                   key={item.href}
                   href={item.href}
-                  prefetch={false}
                   className={`flex-1 flex flex-col items-center justify-center gap-1 py-4 transition-colors ${
                     active ? 'text-[#b88a92]' : 'text-gray-400'
                   }`}
@@ -236,7 +234,7 @@ export default function Navbar() {
                 >
                   {item.icon}
                   <span className={`w-1.5 h-1.5 rounded-full transition-opacity ${active ? 'bg-[#b88a92] opacity-100' : 'opacity-0'}`} />
-                </Link>
+                </a>
               );
             })}
           </div>
