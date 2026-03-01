@@ -1832,8 +1832,6 @@ export default function QuizzesPage() {
   const [step, setStep]             = useState(0);
   const [answers, setAnswers]       = useState([]);
   const [result, setResult]         = useState(null);
-  const [embeds, setEmbeds]         = useState([]);
-  const [embedInput, setEmbedInput] = useState({ title: '', url: '' });
   const [saved, setSaved]           = useState({});
   const [saving, setSaving]         = useState({});
   const [sb, setSb]                 = useState(null);
@@ -1841,17 +1839,6 @@ export default function QuizzesPage() {
   useEffect(() => {
     const client = createClient();
     setSb(client);
-    client.auth.getUser().then(({ data: { user } }) => {
-      const meta = user?.user_metadata ?? {};
-      if (meta.quizEmbeds) {
-        setEmbeds(meta.quizEmbeds);
-      } else {
-        try {
-          const stored = localStorage.getItem('quiz-embeds');
-          if (stored) setEmbeds(JSON.parse(stored));
-        } catch {}
-      }
-    });
   }, []);
 
   // ─── Quiz logic ────────────────────────────────────────────────────────────
@@ -1910,24 +1897,6 @@ export default function QuizzesPage() {
     } finally {
       setSaving(s => ({ ...s, [quizId]: false }));
     }
-  }
-
-  // ─── Embed logic ───────────────────────────────────────────────────────────
-
-  function addEmbed() {
-    const url = embedInput.url.trim();
-    const title = embedInput.title.trim() || 'Quiz';
-    if (!url) return;
-    const next = [...embeds, { id: Date.now(), title, url }];
-    setEmbeds(next);
-    sb?.auth.updateUser({ data: { quizEmbeds: next } });
-    setEmbedInput({ title: '', url: '' });
-  }
-
-  function removeEmbed(id) {
-    const next = embeds.filter(e => e.id !== id);
-    setEmbeds(next);
-    sb?.auth.updateUser({ data: { quizEmbeds: next } });
   }
 
   // ─── Render ────────────────────────────────────────────────────────────────
@@ -2067,68 +2036,6 @@ export default function QuizzesPage() {
                 </button>
               </div>
             </>
-          )}
-        </div>
-
-        {/* ── External Embeds ── */}
-        <div className="glass-card rounded-3xl p-6 sm:p-8">
-          <h2 className="font-playfair text-xl text-gray-800 mb-1">Your Embeds</h2>
-          <p className="text-xs text-gray-500 mb-5">
-            Paste any quiz URL — Typeform, Google Forms, or any embeddable link.
-          </p>
-
-          {/* Add embed row */}
-          <div className="flex gap-2 mb-6">
-            <input
-              type="text"
-              placeholder="Title"
-              value={embedInput.title}
-              onChange={e => setEmbedInput(v => ({ ...v, title: e.target.value }))}
-              className="w-32 flex-shrink-0 text-sm bg-white/60 border border-white/50 rounded-xl px-3 py-2 outline-none focus:border-[#d4adb6] placeholder-gray-300"
-            />
-            <input
-              type="url"
-              placeholder="https://…"
-              value={embedInput.url}
-              onChange={e => setEmbedInput(v => ({ ...v, url: e.target.value }))}
-              onKeyDown={e => e.key === 'Enter' && addEmbed()}
-              className="flex-1 text-sm bg-white/60 border border-white/50 rounded-xl px-3 py-2 outline-none focus:border-[#d4adb6] placeholder-gray-300"
-            />
-            <button
-              onClick={addEmbed}
-              className="btn-gradient text-white text-sm font-medium px-4 py-2 rounded-xl whitespace-nowrap"
-            >
-              Add
-            </button>
-          </div>
-
-          {embeds.length === 0 ? (
-            <p className="text-xs text-gray-400 text-center py-6">No embeds yet — add one above.</p>
-          ) : (
-            <div className="space-y-6">
-              {embeds.map(embed => (
-                <div key={embed.id}>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-gray-700">{embed.title}</span>
-                    <button
-                      onClick={() => removeEmbed(embed.id)}
-                      className="text-gray-300 hover:text-rose-400 transition-colors text-lg leading-none"
-                      aria-label="Remove embed"
-                    >
-                      ×
-                    </button>
-                  </div>
-                  <iframe
-                    src={embed.url}
-                    width="100%"
-                    height="600"
-                    className="rounded-2xl border border-white/40"
-                    allow="*"
-                    title={embed.title}
-                  />
-                </div>
-              ))}
-            </div>
           )}
         </div>
 

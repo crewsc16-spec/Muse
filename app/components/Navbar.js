@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { createClient } from '@/app/lib/supabase/client';
 import { applyScheme } from '@/app/lib/color-schemes';
@@ -20,8 +20,97 @@ function syncMetaToLocalStorage(meta) {
   }
 }
 
+const NAV_ITEMS = [
+  {
+    href: '/',
+    label: 'Home',
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+      </svg>
+    ),
+    iconSm: (
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" className="flex-shrink-0">
+        <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+      </svg>
+    ),
+    exact: true,
+  },
+  {
+    href: '/board',
+    label: 'Board',
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M3 3h8v8H3zm10 0h8v8h-8zM3 13h8v8H3zm13 0a4 4 0 1 1 0 8 4 4 0 0 1 0-8z"/>
+      </svg>
+    ),
+    iconSm: (
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" className="flex-shrink-0">
+        <path d="M3 3h8v8H3zm10 0h8v8h-8zM3 13h8v8H3zm13 0a4 4 0 1 1 0 8 4 4 0 0 1 0-8z"/>
+      </svg>
+    ),
+  },
+  {
+    href: '/daily',
+    label: 'Daily',
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+      </svg>
+    ),
+    iconSm: (
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" className="flex-shrink-0">
+        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+      </svg>
+    ),
+  },
+  {
+    href: '/cosmic',
+    label: 'Chart',
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="4"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><path d="M2 12h20"/>
+      </svg>
+    ),
+    iconSm: (
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="flex-shrink-0">
+        <circle cx="12" cy="12" r="4"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><path d="M2 12h20"/>
+      </svg>
+    ),
+  },
+  {
+    href: '/quizzes',
+    label: 'Quizzes',
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2l1.5 4.5H18l-3.75 2.72 1.43 4.41L12 11.35l-3.68 2.28 1.43-4.41L6 6.5h4.5z M5 15l1 3H3zm14 0l1 3h-2zm-7 2l1 3h-2z"/>
+      </svg>
+    ),
+    iconSm: (
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" className="flex-shrink-0">
+        <path d="M12 2l1.5 4.5H18l-3.75 2.72 1.43 4.41L12 11.35l-3.68 2.28 1.43-4.41L6 6.5h4.5z M5 15l1 3H3zm14 0l1 3h-2zm-7 2l1 3h-2z"/>
+      </svg>
+    ),
+  },
+  {
+    href: '/profile',
+    label: 'Profile',
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 12c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm0 2c-3.33 0-10 1.67-10 5v2h20v-2c0-3.33-6.67-5-10-5z"/>
+      </svg>
+    ),
+    iconSm: (
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" className="flex-shrink-0">
+        <path d="M12 12c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm0 2c-3.33 0-10 1.67-10 5v2h20v-2c0-3.33-6.67-5-10-5z"/>
+      </svg>
+    ),
+  },
+];
+
 export default function Navbar() {
   const router = useRouter();
+  const pathname = usePathname();
   const [user, setUser] = useState(null);
 
   useEffect(() => {
@@ -50,89 +139,89 @@ export default function Navbar() {
     router.refresh();
   }
 
-  return (
-    <nav className="sticky top-0 z-10 backdrop-blur-md bg-white/60 border-b border-white/30 px-4 py-3">
-      <div className="max-w-4xl mx-auto flex items-center justify-between">
-        <Link href="/" className="font-playfair text-xl tracking-tight" style={{ color: '#b88a92' }}>
-          Muse
-        </Link>
+  function isActive(item) {
+    if (item.exact) return pathname === item.href;
+    return pathname === item.href || pathname.startsWith(item.href + '/');
+  }
 
-        <div className="flex items-center gap-2">
+  return (
+    <>
+      {/* ── Top bar ── */}
+      <nav className="sticky top-0 z-10 backdrop-blur-md bg-white/60 border-b border-white/30 px-4 py-3">
+        <div className="max-w-4xl mx-auto flex items-center justify-between">
+          <Link href="/" className="font-playfair text-xl tracking-tight" style={{ color: '#b88a92' }}>
+            Muse
+          </Link>
+
           {user ? (
             <>
-              <Link
-                href="/"
-                className="flex items-center gap-1.5 text-sm text-gray-600 hover:text-[#b88a92] transition-colors font-medium bg-white/60 border border-white/40 rounded-full px-3 py-1.5"
-              >
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" className="text-[#b88a92] flex-shrink-0">
-                  <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
-                </svg>
-                Home
-              </Link>
-              <Link
-                href="/board"
-                className="flex items-center gap-1.5 text-sm text-gray-600 hover:text-[#b88a92] transition-colors font-medium bg-white/60 border border-white/40 rounded-full px-3 py-1.5"
-              >
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" className="text-[#b88a92] flex-shrink-0">
-                  <path d="M3 3h8v8H3zm10 0h8v8h-8zM3 13h8v8H3zm13 0a4 4 0 1 1 0 8 4 4 0 0 1 0-8z"/>
-                </svg>
-                Board
-              </Link>
-              <Link
-                href="/daily"
-                className="flex items-center gap-1.5 text-sm text-gray-600 hover:text-[#b88a92] transition-colors font-medium bg-white/60 border border-white/40 rounded-full px-3 py-1.5"
-              >
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" className="text-[#b88a92] flex-shrink-0">
-                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                </svg>
-                Daily
-              </Link>
-              <Link
-                href="/cosmic"
-                className="flex items-center gap-1.5 text-sm text-gray-600 hover:text-[#b88a92] transition-colors font-medium bg-white/60 border border-white/40 rounded-full px-3 py-1.5"
-              >
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#b88a92] flex-shrink-0">
-                  <circle cx="12" cy="12" r="4"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><path d="M2 12h20"/>
-                </svg>
-                Chart
-              </Link>
-              <Link
-                href="/quizzes"
-                className="flex items-center gap-1.5 text-sm text-gray-600 hover:text-[#b88a92] transition-colors font-medium bg-white/60 border border-white/40 rounded-full px-3 py-1.5"
-              >
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" className="text-[#b88a92] flex-shrink-0">
-                  <path d="M12 2l1.5 4.5H18l-3.75 2.72 1.43 4.41L12 11.35l-3.68 2.28 1.43-4.41L6 6.5h4.5z M5 15l1 3H3zm14 0l1 3h-2zm-7 2l1 3h-2z"/>
-                </svg>
-                Quizzes
-              </Link>
-              <Link
-                href="/profile"
-                className="flex items-center gap-1.5 text-sm text-gray-600 hover:text-[#b88a92] transition-colors font-medium bg-white/60 border border-white/40 rounded-full px-3 py-1.5"
-              >
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" className="text-[#b88a92] flex-shrink-0">
-                  <path d="M12 12c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm0 2c-3.33 0-10 1.67-10 5v2h20v-2c0-3.33-6.67-5-10-5z"/>
-                </svg>
-                Profile
-              </Link>
+              {/* Desktop nav — hidden on mobile */}
+              <div className="hidden md:flex items-center gap-2">
+                {NAV_ITEMS.map(item => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`flex items-center gap-1.5 text-sm font-medium transition-colors bg-white/60 border border-white/40 rounded-full px-3 py-1.5 ${
+                      isActive(item) ? 'text-[#b88a92]' : 'text-gray-600 hover:text-[#b88a92]'
+                    }`}
+                  >
+                    {item.iconSm}
+                    {item.label}
+                  </Link>
+                ))}
+                <button
+                  onClick={handleLogout}
+                  className="text-xs text-gray-400 hover:text-[#b88a92] transition-colors border border-gray-200 rounded-full px-3 py-1.5 hover:border-[#d4adb6]"
+                >
+                  Log out
+                </button>
+              </div>
+
+              {/* Mobile top-right: log out only */}
               <button
                 onClick={handleLogout}
-                className="text-xs text-gray-400 hover:text-[#b88a92] transition-colors border border-gray-200 rounded-full px-3 py-1.5 hover:border-[#d4adb6]"
+                className="md:hidden text-xs text-gray-400 hover:text-[#b88a92] transition-colors border border-gray-200 rounded-full px-3 py-1.5"
               >
                 Log out
               </button>
             </>
           ) : (
-            <>
+            <div className="flex items-center gap-2">
               <Link href="/login" className="text-xs text-gray-400 hover:text-rose-400 transition-colors">
                 Sign in
               </Link>
               <Link href="/signup" className="btn-gradient text-white text-xs px-4 py-2 rounded-full font-medium">
                 Sign up
               </Link>
-            </>
+            </div>
           )}
         </div>
-      </div>
-    </nav>
+      </nav>
+
+      {/* ── Mobile bottom tab bar ── */}
+      {user && (
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 backdrop-blur-md bg-white/80 border-t border-white/50"
+          style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+        >
+          <div className="flex items-stretch">
+            {NAV_ITEMS.map(item => {
+              const active = isActive(item);
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`flex-1 flex flex-col items-center justify-center gap-0.5 py-2.5 transition-colors ${
+                    active ? 'text-[#b88a92]' : 'text-gray-400'
+                  }`}
+                >
+                  {item.icon}
+                  <span className="text-[10px] font-medium leading-none">{item.label}</span>
+                </Link>
+              );
+            })}
+          </div>
+        </nav>
+      )}
+    </>
   );
 }

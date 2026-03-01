@@ -26,7 +26,7 @@ export default function RootLayout({ children }) {
       <body className={`${geist.variable} ${playfair.variable} antialiased`}>
         <ThemeInitializer />
         <Navbar />
-        <main className="max-w-4xl mx-auto px-4 py-8">
+        <main className="max-w-4xl mx-auto px-4 py-8 pb-24 md:pb-8">
           {children}
         </main>
       </body>
