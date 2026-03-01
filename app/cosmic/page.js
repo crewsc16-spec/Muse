@@ -638,6 +638,7 @@ export default function CosmicPage() {
   const [chatLoading,  setChatLoading]  = useState(false);
   const [chatAsked,    setChatAsked]    = useState('');
   const [chatSaved,    setChatSaved]    = useState(false);
+  const [hdIntroOpen,  setHdIntroOpen]  = useState(false);
   const [today] = useState(() => new Date().toISOString().slice(0,10));
 
   useEffect(() => {
@@ -1273,6 +1274,134 @@ export default function CosmicPage() {
       {/* ════ HUMAN DESIGN ════ */}
       {tab === 'hd' && (
         <div className="space-y-4">
+
+          {/* ── What is Human Design? ── */}
+          <div className="glass-card rounded-3xl overflow-hidden">
+            <button
+              onClick={() => setHdIntroOpen(o => !o)}
+              className="w-full flex items-center justify-between px-6 py-5 text-left"
+            >
+              <div>
+                <h2 className="font-playfair text-xl text-gray-700">What is Human Design?</h2>
+                <p className="text-xs text-gray-400 mt-0.5">A beginner's guide to the system</p>
+              </div>
+              <span className="text-gray-300 text-xl leading-none ml-4">{hdIntroOpen ? '−' : '+'}</span>
+            </button>
+
+            {hdIntroOpen && (
+              <div className="px-6 pb-6 space-y-6 border-t border-white/40 pt-5">
+
+                {/* Intro */}
+                <div className="space-y-3">
+                  <p className="text-sm text-gray-600 leading-relaxed">
+                    Human Design is a system for understanding how you are uniquely wired — energetically, mentally, and emotionally. It was synthesized in 1987 by Ra Uru Hu, who described receiving a mystical transmission that wove together four ancient traditions: the <strong className="text-gray-700">I Ching</strong>, <strong className="text-gray-700">Kabbalah</strong>, <strong className="text-gray-700">Hindu chakras</strong>, and <strong className="text-gray-700">Western astrology</strong>.
+                  </p>
+                  <p className="text-sm text-gray-600 leading-relaxed">
+                    Your chart is calculated from your exact birth date, time, and location. The positions of the planets at the moment of your birth — and again 88 days before your birth (your unconscious "Design" imprint) — are mapped onto a <strong className="text-gray-700">Body Graph</strong>: a diagram of 9 energy centers, 64 gates, and 36 channels that describes how your energy flows and where it is consistent or open to influence.
+                  </p>
+                  <p className="text-sm text-gray-600 leading-relaxed">
+                    Human Design is not about prediction. It is about recognition — understanding your natural way of operating so you can make decisions from a place of alignment rather than conditioning. The two most important things in your chart are your <strong className="text-gray-700">Type</strong> (how your energy works) and your <strong className="text-gray-700">Authority</strong> (how to make decisions that are correct for you).
+                  </p>
+                </div>
+
+                {/* The 5 Types */}
+                <div className="space-y-3">
+                  <h3 className="font-playfair text-base text-gray-700">The 5 Energy Types</h3>
+                  <p className="text-xs text-gray-400">Tap any type to learn more.</p>
+                  <div className="space-y-2">
+                    {[
+                      { key: 'generator',             label: 'Generator',             pct: '37%', strategy: 'Wait to respond',           icon: '⚡', color: 'from-amber-50 to-yellow-50',   border: 'border-amber-200/60',  pill: 'bg-amber-100 text-amber-700' },
+                      { key: 'manifesting-generator', label: 'Manifesting Generator', pct: '33%', strategy: 'Respond, then inform',        icon: '🔥', color: 'from-orange-50 to-amber-50', border: 'border-orange-200/60', pill: 'bg-orange-100 text-orange-700' },
+                      { key: 'projector',             label: 'Projector',             pct: '20%', strategy: 'Wait for the invitation',     icon: '🔭', color: 'from-blue-50 to-indigo-50',  border: 'border-blue-200/60',   pill: 'bg-blue-100 text-blue-700' },
+                      { key: 'manifestor',            label: 'Manifestor',            pct: '9%',  strategy: 'Inform before acting',        icon: '🌊', color: 'from-rose-50 to-pink-50',    border: 'border-rose-200/60',   pill: 'bg-rose-100 text-rose-700' },
+                      { key: 'reflector',             label: 'Reflector',             pct: '1%',  strategy: 'Wait a lunar cycle (29 days)', icon: '🌙', color: 'from-violet-50 to-purple-50', border: 'border-violet-200/60', pill: 'bg-violet-100 text-violet-700' },
+                    ].map(t => (
+                      <button key={t.key}
+                        onClick={() => setDetail({ title: t.label, subtitle: 'Human Design Type · ' + t.pct + ' of people', body: HD_TYPE[t.key] ?? '' })}
+                        className={`w-full bg-gradient-to-r ${t.color} border ${t.border} rounded-2xl p-4 text-left hover:brightness-[0.97] transition-all active:scale-[0.99]`}>
+                        <div className="flex items-start gap-3">
+                          <span className="text-xl mt-0.5">{t.icon}</span>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <p className="text-sm font-semibold text-gray-700">{t.label}</p>
+                              <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${t.pill}`}>{t.pct}</span>
+                            </div>
+                            <p className="text-xs text-gray-500 mt-1">Strategy: {t.strategy}</p>
+                          </div>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-gray-300 mt-1 shrink-0"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Key concepts */}
+                <div className="space-y-3">
+                  <h3 className="font-playfair text-base text-gray-700">Key Concepts</h3>
+                  <div className="space-y-2">
+                    {[
+                      {
+                        label: 'Strategy',
+                        body: 'Your Strategy is the practical guidance for how to move through life in a way that creates the least resistance. It is specific to your Type. Generators and Manifesting Generators wait to respond to life before committing. Projectors wait for a genuine invitation before sharing their gifts. Manifestors inform those in their field before taking action. Reflectors wait a full lunar cycle before major decisions. Following your Strategy consistently is the foundation of a life that feels right.',
+                      },
+                      {
+                        label: 'Authority',
+                        body: 'Your Authority is the specific inner guidance system you should use when making decisions — especially important ones. Logic, advice from others, and analysis are not your Authority. Your Authority lives in your body: it may be a gut response (Sacral), an emotional wave that needs time (Emotional), a quiet instinctive knowing (Splenic), or something else entirely. When you make decisions from your Authority rather than your mind, you align with what is actually correct for you.',
+                      },
+                      {
+                        label: 'Profile',
+                        body: 'Your Profile is a pair of numbers (like 2/4 or 6/2) derived from the lines of your Personality and Design Sun gates. It describes the archetypal role you are here to play in this lifetime — the costume your Type wears. Line 1 is the Investigator; Line 2, the Hermit; Line 3, the Martyr; Line 4, the Opportunist; Line 5, the Heretic; Line 6, the Role Model. The first number describes your conscious, recognizable self — the second describes the deeper unconscious layer that others often see more clearly than you do.',
+                      },
+                      {
+                        label: 'Defined vs. Open Centers',
+                        body: 'The 9 energy centers in your Body Graph are either Defined (colored in) or Open (white). Defined centers have consistent, reliable energy — they are the fixed parts of who you are. Open centers are not broken or missing something; they are where you receive, amplify, and learn from the energy of others. Open centers are also where you are most susceptible to conditioning — to taking on the energy of your environment and believing it is your own. Understanding which centers are open is one of the most liberating things Human Design offers.',
+                      },
+                      {
+                        label: 'Gates & Channels',
+                        body: 'The 64 gates in Human Design correspond to the 64 hexagrams of the I Ching. Each gate represents a specific energetic quality or gift. When a gate in one center connects to a gate in an adjacent center, it forms a Channel — a fully active energy circuit. Defined Channels are the consistent, reliable energies you carry with you everywhere. They are neither better nor worse than open channels; they simply describe where your energy is always "on." Your gate activations come from the planetary positions at your birth (Personality) and 88 days prior (Design).',
+                      },
+                    ].map(({ label, body }) => (
+                      <button key={label}
+                        onClick={() => setDetail({ title: label, subtitle: 'Human Design · Key Concept', body })}
+                        className="w-full bg-white/50 rounded-2xl p-4 border border-white/40 text-left hover:bg-white/70 transition-colors active:scale-[0.99] flex items-center justify-between gap-3">
+                        <p className="text-sm font-medium text-gray-700">{label}</p>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-gray-300 shrink-0"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* How to read your chart */}
+                <div className="space-y-3">
+                  <h3 className="font-playfair text-base text-gray-700">How to read your chart</h3>
+                  <div className="space-y-2">
+                    {[
+                      { step: '1', title: 'Find your Type', desc: 'Your Type tells you how your aura interacts with the world and gives you your Strategy — the most important thing to experiment with first.' },
+                      { step: '2', title: 'Follow your Strategy', desc: 'Before anything else, experiment with your Strategy for 90 days. Notice how life responds when you wait to respond, wait for an invitation, or inform before acting.' },
+                      { step: '3', title: 'Trust your Authority', desc: 'When facing a decision, stop going to your mind. Instead, go to the specific body intelligence your Authority points to — gut, emotional wave, splenic flash, or other.' },
+                      { step: '4', title: 'Explore your Profile & Centers', desc: 'Once Strategy and Authority feel natural, dive deeper into your Profile, Defined Centers, and Channels to understand the consistent themes and gifts of your design.' },
+                    ].map(({ step, title, desc }) => (
+                      <div key={step} className="flex gap-3 p-3 bg-white/40 rounded-2xl border border-white/40">
+                        <span className="w-6 h-6 rounded-full bg-gradient-to-br from-rose-300 to-violet-300 text-white text-xs font-semibold flex items-center justify-center shrink-0 mt-0.5">{step}</span>
+                        <div>
+                          <p className="text-sm font-medium text-gray-700">{title}</p>
+                          <p className="text-xs text-gray-500 mt-0.5 leading-relaxed">{desc}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {!hdData && (
+                  <div className="bg-gradient-to-r from-rose-50 to-violet-50 border border-rose-100 rounded-2xl p-4 text-center space-y-2">
+                    <p className="text-sm text-gray-600">Ready to see your personal chart?</p>
+                    <a href="/profile" className="inline-block btn-gradient text-white text-sm font-medium px-5 py-2 rounded-full">Add birth details on Profile →</a>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
           {hdData ? (
             <>
               <div className="glass-card rounded-3xl p-6 space-y-3">
