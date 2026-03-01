@@ -4,6 +4,21 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { createClient } from '@/app/lib/supabase/client';
+import { applyScheme } from '@/app/lib/color-schemes';
+
+const USER_LS_KEYS = ['displayName', 'profilePhotoUrl', 'birthData', 'milestones', 'colorScheme'];
+
+function syncMetaToLocalStorage(meta) {
+  if (!meta) return;
+  if (meta.displayName)    localStorage.setItem('displayName',    meta.displayName);
+  if (meta.profilePhotoUrl) localStorage.setItem('profilePhotoUrl', meta.profilePhotoUrl);
+  if (meta.birthData)      localStorage.setItem('birthData',      JSON.stringify(meta.birthData));
+  if (meta.milestones)     localStorage.setItem('milestones',     JSON.stringify(meta.milestones));
+  if (meta.colorScheme) {
+    localStorage.setItem('colorScheme', meta.colorScheme);
+    applyScheme(meta.colorScheme);
+  }
+}
 
 export default function Navbar() {
   const router = useRouter();
@@ -11,9 +26,19 @@ export default function Navbar() {
 
   useEffect(() => {
     const supabase = createClient();
-    supabase.auth.getUser().then(({ data: { user } }) => setUser(user));
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUser(user);
+      if (user) syncMetaToLocalStorage(user.user_metadata);
+    });
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setUser(session?.user ?? null);
+      if (event === 'SIGNED_IN' && session?.user) {
+        syncMetaToLocalStorage(session.user.user_metadata);
+      }
+      if (event === 'SIGNED_OUT') {
+        USER_LS_KEYS.forEach(k => localStorage.removeItem(k));
+        applyScheme('blush');
+      }
     });
     return () => subscription.unsubscribe();
   }, []);
