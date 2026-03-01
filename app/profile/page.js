@@ -68,35 +68,61 @@ export default function ProfilePage() {
   useEffect(() => {
     const supabase = createClient();
     setSb(supabase);
-    supabase.auth.getUser().then(({ data: { user } }) => setUser(user));
-    setDisplayName(localStorage.getItem('displayName') ?? '');
-    setAvatarUrl(localStorage.getItem('profilePhotoUrl') ?? '');
-    setActiveScheme(getSavedScheme());
-    try {
-      const saved = localStorage.getItem('milestones');
-      if (saved) setMilestones(JSON.parse(saved));
-    } catch {}
-    try {
-      const bd = localStorage.getItem('birthData');
+
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUser(user);
+      const meta = user?.user_metadata ?? {};
+
+      // Display name — Supabase metadata wins over localStorage
+      const dn = meta.displayName ?? localStorage.getItem('displayName') ?? '';
+      setDisplayName(dn);
+      if (dn) localStorage.setItem('displayName', dn);
+
+      // Avatar — Supabase metadata wins over localStorage
+      const au = meta.profilePhotoUrl ?? localStorage.getItem('profilePhotoUrl') ?? '';
+      setAvatarUrl(au);
+      if (au) localStorage.setItem('profilePhotoUrl', au);
+
+      // Color scheme
+      if (meta.colorScheme) {
+        saveScheme(meta.colorScheme);
+        setActiveScheme(meta.colorScheme);
+      } else {
+        setActiveScheme(getSavedScheme());
+      }
+
+      // Milestones — Supabase metadata wins over localStorage
+      const ms = meta.milestones ?? (() => {
+        try { return JSON.parse(localStorage.getItem('milestones') ?? 'null'); } catch { return null; }
+      })();
+      if (ms) {
+        setMilestones(ms);
+        localStorage.setItem('milestones', JSON.stringify(ms));
+      }
+
+      // Birth data — Supabase metadata wins over localStorage
+      const bd = meta.birthData ?? (() => {
+        try { return JSON.parse(localStorage.getItem('birthData') ?? 'null'); } catch { return null; }
+      })();
       if (bd) {
-        const parsed = JSON.parse(bd);
-        setBirthDate(parsed.date ?? '');
-        setBirthTime(parsed.time ?? '');
-        setBirthPlace(parsed.birthPlace ?? '');
-        setBirthTimezone(parsed.birthTimezone ?? '');
-        setAstroSystem(parsed.system ?? 'tropical');
-        if (parsed.hdCalculated) {
+        setBirthDate(bd.date ?? '');
+        setBirthTime(bd.time ?? '');
+        setBirthPlace(bd.birthPlace ?? '');
+        setBirthTimezone(bd.birthTimezone ?? '');
+        setAstroSystem(bd.system ?? 'tropical');
+        if (bd.hdCalculated) {
           setHdCalc({
-            type:         parsed.hdType,
-            profile:      parsed.hdProfile,
-            profileLine1: parsed.hdProfileLine1,
-            profileLine2: parsed.hdProfileLine2,
+            type:         bd.hdType,
+            profile:      bd.hdProfile,
+            profileLine1: bd.hdProfileLine1,
+            profileLine2: bd.hdProfileLine2,
           });
         }
-        if (parsed.hdTypeOverride) setHdTypeOverride(parsed.hdTypeOverride);
-        if (parsed.hdProfileOverride) setHdProfileOverride(parsed.hdProfileOverride);
+        if (bd.hdTypeOverride) setHdTypeOverride(bd.hdTypeOverride);
+        if (bd.hdProfileOverride) setHdProfileOverride(bd.hdProfileOverride);
+        localStorage.setItem('birthData', JSON.stringify(bd));
       }
-    } catch {}
+    });
   }, []);
 
   // ── Avatar ──
@@ -115,6 +141,7 @@ export default function ProfilePage() {
       const url = `${data.publicUrl}?t=${Date.now()}`;
       setAvatarUrl(url);
       localStorage.setItem('profilePhotoUrl', url);
+      sb?.auth.updateUser({ data: { profilePhotoUrl: url } });
     } catch (err) {
       setUploadError(err.message ?? 'Upload failed');
     } finally {
@@ -124,7 +151,9 @@ export default function ProfilePage() {
 
   // ── Display name ──
   function handleSaveName() {
-    localStorage.setItem('displayName', displayName.trim());
+    const name = displayName.trim();
+    localStorage.setItem('displayName', name);
+    sb?.auth.updateUser({ data: { displayName: name } });
     setNameSaved(true);
     setTimeout(() => setNameSaved(false), 2000);
   }
@@ -133,6 +162,7 @@ export default function ProfilePage() {
   function handleSchemeSelect(key) {
     setActiveScheme(key);
     saveScheme(key);
+    sb?.auth.updateUser({ data: { colorScheme: key } });
   }
 
   // ── Place search ──
@@ -261,12 +291,9 @@ export default function ProfilePage() {
       }
     }
 
-    localStorage.setItem('birthData', JSON.stringify({
-      ...base,
-      ...hdFields,
-      hdTypeOverride,
-      hdProfileOverride,
-    }));
+    const birthData = { ...base, ...hdFields, hdTypeOverride, hdProfileOverride };
+    localStorage.setItem('birthData', JSON.stringify(birthData));
+    sb?.auth.updateUser({ data: { birthData } });
     setAstroSaved(true);
     setTimeout(() => setAstroSaved(false), 2000);
   }
@@ -275,6 +302,7 @@ export default function ProfilePage() {
   function saveMilestones(list) {
     setMilestones(list);
     localStorage.setItem('milestones', JSON.stringify(list));
+    sb?.auth.updateUser({ data: { milestones: list } });
   }
 
   function addMilestone() {
