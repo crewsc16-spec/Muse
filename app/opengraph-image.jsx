@@ -114,32 +114,12 @@ export default async function OGImage() {
         {/* Feature words */}
         <div
           style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 0,
-            fontSize: 28,
-            color: 'rgba(212,196,176,0.7)',
-            letterSpacing: '0.04em',
+            fontSize: 38,
+            color: '#c4b49e',
+            letterSpacing: '0.06em',
           }}
         >
-          {['Astrology', 'Human Design', 'Tarot', 'Journaling'].map(
-            (label, i) => (
-              <div key={label} style={{ display: 'flex', alignItems: 'center' }}>
-                {i > 0 && (
-                  <div
-                    style={{
-                      width: 5,
-                      height: 5,
-                      borderRadius: '50%',
-                      background: 'rgba(212,196,176,0.4)',
-                      margin: '0 22px',
-                    }}
-                  />
-                )}
-                <span>{label}</span>
-              </div>
-            )
-          )}
+          Astrology · Human Design · Tarot · Journaling
         </div>
 
         {/* Bottom accent line */}
