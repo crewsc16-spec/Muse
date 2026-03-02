@@ -6,6 +6,7 @@ import { getDailyContent, TAROT_IMAGES, ANIMAL_IMAGE_QUERIES } from '@/app/lib/d
 import { computeChart, getLunarPhase, gateLineToLon, computeCrossAspects, getPersonalYear, computePanchanga } from '@/app/lib/astrology';
 import { calculateHDChart } from '@/app/lib/hd-chart';
 import { saveVisionItem, getJournalEntries, createJournalEntry, updateJournalEntry } from '@/app/lib/storage';
+import VibeCardModal from '@/app/components/VibeCardModal';
 
 const VIBE_DATA = {
   fire: {
@@ -122,6 +123,7 @@ export default function DailyPage() {
   const [saving, setSaving] = useState({});
   const [journalEntryId, setJournalEntryId] = useState(null);
   const [goodNews, setGoodNews] = useState([]);
+  const [vibeModalOpen, setVibeModalOpen] = useState(false);
   const journalSaveTimer = useRef(null);
 
   const dateStr = getTodayStr();
@@ -400,6 +402,14 @@ export default function DailyPage() {
         {/* Today's Vibe */}
         <TodaysVibe chartData={content.chartData} dateStr={getTodayStr()} />
 
+        {/* Share Vibe Check */}
+        <button
+          onClick={() => setVibeModalOpen(true)}
+          className="w-full glass-card rounded-2xl px-5 py-3 text-sm text-gray-400 hover:text-gray-600 transition-colors text-center"
+        >
+          Share your cosmic vibe check
+        </button>
+
         {/* Good News */}
         {goodNews.length > 0 && (
           <section className="glass-card rounded-3xl p-5">
@@ -631,6 +641,14 @@ export default function DailyPage() {
           </div>
         </section>
       </div>
+
+      {vibeModalOpen && (
+        <VibeCardModal
+          content={content}
+          dateStr={dateStr}
+          onClose={() => setVibeModalOpen(false)}
+        />
+      )}
     </main>
   );
 }
