@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import BodyGraph from '@/app/components/BodyGraph';
 import NatalWheel from '@/app/components/NatalWheel';
 import { createClient } from '@/app/lib/supabase/client';
@@ -740,6 +740,7 @@ const KARANA_DESC = {
 const DIGNITY_STYLE = {
   exalted:     {label:'Exalted',     color:'text-amber-600', bg:'bg-amber-50',   border:'border-amber-200/60'},
   own:         {label:'Own Sign',    color:'text-green-600', bg:'bg-green-50',   border:'border-green-200/60'},
+  own_sign:    {label:'Own Sign',    color:'text-green-600', bg:'bg-green-50',   border:'border-green-200/60'},
   moolatrikona:{label:'Moolatrikona',color:'text-emerald-600',bg:'bg-emerald-50',border:'border-emerald-200/60'},
   friendly:    {label:'Friend',      color:'text-sky-600',   bg:'bg-sky-50',     border:'border-sky-200/60'},
   neutral:     {label:'Neutral',     color:'text-gray-500',  bg:'bg-gray-50',    border:'border-gray-200/60'},
@@ -793,6 +794,113 @@ const PURPOSE_STYLE = {
   Dusthana:'bg-gray-50 text-gray-500 border-gray-200/50',
 };
 
+// ─── Vedic personalized descriptions ─────────────────────────────────────────
+const VEDIC_SUN_IN_SIGN = {
+  Aries:       'Your Surya in Aries — the sign of its exaltation — blazes with exceptional strength and self-directed force. The pioneering fire of Aries amplifies the Sun\'s natural authority, producing a solar nature that is courageous, independent, and powerfully self-willed. You are built to initiate, to lead, and to act on the truth of your own vision without needing permission.',
+  Taurus:      'Your Surya in Taurus grounds the solar light in Venus\'s earthy, sensory world. Your sense of self is rooted in beauty, stability, and what you create and accumulate with patience. Identity emerges through craftsmanship and the pleasure of the physical world — a steady, productive solar nature that builds something real and lasting.',
+  Gemini:      'Your Surya in Gemini gives your solar nature a mercurial, quick, and intellectually alive quality. Identity is built through ideas, communication, and the exchange of perspectives. You may express yourself across multiple fields, finding your essential purpose through the versatility of your mind and the breadth of your genuine curiosity.',
+  Cancer:      'Your Surya in Cancer turns the solar light inward, toward the emotional and the relational. The ego here is gentler and more permeable — identity is shaped by the quality of your bonds, your home life, and your capacity to nurture and protect. This placement often produces exceptional emotional intelligence and leadership through care rather than command.',
+  Leo:         'Your Surya in Leo — its own sign — shines with natural confidence and creative authority. The solar energy finds its most authentic home here. You are meant to be seen, to create, and to lead with warmth and generosity. There is a natural dignity and magnetic radiance in this placement that draws others into your orbit.',
+  Virgo:       'Your Surya in Virgo channels solar energy into service, refinement, and the discriminating intelligence of Mercury. Your sense of purpose is tied to doing things precisely and well — being genuinely useful, improving what you touch, and applying discernment to whatever you take on. This solar nature serves rather than commands, and finds deep fulfillment in that.',
+  Libra:       'Your Surya in Libra — the sign of its debilitation — softens the solar fire through the relational, harmonizing lens of Venus. The self finds identity through partnership, fairness, and the aesthetic sense of what is beautiful and balanced. You are built for cooperation — your solar purpose is realized most fully through and alongside others.',
+  Scorpio:     'Your Surya in Scorpio gives your solar nature a penetrating, intense, and transformative quality. Identity is built through depth of experience, emotional honesty, and a willingness to encounter what is hidden. Your sense of self grows through genuine encounter with life\'s most essential and difficult themes — you are not interested in the surface of things.',
+  Sagittarius: 'Your Surya in Sagittarius gives you a solar nature that is expansive, philosophical, and hunger for meaning. Identity is built through wisdom, adventure, and the pursuit of truth across many domains. There is a natural optimism and ethical seriousness here — life is most fully lived when oriented toward something larger than personal gain.',
+  Capricorn:   'Your Surya in Capricorn gives your solar nature a disciplined, ambitious, and profoundly long-range quality. Identity emerges through achievement, mastery, and the patient building of something real and enduring. The Sun here is not concerned with immediate recognition — it is building toward authority that cannot be taken away.',
+  Aquarius:    'Your Surya in Aquarius turns the solar light toward the collective, the original, and the future. Identity is shaped by your relationship to community and innovation — the vision of what could be. There is a productive tension between individual solar purpose and the pull toward the group; this is your creative field, where your nature finds its most meaningful expression.',
+  Pisces:      'Your Surya in Pisces gives the solar nature a fluid, compassionate, and spiritually permeable quality. Identity is shaped by imagination, intuition, and the dissolving of hard edges between self and world. The self here is not fixed — it is responsive, empathic, and capable of extraordinary compassion. Purpose often emerges through the arts, spiritual life, or service that transcends ordinary selfhood.',
+};
+
+const VEDIC_MOON_IN_SIGN = {
+  Aries:       'Your Chandra in Aries gives your mind and emotional life a quick, impulsive, and intensely responsive quality. Feelings move fast — you react in the moment and recover quickly. The emotional world is active, passionate, and self-directed. You process feelings through action rather than reflection, and you recover your equilibrium most quickly through movement and decisiveness.',
+  Taurus:      'Your Chandra in Taurus — the sign of its exaltation — is exceptionally strong and peaceful. The mind is grounded, patient, and deeply sensory. Emotional security comes through stability, beauty, and the nourishing pleasures of the physical world. This is the Moon at its most content and resilient — capable of giving and receiving care with remarkable and consistent ease.',
+  Gemini:      'Your Chandra in Gemini creates a mind that is quick, curious, and emotionally engaged through ideas and communication. Your emotional world is broad rather than deep — you process feelings by talking, thinking, and making connections. This placement produces emotional versatility and genuine social ease, with a natural tendency to intellectualize what you feel.',
+  Cancer:      'Your Chandra in Cancer — its own sign — is exceptionally strong, empathic, and deeply nourishing. The mind is feeling-rich, receptive, and powerfully oriented toward home, family, and belonging. You have a natural and abundant gift for nurturing and being nurtured. The emotional world is deep and long-memoried — bonds formed here last lifetimes.',
+  Leo:         'Your Chandra in Leo gives your emotional life a warm, generous, and expressive quality. You feel most yourself when creating, playing, or receiving genuine recognition and appreciation. The mind needs room to shine — emotional wellbeing comes through creative expression and the warmth of being truly seen by those you love.',
+  Virgo:       'Your Chandra in Virgo brings a precise, discerning, and service-oriented quality to your emotional world. The mind is analytical, attentive to detail, and finds peace through order and useful work. Emotional security comes through having clear systems, feeling genuinely competent, and being of real service — the mind is happiest when it has a problem worth solving well.',
+  Libra:       'Your Chandra in Libra creates a mind that is harmonious, relational, and oriented toward beauty and balance. Emotional peace depends significantly on the quality of your relationships — you feel most yourself in partnership and most unsettled by conflict or ugliness. There is a natural refinement and diplomatic grace in how your feelings move through you.',
+  Scorpio:     'Your Chandra in Scorpio — the sign of its debilitation — creates an intensely feeling, penetrating, and psychologically deep inner world. Emotions run very deep and are not easily or quickly shared. The mind encounters the full spectrum of human experience — including its darkest and most transformative dimensions — with unusual directness and unflinching clarity.',
+  Sagittarius: 'Your Chandra in Sagittarius gives your emotional life an optimistic, expansive, and philosophically inclined quality. The mind naturally reaches for meaning — you feel most emotionally alive when learning, traveling, or engaging with ideas that matter. Emotional wellbeing comes through freedom, adventure, and the sense that life is genuinely moving toward something worth understanding.',
+  Capricorn:   'Your Chandra in Capricorn brings a measured, self-contained, and deeply serious quality to the emotional world. Feelings are real but rarely displayed freely — the mind is more at ease with structure and responsibility than with open emotional vulnerability. Security comes through competence, a degree of control, and the quiet satisfaction of doing genuinely difficult things well.',
+  Aquarius:    'Your Chandra in Aquarius creates a mind that is cool, original, and emotionally oriented toward the collective rather than the purely personal. You care deeply — but often at a certain distance, for humanity as much as for individuals. The mind is independent and inventive, most comfortable when it has the freedom to think and connect entirely on its own terms.',
+  Pisces:      'Your Chandra in Pisces gives your emotional world a deeply compassionate, intuitive, and spiritually permeable quality. The boundaries between self and other are genuinely thin — you absorb the emotional atmosphere around you with extraordinary sensitivity. Emotional peace comes through creative solitude, spiritual practice, and the patient honoring of your own immense and complex feeling world.',
+};
+
+const VEDIC_PLANET_SIGN_TEMPLATE = {
+  Mars:    (sign, q) => `Your Mangala (Mars) in ${sign} gives your drive and life force a ${q.themes} quality. Your energy moves most powerfully through the domain of ${q.domain} — this is how you act, pursue, and assert yourself in the world. Mars in this sign gives your ambition and courage the signature of ${sign}: what you fight for and how you fight for it carries this distinct quality.`,
+  Mercury: (sign, q) => `Your Budha (Mercury) in ${sign} gives your mind a ${q.themes} quality. Your intellect is most alive when engaging with the domain of ${q.domain}. In Jyotish, Mercury governs commerce, communication, and discrimination — in ${sign}, these faculties are flavored by ${sign}'s qualities, shaping both how your mind works and how your words naturally land.`,
+  Jupiter: (sign, q) => `Your Guru (Jupiter) in ${sign} expands you through the domain of ${q.domain}. The abundance and wisdom that Jupiter offers flows most readily when you are engaged with what ${sign} values: being ${q.themes}. This is where your natural grace and growth live — a placement that, when consciously engaged, opens genuine doors.`,
+  Venus:   (sign, q) => `Your Shukra (Venus) in ${sign} brings a ${q.themes} quality to love, beauty, and desire. In the domain of ${q.domain}, your heart opens most fully. In Jyotish, Venus governs marriage, luxury, and artistic sense — in ${sign}, these are expressed through the lens of ${q.themes}, shaping the texture of your relationships and what you find most genuinely beautiful.`,
+  Saturn:  (sign, q) => `Your Shani (Saturn) in ${sign} places your most important karmic lessons and your greatest eventual mastery in the domain of ${q.domain}. Saturn asks you to go slowly, carefully, and to build something real through the ${q.themes} qualities of ${sign}. This is the domain of your long, patient work — where sustained effort yields the most enduring and unshakeable strength.`,
+  Rahu:    (sign, q) => `Your Rahu in ${sign} places the soul's deepest hunger and evolutionary pull in the domain of ${q.domain}. Rahu obsesses over what ${sign} values — the ${q.themes} quality becomes both your greatest longing and your most disorienting fascination. This is what you are being pulled toward in this incarnation: not easily, not without confusion, but with an intensity that cannot ultimately be ignored.`,
+  Ketu:    (sign, q) => `Your Ketu in ${sign} marks the domain of ${q.domain} as an area of deep past-life mastery — and present-life ambivalence. The ${q.themes} qualities of ${sign} are deeply familiar to your soul, which is precisely why you may feel both gifted and strangely detached here. Ketu in ${sign} brings natural ability without the usual hunger — and often the invitation to release attachment to this domain as a source of identity.`,
+};
+
+const VEDIC_DIGNITY_CTX = {
+  exalted:      p => `${p} is exalted here — at the absolute peak of its Jyotish strength — able to deliver its highest gifts with remarkable ease and clarity.`,
+  own:          p => `In its own sign, ${p} is especially strong and completely at home — its qualities express cleanly, with natural authority and without distortion.`,
+  own_sign:     p => `In its own sign, ${p} is especially strong and completely at home — its qualities express cleanly, with natural authority and without distortion.`,
+  moolatrikona: p => `In its moolatrikona position, ${p} occupies an elevated and auspicious dignity — stable, powerful, and reliably able to give its full results.`,
+  friendly:     p => `${p} is in a friendly sign, giving it good support and producing reasonably strong, cooperative results throughout the areas it governs.`,
+  neutral:      p => `${p} is in a neutral sign — neither especially aided nor impeded — its results depending primarily on the supporting factors of the broader chart.`,
+  enemy:        p => `${p} is in an enemy sign, which introduces friction and complexity. Results come, but often through navigating additional layers of challenge before they arrive.`,
+  debilitated:  p => `${p} is in the sign of its debilitation — its most challenged Jyotish position. In traditional Jyotish, debilitation is the forge: difficulty becomes the teacher, and what eventually emerges is often a strength that could not have been earned any other way.`,
+};
+
+const VEDIC_HOUSE_PLANET_CTX = {
+  1:  p => `Placed in the first house — the house of self and body — ${p} colors your entire personality and physical vitality. This is one of the most potent placements: it marks the whole chart.`,
+  2:  p => `In the second house, ${p} strongly influences your relationship with wealth, family, and speech — the immediate foundations of material and relational life.`,
+  3:  p => `In the third house, ${p} energizes your personal courage, communication, and the quality of your sustained self-directed effort. Siblings may also be colored by this energy.`,
+  4:  p => `In the fourth house, ${p} shapes your home, your inner life, and your relationship with your mother — the roots from which your sense of security grows.`,
+  5:  p => `In the fifth house — a powerful trikona — ${p} influences your children, creative intelligence, romantic life, and the accumulated merit of your past actions.`,
+  6:  p => `In the sixth house, ${p} engages with health, service, and the overcoming of opposition. This can be a powerful placement for defeating obstacles when the planet is strong.`,
+  7:  p => `In the seventh house, ${p} directly colors your marriage, partnerships, and how you appear to and engage with the world at large.`,
+  8:  p => `In the eighth house, ${p} touches the domain of transformation, hidden knowledge, longevity, and sudden change — deep and intense territory.`,
+  9:  p => `In the ninth house — the most auspicious house — ${p} blesses your dharma, fortune, relationship with teachers and the father, and the philosophical path that gives life meaning.`,
+  10: p => `In the tenth house, ${p} directly shapes your career, public status, and the professional actions for which you become known. This is a highly visible and powerful placement.`,
+  11: p => `In the eleventh house — the house of gain — ${p} influences income, the fulfillment of aspirations, influential friendships, and the realization of your most important goals.`,
+  12: p => `In the twelfth house, ${p} governs your relationship with solitude, spiritual practice, foreign lands, expenses, and the eventual liberation of the soul from material attachment.`,
+};
+
+function vedicPlanetBody(p) {
+  const planet  = p.celestialBody;
+  const sign    = p.sign;
+  const house   = p.houseNumber ?? p.house;
+  const nak     = p.nakshatra;
+  const dig     = p.dignities?.dignity?.toLowerCase();
+  const isNode  = planet === 'Rahu' || planet === 'Ketu';
+  const isRx    = !isNode && p.motion_type === 'retrograde';
+  const nakD    = NAKSHATRA_DATA.find(n => n.name === nak);
+  const signQ   = SIGN_Q[sign];
+  const hCtx    = VEDIC_HOUSE_PLANET_CTX[house];
+  const digNorm = dig === 'own_sign' ? 'own' : dig;
+
+  // ── Sign body
+  let signBody = '';
+  if (planet === 'Sun')  signBody = VEDIC_SUN_IN_SIGN[sign]  ?? VEDIC_PLANET_DESC.Sun.body;
+  else if (planet === 'Moon') signBody = VEDIC_MOON_IN_SIGN[sign] ?? VEDIC_PLANET_DESC.Moon.body;
+  else if (signQ && VEDIC_PLANET_SIGN_TEMPLATE[planet]) {
+    signBody = VEDIC_PLANET_SIGN_TEMPLATE[planet](sign, signQ);
+  } else {
+    signBody = VEDIC_PLANET_DESC[planet]?.body ?? '';
+  }
+
+  // ── House context
+  const houseBody = hCtx ? hCtx(planet) : '';
+
+  // ── Dignity
+  const digBody = digNorm && VEDIC_DIGNITY_CTX[digNorm] ? VEDIC_DIGNITY_CTX[digNorm](planet) : '';
+
+  // ── Retrograde
+  const rxBody = isRx ? `${planet} moves retrograde here — internalizing its energy, slowing its outward delivery, and often producing a more reflective, subtle, and ultimately deeper expression of its themes.` : '';
+
+  // ── Nakshatra
+  const nakBody = nak && nakD
+    ? `Moving through ${nakD.symbol} ${nak} (pada ${p.pada ?? '—'}), ruled by ${nakD.lord} — ${NAKSHATRA_DESC[nak]?.split('.')[0] ?? ''}. This nakshatra colors the specific texture and expression of ${planet}'s placement.`
+    : '';
+
+  return [signBody, houseBody, digBody || rxBody, nakBody].filter(Boolean).join('\n\n');
+}
+
 // ─── Main page ────────────────────────────────────────────────────────────────
 export default function CosmicPage() {
   const [birthData,    setBirthData]    = useState(null);
@@ -813,6 +921,7 @@ export default function CosmicPage() {
   const [vedicData,    setVedicData]    = useState(null);
   const [vedicLoading, setVedicLoading] = useState(false);
   const [vedicTab,     setVedicTab]     = useState('rasi');
+  const vedicFetchedRef = useRef(false);
 
   useEffect(() => {
     async function load() {
@@ -853,8 +962,10 @@ export default function CosmicPage() {
   }, [today]);
 
   useEffect(() => {
-    if (vedicMode !== 'vedic' || vedicData || vedicLoading) return;
+    if (vedicMode !== 'vedic') return;
+    if (vedicFetchedRef.current) return;
     if (!birthData?.date || !birthData?.time || birthData?.birthLat == null) return;
+    vedicFetchedRef.current = true;
     setVedicLoading(true);
     fetch('/api/vedic', {
       method: 'POST',
@@ -872,7 +983,7 @@ export default function CosmicPage() {
       .then(r => r.ok ? r.json() : null)
       .catch(() => null)
       .then(data => { setVedicData(data); setVedicLoading(false); });
-  }, [vedicMode, vedicData, vedicLoading, birthData, displayName]);
+  }, [vedicMode, birthData, displayName]);
 
   const natalLons = {};
   if (hdData?.personality) for (const [b,{gate,line}] of Object.entries(hdData.personality)) natalLons[b] = gateLineToLon(gate,line);
@@ -1727,6 +1838,33 @@ export default function CosmicPage() {
                 </div>
               )}
 
+              {hdData.definedChannels?.length > 0 && (
+                <div className="glass-card rounded-3xl p-6 space-y-3">
+                  <h2 className="font-playfair text-xl text-gray-700">Your Channels as a Whole</h2>
+                  <p className="text-xs text-gray-400">
+                    Your defined channels are the consistent energies you carry — they don&apos;t come and go. Seen together, they form the architecture of your gifts.
+                  </p>
+                  <div className="space-y-2">
+                    {hdData.definedChannels.map(([g1, g2]) => {
+                      const key  = `${g1}-${g2}`;
+                      const name = CHANNEL_NAMES[key] ?? CHANNEL_NAMES[`${g2}-${g1}`] ?? `Channel ${g1}–${g2}`;
+                      const [nameShort, nameLong] = name.split(' — ');
+                      return (
+                        <button key={key} onClick={() => openChannel([g1, g2])}
+                          className="w-full flex items-start gap-3 p-3 rounded-2xl border bg-white/30 border-white/30 hover:bg-white/50 text-left transition-colors">
+                          <div className="mt-1 w-2 h-2 rounded-full shrink-0 bg-[#b88a92] opacity-60" />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs font-semibold text-gray-500">{g1} — {g2} · {nameShort}</p>
+                            {nameLong && <p className="text-sm text-gray-600 mt-0.5">{nameLong}</p>}
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <p className="text-xs text-gray-400 pt-1">Tap any channel to read its full description.</p>
+                </div>
+              )}
+
               <div className="glass-card rounded-3xl p-6 space-y-4">
                 <div>
                   <h2 className="font-playfair text-xl text-gray-700">Gate Activations</h2>
@@ -1993,33 +2131,146 @@ export default function CosmicPage() {
                   </div>
                 </div>
 
-                {/* ── Defined Channels in context ── */}
-                {hdData.definedChannels?.length > 0 && (
-                  <div className="glass-card rounded-3xl p-6 space-y-3">
-                    <h2 className="font-playfair text-xl text-gray-700">Your Channels as a Whole</h2>
-                    <p className="text-xs text-gray-400">
-                      Your defined channels are the consistent energies you carry — they don&apos;t come and go. Seen together, they form the architecture of your gifts.
-                    </p>
-                    <div className="space-y-2">
-                      {hdData.definedChannels.map(([g1, g2]) => {
-                        const key  = `${g1}-${g2}`;
-                        const name = CHANNEL_NAMES[key] ?? CHANNEL_NAMES[`${g2}-${g1}`] ?? `Channel ${g1}–${g2}`;
-                        const [nameShort, nameLong] = name.split(' — ');
-                        return (
-                          <button key={key} onClick={() => openChannel([g1, g2])}
-                            className="w-full flex items-start gap-3 p-3 rounded-2xl border bg-white/30 border-white/30 hover:bg-white/50 text-left transition-colors">
-                            <div className="mt-1 w-2 h-2 rounded-full shrink-0 bg-[#b88a92] opacity-60" />
-                            <div className="flex-1 min-w-0">
-                              <p className="text-xs font-semibold text-gray-500">{g1} — {g2} · {nameShort}</p>
-                              {nameLong && <p className="text-sm text-gray-600 mt-0.5">{nameLong}</p>}
-                            </div>
-                          </button>
-                        );
-                      })}
-                    </div>
-                    <p className="text-xs text-gray-400 pt-1">Tap any channel to read its full description.</p>
-                  </div>
-                )}
+                {/* ── You in Relationships ── */}
+                <div className="glass-card rounded-3xl p-6 space-y-4">
+                  <h2 className="font-playfair text-xl text-gray-700">You in Relationships</h2>
+                  <p className="text-xs text-gray-400">How your astrology, HD, and numerology shape your love life.</p>
+                  <p className="text-sm text-gray-600 leading-relaxed">
+                    {(() => {
+                      const venusSign = natalLons.venus != null ? lonToSign(natalLons.venus) : null;
+                      const marsSign  = natalLons.mars  != null ? lonToSign(natalLons.mars)  : null;
+                      const venusLine = venusSign ? `Venus in ${venusSign.name} shapes how you love — ${SIGN_Q[venusSign.name]?.themes ?? 'deeply'} in your affections, drawn to ${SIGN_Q[venusSign.name]?.domain ?? 'connection'}.` : '';
+                      const marsLine  = marsSign  ? `Mars in ${marsSign.name} drives your desire — you pursue what you want with a ${SIGN_Q[marsSign.name]?.themes ?? 'direct'} force.` : '';
+                      const modNote = sunSign.modality === 'cardinal' ? `${sunSign.name} is cardinal — you initiate in love, often being the one to make the first move or redefine the dynamic.`
+                        : sunSign.modality === 'fixed' ? `${sunSign.name} is fixed — once you commit, you commit deeply, and loyalty is non-negotiable.`
+                        : `${sunSign.name} is mutable — you adapt to your partner and thrive when love has room to evolve.`;
+                      const moonLine = moonSign ? `Your ${moonSign.name} moon needs ${SIGN_Q[moonSign.name]?.domain ?? 'emotional depth'} to feel safe in partnership.` : '';
+                      const authLine = hdData.authority === 'emotional' ? 'With Emotional Authority, never commit at the peak or the trough — clarity lives in the middle of the wave.'
+                        : hdData.authority === 'sacral' ? 'Your Sacral Authority is your compass — a lit-up gut response means yes; a flat one means no, regardless of logic.'
+                        : hdData.authority === 'splenic' ? 'Splenic Authority gives you one quiet hit about who is safe for you — trust it the first time.'
+                        : `Your ${hdData.authority} authority reveals your truth about a relationship through conversation — listen to what you hear yourself say.`;
+                      const spDefined = hdData.centers?.SolarPlexus;
+                      const emoteLine = spDefined ? 'Your defined Solar Plexus means you ride your own emotional wave in relationships — your partner feels your moods, not the other way around.' : 'Your open Solar Plexus absorbs your partner\'s emotions — learning what\'s yours vs. theirs is essential.';
+                      const profileRelate = hdData.profileLine1 === 1 ? 'The 1-line in you wants to research the relationship before fully committing.'
+                        : hdData.profileLine1 === 2 ? 'Your 2-line needs alone time — the right partner respects your withdrawals without taking them personally.'
+                        : hdData.profileLine1 === 3 ? 'Your 3-line learns love through trial and experience — each bond teaches you something irreplaceable.'
+                        : hdData.profileLine1 === 4 ? 'Your 4-line finds love through existing connections — your network holds the key.'
+                        : hdData.profileLine1 === 5 ? 'Others project ideals onto your 5-line — the right partner sees you, not a savior.'
+                        : 'Your 6-line deepens in love with time — relationships get richer after you stop experimenting and start modeling.';
+                      const lpRelate = lifePath === 2 ? 'Life Path 2 is the natural partner — relationships are your classroom and your calling.'
+                        : lifePath === 4 ? 'Life Path 4 builds lasting foundations in love — you need reliability and shared commitment.'
+                        : lifePath === 6 ? 'Life Path 6 is the nurturer — you give deeply and must learn to receive equally.'
+                        : '';
+                      return [venusLine, marsLine, modNote, moonLine, authLine, emoteLine, profileRelate, lpRelate].filter(Boolean).join(' ');
+                    })()}
+                  </p>
+                </div>
+
+                {/* ── You at Work ── */}
+                <div className="glass-card rounded-3xl p-6 space-y-4">
+                  <h2 className="font-playfair text-xl text-gray-700">You at Work</h2>
+                  <p className="text-xs text-gray-400">Your professional design across all three systems.</p>
+                  <p className="text-sm text-gray-600 leading-relaxed">
+                    {(() => {
+                      const mcSign   = hdData.houses?.mc != null ? lonToSign(hdData.houses.mc) : null;
+                      const mercSign = natalLons.mercury != null ? lonToSign(natalLons.mercury) : null;
+                      const satSign  = natalLons.saturn  != null ? lonToSign(natalLons.saturn)  : null;
+                      const workStyle = hdData.type === 'generator' ? 'As a Generator, your work thrives through response — the sacral lights up for what\'s correct and goes flat for what isn\'t.'
+                        : hdData.type === 'manifesting-generator' ? 'As a Manifesting Generator, you multitask and move fast — follow what excites you, skip steps that bore you, and trust the non-linear path.'
+                        : hdData.type === 'projector' ? 'As a Projector, your genius is guiding others\' energy — wait for recognition and invitation into the roles where your insight is truly valued.'
+                        : hdData.type === 'manifestor' ? 'As a Manifestor, you initiate — your career flourishes when you have freedom to start things and inform those around you as you move.'
+                        : 'As a Reflector, you mirror your work environment — in the right place with the right people, your assessment ability is unmatched.';
+                      const sacralDef = hdData.centers?.Sacral;
+                      const throatDef = hdData.centers?.Throat;
+                      const centerLine = (sacralDef ? 'Your defined Sacral gives you consistent workforce energy — you can sustain effort when the work is correct.' : 'Your open Sacral means you amplify others\' energy; honor your own limits and don\'t overwork to keep up.')
+                        + ' ' + (throatDef ? 'A defined Throat gives you a reliable voice — you can manifest and communicate consistently.' : 'Your open Throat finds its voice through timing; speak when recognized, not from pressure.');
+                      const mcLine = mcSign ? `Your Midheaven in ${mcSign.name} points your public career toward ${SIGN_Q[mcSign.name]?.domain ?? 'contribution'} — this is the reputation you build over time.` : '';
+                      const mercLine = mercSign ? `Mercury in ${mercSign.name} makes your professional communication ${SIGN_Q[mercSign.name]?.themes ?? 'sharp'}.` : '';
+                      const satLine = satSign ? `Saturn in ${satSign.name} is where you build lasting mastery — the domain of ${SIGN_Q[satSign.name]?.domain ?? 'discipline'} asks for patient, sustained effort that pays off over decades.` : '';
+                      const careerTheme = lifePath === 1 ? 'Life Path 1 drives you toward pioneering roles where you forge your own path.'
+                        : lifePath === 2 ? 'Life Path 2 excels behind the scenes — partnership, mediation, and bringing people together.'
+                        : lifePath === 3 ? 'Life Path 3 thrives where creative expression and your voice take center stage.'
+                        : lifePath === 4 ? 'Life Path 4 builds systems and structures others depend on.'
+                        : lifePath === 5 ? 'Life Path 5 needs variety — rigid roles drain you, dynamic careers keep you alive.'
+                        : lifePath === 6 ? 'Life Path 6 fulfills through service — healing, teaching, and nurturing roles.'
+                        : lifePath === 7 ? 'Life Path 7 pulls toward depth — research, analysis, and spiritual inquiry.'
+                        : lifePath === 8 ? 'Life Path 8 is built for executive leadership, financial mastery, and large-scale impact.'
+                        : lifePath === 9 ? 'Life Path 9 finds fulfillment through work that serves the collective.'
+                        : `Life Path ${lifePath} carries a master frequency — work that channels higher purpose into tangible impact.`;
+                      const expressVoice = expressNum ? `Expression ${expressNum} (${EXPRESSION_NUM[expressNum]?.title ?? ''}) is the voice through which all of this reaches colleagues and clients.` : '';
+                      return [workStyle, centerLine, mcLine, mercLine, satLine, careerTheme, expressVoice].filter(Boolean).join(' ');
+                    })()}
+                  </p>
+                </div>
+
+                {/* ── First Impression ── */}
+                <div className="glass-card rounded-3xl p-6 space-y-4">
+                  <h2 className="font-playfair text-xl text-gray-700">First Impression</h2>
+                  <p className="text-xs text-gray-400">What others sense before you say a word.</p>
+                  <p className="text-sm text-gray-600 leading-relaxed">
+                    {(() => {
+                      const ascSign = hdData.houses?.asc != null ? lonToSign(hdData.houses.asc) : null;
+                      const ascLine = ascSign ? `Your rising sign is ${ascSign.name} — before anyone knows your sun sign, they meet your ${ascSign.name} mask: ${SIGN_Q[ascSign.name]?.themes ?? 'distinctive'} energy in the domain of ${SIGN_Q[ascSign.name]?.domain ?? 'self-presentation'}.` : '';
+                      const auraDesc = hdData.type === 'generator' || hdData.type === 'manifesting-generator'
+                        ? `Your ${cap(hdData.type.replace(/-/g, ' '))} aura is open and enveloping — people feel drawn in by your life force before understanding why.`
+                        : hdData.type === 'projector'
+                        ? 'Your Projector aura is focused and penetrating — others feel deeply seen by you, sometimes before you\'ve spoken.'
+                        : hdData.type === 'manifestor'
+                        ? 'Your Manifestor aura pushes outward — others feel your impact before they understand its source.'
+                        : 'Your Reflector aura samples and mirrors — people sense something shifting and unusual about you.';
+                      const sunGate = hdData.personality?.sun?.gate;
+                      const gateLine = sunGate ? `You consciously radiate Gate ${sunGate} — ${GATE_DESC[sunGate]?.[0] ?? ''} — the energy others most consistently feel coming from you.` : '';
+                      const modLine = sunSign.modality === 'cardinal' ? `${sunSign.name}\'s cardinal quality gives your presence an initiating, take-charge feel.`
+                        : sunSign.modality === 'fixed' ? `${sunSign.name}\'s fixed quality gives your presence a solid, unmovable steadiness.`
+                        : `${sunSign.name}\'s mutable quality gives your presence an adaptive, fluid openness.`;
+                      const p1perception = hdData.profileLine1 === 1 ? 'Your 1-line reads as grounded authority — people sense your depth of preparation.'
+                        : hdData.profileLine1 === 2 ? 'Your 2-line reads as natural talent — others see gifts in you that you may not fully recognize.'
+                        : hdData.profileLine1 === 3 ? 'Your 3-line reads as resilience — people sense someone who has been through things and emerged stronger.'
+                        : hdData.profileLine1 === 4 ? 'Your 4-line reads as warm and connected — people feel instantly welcomed into your world.'
+                        : hdData.profileLine1 === 5 ? 'Your 5-line reads as magnetic and heroic — others project solutions onto you before you speak.'
+                        : 'Your 6-line reads as earned wisdom — people sense someone who has seen it all and carries that experience with grace.';
+                      const expressLine = expressNum ? `Expression ${expressNum} (${EXPRESSION_NUM[expressNum]?.title ?? ''}) adds a specific tone to how your personality lands with others.` : '';
+                      return [ascLine, auraDesc, gateLine, modLine, p1perception, expressLine].filter(Boolean).join(' ');
+                    })()}
+                  </p>
+                </div>
+
+                {/* ── Core Desires & Needs ── */}
+                <div className="glass-card rounded-3xl p-6 space-y-4">
+                  <h2 className="font-playfair text-xl text-gray-700">Core Desires &amp; Needs</h2>
+                  <p className="text-xs text-gray-400">What your soul craves at the deepest level.</p>
+                  <p className="text-sm text-gray-600 leading-relaxed">
+                    {(() => {
+                      const nnSign = natalLons.northNode != null ? lonToSign(natalLons.northNode) : null;
+                      const venusSign = natalLons.venus != null ? lonToSign(natalLons.venus) : null;
+                      const nnLine = nnSign ? `Your North Node in ${nnSign.name} pulls your soul toward ${SIGN_Q[nnSign.name]?.domain ?? 'growth'} — this is unfamiliar territory, but growing into it brings the deepest fulfillment.` : '';
+                      const venusLine = venusSign ? `Venus in ${venusSign.name} reveals what you truly value — ${SIGN_Q[venusSign.name]?.domain ?? 'beauty and love'}.` : '';
+                      const lpDesire = lifePath === 1 ? 'Life Path 1 desires sovereignty — the freedom to pioneer and stand in your own power.'
+                        : lifePath === 2 ? 'Life Path 2 desires true partnership — to be seen, received, and met halfway.'
+                        : lifePath === 3 ? 'Life Path 3 desires creative expression — to share what lives inside you without fear.'
+                        : lifePath === 4 ? 'Life Path 4 desires stability — to build something lasting and know it will hold.'
+                        : lifePath === 5 ? 'Life Path 5 desires freedom — to experience everything and be contained by nothing.'
+                        : lifePath === 6 ? 'Life Path 6 desires harmony — to love deeply and create beauty wherever you go.'
+                        : lifePath === 7 ? 'Life Path 7 desires understanding — to touch the mystery beneath the surface.'
+                        : lifePath === 8 ? 'Life Path 8 desires mastery — to wield influence with integrity and create abundance.'
+                        : lifePath === 9 ? 'Life Path 9 desires completion — to give back everything you\'ve learned and love without conditions.'
+                        : `Life Path ${lifePath} desires transcendence — to channel a spiritual mission that serves beyond yourself.`;
+                      const moonLine = moonSign ? `Your ${moonSign.name} moon craves ${SIGN_Q[moonSign.name]?.domain ?? 'emotional depth'} — this is what your inner world needs to feel safe and nourished.` : '';
+                      const sigLine = hdData.signature ? `Your HD signature is ${hdData.signature} — when you feel it, you\'re living correctly.` : '';
+                      const notSelfLine = hdData.notSelf ? `When ${hdData.notSelf.toLowerCase()} shows up, it\'s a signal to return to your strategy, not push harder.` : '';
+                      const typeNeed = hdData.type === 'generator' || hdData.type === 'manifesting-generator'
+                        ? `As a ${cap(hdData.type.replace(/-/g, ' '))}, your core energetic need is satisfaction — the feeling of having spent your energy on what truly lights you up.`
+                        : hdData.type === 'projector'
+                        ? 'As a Projector, your core need is recognition — being truly seen and invited into what\'s correct for you.'
+                        : hdData.type === 'manifestor'
+                        ? 'As a Manifestor, your core need is peace — the inner stillness that comes when you can initiate without resistance.'
+                        : 'As a Reflector, your core need is surprise and delight — the magic that reflects back when you\'re in the right environment.';
+                      const openCenters = hdData.centers ? Object.entries(hdData.centers).filter(([,v]) => !v).map(([k]) => CENTER_META[k]?.label ?? k) : [];
+                      const openLine = openCenters.length ? `Your open centers (${openCenters.join(', ')}) are where you take in and amplify others\' energy — wisdom lives there, but so does conditioning.` : '';
+                      return [lpDesire, nnLine, venusLine, moonLine, typeNeed, sigLine, notSelfLine, openLine].filter(Boolean).join(' ');
+                    })()}
+                  </p>
+                </div>
               </>
             );
           })() : (
@@ -2419,33 +2670,62 @@ export default function CosmicPage() {
         const lagnaSign   = lagna?.sign;
         const lagnaLord   = lagnaSign ? SIGN_LORDS[lagnaSign] : null;
         const lagnaHouseDesc = VEDIC_HOUSE_DESC[1];
+        const lagnaNak    = lagna?.nakshatra;
+        const lagnaPada   = lagna?.pada;
+        const lagnaNakD   = NAKSHATRA_DATA.find(n => n.name === lagnaNak);
 
-        function openNakshatra(name) {
+        function openNakshatra(name, context) {
           const d  = NAKSHATRA_DESC[name];
           const nd = NAKSHATRA_DATA.find(n => n.name === name);
           if (!d) return;
-          setDetail({ title:`${nd?.symbol ?? '✦'} ${name}`, subtitle:`Ruled by ${nd?.lord ?? '—'}`, body: d });
+          let body = d;
+          if (context === 'janma') {
+            const moonP = planets.find(pl => pl.celestialBody === 'Moon');
+            const moonSign = moonP?.sign ?? '';
+            const moonHouse = moonP?.houseNumber ?? moonP?.house;
+            const hDesc = moonHouse ? VEDIC_HOUSE_DESC[moonHouse] : null;
+            const intro = `Your Moon is in ${name} — this is your Janma Nakshatra, the most personally significant placement in your entire Vedic chart.\n\nIn Jyotish, the nakshatra your Moon occupies at birth is the foundation of your inner world: your emotional nature, your instinctive responses, your subconscious, and the quality of your felt experience of life from the inside. Where your Sun describes your soul's purpose, your Janma Nakshatra describes the texture of the soul itself.\n\nYour Moon is in ${moonSign}${moonHouse ? ` in the ${moonHouse}${[1,21].includes(moonHouse)?'st':[2,22].includes(moonHouse)?'nd':[3].includes(moonHouse)?'rd':'th'} house` : ''}${hDesc ? ` — the house of ${hDesc.themes.split(',')[0].toLowerCase()}` : ''}, moving through ${nd?.symbol ?? ''} ${name} (ruled by ${nd?.lord ?? '—'}).\n\nThis nakshatra also determines the starting point of your Vimshottari Dasha sequence — the unfoldment of your karma across time begins from the Moon's position in ${name} at birth.\n\n`;
+            body = intro + d;
+          }
+          setDetail({ title:`${nd?.symbol ?? '✦'} ${name}`, subtitle: context === 'janma' ? `Your Janma Nakshatra · Ruled by ${nd?.lord ?? '—'}` : `Ruled by ${nd?.lord ?? '—'}`, body });
         }
         function openVedicPlanet(p) {
-          const desc = VEDIC_PLANET_DESC[p.celestialBody];
+          const desc   = VEDIC_PLANET_DESC[p.celestialBody];
           if (!desc) return;
-          const dig = p.dignities?.dignity;
-          const digSt = dig ? DIGNITY_STYLE[dig.toLowerCase()] : null;
+          const isNode = p.celestialBody === 'Rahu' || p.celestialBody === 'Ketu';
+          const dig    = p.dignities?.dignity;
+          const digKey = dig ? (dig.toLowerCase() === 'own_sign' ? 'own' : dig.toLowerCase()) : null;
+          const digSt  = digKey ? DIGNITY_STYLE[digKey] : null;
+          const house  = p.houseNumber ?? p.house;
+          const hDesc  = VEDIC_HOUSE_DESC[house];
           setDetail({
-            title: `${VEDIC_PLANET_SYM[p.celestialBody] ?? ''} ${desc.title}`,
-            subtitle: `${p.sign} · House ${p.houseNumber ?? p.house} · ${p.nakshatra ?? ''} pada ${p.pada ?? ''}${p.motion_type === 'retrograde' ? ' · Retrograde' : ''}`,
-            tags: [p.sign, digSt?.label ?? '', p.motion_type === 'retrograde' ? 'Rx' : ''].filter(Boolean),
-            body: desc.body,
+            title:    `${VEDIC_PLANET_SYM[p.celestialBody] ?? ''} ${desc.title}`,
+            subtitle: `${p.sign} · House ${house}${hDesc ? ' · ' + hDesc.themes.split(',')[0] : ''} · ${p.nakshatra ?? ''} P${p.pada ?? ''}${(p.motion_type === 'retrograde' && !isNode) ? ' · Rx' : ''}`,
+            tags:     [p.sign, digSt?.label ?? '', (p.motion_type === 'retrograde' && !isNode) ? 'Retrograde' : ''].filter(Boolean),
+            body:     vedicPlanetBody(p),
           });
         }
         function openVedicHouse(h) {
           const desc = VEDIC_HOUSE_DESC[h.number];
           if (!desc) return;
+          const signQ   = SIGN_Q[h.sign];
+          const lord    = h.lord ?? SIGN_LORDS[h.sign];
+          const lordH   = h.lordPlacedHouse;
+          const occs    = (h.occupants ?? []).map(o => o.celestialBody);
+          const occLine = occs.length
+            ? `${occs.join(' and ')} ${occs.length === 1 ? 'occupies' : 'occupy'} this house, bringing ${occs.length === 1 ? 'its' : 'their'} energy directly into the domain of ${desc.themes.split(',')[0].toLowerCase()}.`
+            : `No planets occupy this house — its matters are governed entirely through its lord, ${lord}.`;
+          const signLine = signQ
+            ? `With ${h.sign} on the cusp, you experience this house through a ${signQ.themes} lens — the domain of ${signQ.domain} colors how these themes unfold for you.`
+            : '';
+          const lordLine = lordH
+            ? `The house lord ${lord} is placed in the ${lordH}${lordH===1?'st':lordH===2?'nd':lordH===3?'rd':'th'} house, directing ${desc.themes.split(',')[0].toLowerCase()} energy toward those themes.`
+            : '';
           setDetail({
-            title: desc.name,
-            subtitle: `${h.sign} · Ruled by ${h.lord ?? SIGN_LORDS[h.sign]}`,
-            tags: (h.purposes ?? []),
-            body: desc.body,
+            title:    desc.name,
+            subtitle: `${h.sign} · Ruled by ${lord}`,
+            tags:     (h.purposes ?? []),
+            body:     [signLine, desc.body, lordLine, occLine].filter(Boolean).join('\n\n'),
           });
         }
 
@@ -2458,10 +2738,11 @@ export default function CosmicPage() {
                 <button onClick={() => lagna && openVedicHouse(lagna)} className="text-left hover:opacity-80 transition-opacity">
                   <p className="text-xs text-gray-400 uppercase tracking-widest">Lagna · Ascendant</p>
                   <p className="font-playfair text-2xl text-gray-700 mt-0.5">{lagnaSign ?? '—'}</p>
-                  <p className="text-xs text-gray-400 mt-1">Ruled by {lagnaLord} · tap to learn more</p>
+                  <p className="text-xs text-gray-400 mt-1">Ruled by {lagnaLord}{lagnaNak ? ` · ${lagnaNakD?.symbol ?? ''} ${lagnaNak} P${lagnaPada}` : ''}</p>
+                  <p className="text-xs text-[#b88a92] mt-0.5">tap to learn more ›</p>
                 </button>
                 {moonNak && (
-                  <button onClick={() => openNakshatra(moonNak)}
+                  <button onClick={() => openNakshatra(moonNak, 'janma')}
                     className="text-right bg-white/50 border border-white/40 rounded-2xl px-4 py-3 hover:bg-white/70 transition-colors">
                     <p className="text-xs text-gray-400">Janma Nakshatra</p>
                     <p className="text-sm font-medium text-gray-700 mt-0.5">{moonNakData?.symbol} {moonNak}</p>
@@ -2490,10 +2771,11 @@ export default function CosmicPage() {
               <div className="divide-y divide-white/30">
                 {planets.map(p => {
                   const sym    = VEDIC_PLANET_SYM[p.celestialBody] ?? '•';
-                  const dig    = p.dignities?.dignity?.toLowerCase();
+                  const digRaw = p.dignities?.dignity?.toLowerCase();
+                  const dig    = digRaw === 'own_sign' ? 'own' : digRaw;
                   const digSt  = DIGNITY_STYLE[dig] ?? DIGNITY_STYLE.neutral;
                   const nakD   = NAKSHATRA_DATA.find(n => n.name === p.nakshatra);
-                  const isRx   = p.motion_type === 'retrograde';
+                  const isRx   = p.motion_type === 'retrograde' && p.celestialBody !== 'Rahu' && p.celestialBody !== 'Ketu';
                   return (
                     <button key={p.celestialBody} onClick={() => openVedicPlanet(p)}
                       className="w-full py-3 flex items-center gap-2 flex-wrap hover:bg-white/40 rounded-xl px-2 -mx-2 transition-colors text-left">
@@ -2560,23 +2842,65 @@ export default function CosmicPage() {
             {[
               {
                 label:'Vaara', emoji:'🌞', value: panchanga.vaara, subtitle:'Day of the week · Ruling planet',
-                desc: VAARA_DESC[panchanga.vaara] ?? 'Each weekday is ruled by a planetary deity whose energy colors everything that arises during it.',
+                desc: (() => {
+                  const v = panchanga.vaara ?? '';
+                  const dayPlanet = { Sunday:'Sun', Monday:'Moon', Tuesday:'Mars', Wednesday:'Mercury', Thursday:'Jupiter', Friday:'Venus', Saturday:'Saturn' }[v];
+                  const dp = dayPlanet ? planets.find(pl => pl.celestialBody === dayPlanet) : null;
+                  const planetLine = dp
+                    ? `Your birth weekday is ruled by ${dayPlanet}, and your ${dayPlanet} is placed in ${dp.sign} in the ${dp.houseNumber ?? dp.house}${[1,21].includes(dp.houseNumber??dp.house)?'st':[2,22].includes(dp.houseNumber??dp.house)?'nd':[3].includes(dp.houseNumber??dp.house)?'rd':'th'} house — so the ruling energy of your birth day is directly colored by those themes in your chart.`
+                    : '';
+                  const baseDesc = VAARA_DESC[v] ?? 'Each weekday is ruled by a planetary deity whose energy colors everything that arises during it.';
+                  return `You were born on ${v} — ${baseDesc}\n\n${planetLine}\n\nIn Jyotish the weekday (Vaara) is considered one of the five limbs of the Panchanga because the planetary deity of the day imprints its quality on everything born within it. The Vaara lord is worth noting alongside your chart's planetary strengths.`;
+                })(),
               },
               {
                 label:'Tithi', emoji:'🌙', value: panchanga.tithi, subtitle:'Lunar day · 1 of 30 divisions of the lunar month',
-                desc: 'The tithi is one of the 30 divisions of the lunar cycle, each lasting approximately 12 degrees of angular distance between Sun and Moon. Each tithi has a presiding deity and a distinct quality. Krishna (waning) tithis are generally suited to releasing, introspecting, and completing; Shukla (waxing) tithis to beginning, expanding, and creating. Purnima (full moon) and Amavasya (new moon) are the most potent of all.',
+                desc: (() => {
+                  const t = panchanga.tithi ?? '';
+                  const isKrishna  = t.startsWith('Krishna');
+                  const isShukla   = t.startsWith('Shukla');
+                  const isPurnima  = t === 'Purnima';
+                  const isAmavasya = t === 'Amavasya';
+                  let personalLine = '';
+                  if (isPurnima)   personalLine = `You were born on Purnima — the full moon, the most luminous and emotionally potent of all tithis. The Sun and Moon are directly opposite each other at your birth, creating a polarity of full awareness. Purnima births often carry great visibility, emotional intensity, and a life that tends toward culmination and fullness rather than beginning and becoming.`;
+                  else if (isAmavasya) personalLine = `You were born on Amavasya — the new moon, the most inward and ancestrally charged of all tithis. Sun and Moon are conjunct at your birth, seed-point energy turned entirely within. Amavasya births are associated with strong psychic sensitivity, a deep ancestral connection, and a life that tends to move in cycles of withdrawal and renewal.`;
+                  else if (isKrishna) personalLine = `You were born on ${t} — a Krishna paksha (waning lunar) tithi. The Moon is moving from fullness back toward darkness, and the quality of your birth moment carries the energy of discernment, release, and the refinement of what has been accumulated. Krishna tithi births often indicate souls with depth of introspection, strength in endings, and natural wisdom about impermanence.`;
+                  else if (isShukla) personalLine = `You were born on ${t} — a Shukla paksha (waxing lunar) tithi. The Moon is growing toward fullness, and the quality of your birth moment carries the energy of momentum, expansion, and the building of something new. Shukla tithi births often indicate souls with natural creative drive, a forward-moving life force, and ease with beginnings.`;
+                  else personalLine = `You were born on the ${t} tithi.`;
+                  return `${personalLine}\n\nThe tithi — lunar day — is formed by every 12° of angular separation between the Sun and Moon. There are 30 tithis in a lunar month: 15 in the brightening Shukla paksha and 15 in the darkening Krishna paksha. Each has a presiding deity and a distinct quality that colors everything born within it.`;
+                })(),
               },
               {
-                label:'Nakshatra', emoji:'⭐', value: panchanga.nakshatra, subtitle:'Moon\'s lunar mansion at birth',
-                desc: NAKSHATRA_DESC[panchanga.nakshatra] ?? 'The nakshatra is the lunar mansion the Moon occupies. There are 27 nakshatras, each spanning 13°20\' of the sidereal zodiac, each with a presiding deity, a ruling planet, a symbol, and a distinct psychological and spiritual signature.',
+                label:'Nakshatra', emoji:'⭐', value: panchanga.nakshatra, subtitle:'Janma Nakshatra · Your lunar mansion',
+                desc: (() => {
+                  const nak = panchanga.nakshatra;
+                  const nd  = NAKSHATRA_DATA.find(n => n.name === nak);
+                  const moonP = planets.find(pl => pl.celestialBody === 'Moon');
+                  const moonSign = moonP?.sign ?? '';
+                  const moonHouse = moonP?.houseNumber ?? moonP?.house;
+                  const hDesc = moonHouse ? VEDIC_HOUSE_DESC[moonHouse] : null;
+                  const intro = `Your Moon is in ${nd?.symbol ?? ''} ${nak} — your Janma Nakshatra. This is the most personally significant placement in Jyotish: the lunar mansion your Moon occupies defines the deepest layer of your psychological nature, your emotional instincts, and the quality of your felt experience of life from within.\n\nYour Moon is in ${moonSign}${moonHouse ? ` in the ${moonHouse}${[1,21].includes(moonHouse)?'st':[2,22].includes(moonHouse)?'nd':[3].includes(moonHouse)?'rd':'th'} house` : ''}${hDesc ? ` — the house of ${hDesc.themes.split(',')[0].toLowerCase()}` : ''}. ${nak} is ruled by ${nd?.lord ?? '—'}, which means your Dasha sequence originates here.\n\n`;
+                  return intro + (NAKSHATRA_DESC[nak] ?? '');
+                })(),
               },
               {
                 label:'Yoga', emoji:'☯️', value: panchanga.yoga, subtitle:'Sun + Moon combined longitude ÷ 13°20\'',
-                desc: YOGA_DESC[panchanga.yoga] ? `${panchanga.yoga}: ${YOGA_DESC[panchanga.yoga]}  There are 27 yogas, formed by dividing the combined longitude of Sun and Moon by 13°20'. Each yoga carries a distinct quality — from highly auspicious (Siddhi, Shiva, Brahma) to challenging (Vishkumbha, Ganda, Vyatipata). The yoga of your birth moment colors the overall tone of your life and the quality of your natural energy.` : 'The yoga is formed by the combined longitude of the Sun and Moon. Each of the 27 yogas carries a distinct quality and energetic signature.',
+                desc: (() => {
+                  const y = panchanga.yoga ?? '';
+                  const yd = YOGA_DESC[y];
+                  const sunP  = planets.find(pl => pl.celestialBody === 'Sun');
+                  const moonP = planets.find(pl => pl.celestialBody === 'Moon');
+                  const combLine = (sunP && moonP) ? `At your birth, your Sun in ${sunP.sign} and Moon in ${moonP.sign} combined to form the ${y} yoga.` : `You were born under the ${y} yoga.`;
+                  return `${combLine}${yd ? ` ${yd}` : ''}\n\nThe yoga is one of the 27 divisions formed by adding the sidereal longitudes of the Sun and Moon and dividing by 13°20'. Each yoga carries a distinct quality — from the most auspicious (Siddhi, Shiva, Brahma, Indra) to the more challenging (Vishkumbha, Ganda, Vyatipata, Vaidhriti). The yoga of the birth moment is considered a subtle but persistent background quality that colors your life's overall energetic signature and the ease or challenge with which your efforts tend to bear fruit.`;
+                })(),
               },
               {
                 label:'Karana', emoji:'🌗', value: panchanga.karana, subtitle:'Half of a tithi · 1 of 11 karanas',
-                desc: KARANA_DESC[panchanga.karana] ? `${panchanga.karana}: ${KARANA_DESC[panchanga.karana]}  A karana is half of a tithi — each lunar day has two karanas. There are 11 karanas in total: 7 movable (repeating throughout the month) and 4 fixed (occurring only once). The karana governs the quality of action and initiative appropriate to that half-day.` : 'A karana is half of a tithi. There are 11 karanas cycling through the lunar month, each coloring the quality of action and initiative.',
+                desc: (() => {
+                  const k = panchanga.karana ?? '';
+                  const kd = KARANA_DESC[k];
+                  return `You were born under the ${k} karana.${kd ? ` ${kd}` : ''}\n\nA karana is half of a tithi — each lunar day (tithi) contains two karanas, so there are roughly 60 karana periods in a lunar month. There are 11 karanas in total: 7 movable ones (Bava, Balava, Kaulava, Taitila, Garaja, Vanija, Vishti) that repeat throughout the month, and 4 fixed ones (Shakuni, Chatushpada, Naga, Kimstughna) that occur only once. The karana governs the quality of action and initiative suited to that half-day window — in Jyotish it is used when choosing auspicious moments for important undertakings.`;
+                })(),
               },
             ].map(item => (
               <button key={item.label} onClick={() => setDetail({ title:`${item.emoji} ${item.label} · ${item.value}`, subtitle: item.subtitle, body: item.desc ?? '' })}
@@ -2614,14 +2938,22 @@ export default function CosmicPage() {
                   <p className="font-playfair text-2xl text-gray-700 mt-1">{VEDIC_PLANET_SYM[currentMdName]} {currentMdName} Mahadasha</p>
                   <p className="text-xs text-gray-400 mt-1">{currentMdData?.start} → {currentMdData?.end}</p>
                 </div>
-                <p className="text-sm text-gray-600 leading-relaxed">{DASHA_DESC[currentMdName] ?? ''}</p>
+                {(() => {
+                  const mdPlanet = planets.find(pl => pl.celestialBody === currentMdName);
+                  const placementNote = mdPlanet ? ` Your ${currentMdName} sits in ${mdPlanet.sign} in your ${mdPlanet.houseNumber ?? mdPlanet.house}${[1,21].includes(mdPlanet.houseNumber??mdPlanet.house)?'st':[2,22].includes(mdPlanet.houseNumber??mdPlanet.house)?'nd':[3].includes(mdPlanet.houseNumber??mdPlanet.house)?'rd':'th'} house, which means this period activates the themes of that house with particular force.` : '';
+                  return <p className="text-sm text-gray-600 leading-relaxed">{(DASHA_DESC[currentMdName] ?? '') + placementNote}</p>;
+                })()}
 
                 {currentAdName && (
                   <div className="bg-white/60 border border-white/50 rounded-2xl p-4 space-y-2">
                     <p className="text-xs text-gray-400 uppercase tracking-widest">Current Antardasha (sub-period)</p>
                     <p className="text-sm font-medium text-gray-700">{VEDIC_PLANET_SYM[currentAdName]} {currentAdName} Antardasha</p>
                     <p className="text-xs text-gray-400">{currentAdData?.start} → {currentAdData?.end}</p>
-                    <p className="text-xs text-gray-500 leading-relaxed">The {currentAdName} sub-period within your {currentMdName} Mahadasha brings {currentAdName === currentMdName ? 'the pure, undiluted expression of this period\'s themes' : `the qualities of ${currentAdName} into the broader themes of the ${currentMdName} period — coloring the texture of this specific window of time with ${currentAdName}'s particular energy and domain`}.</p>
+                    {(() => {
+                      const adPlanet = planets.find(pl => pl.celestialBody === currentAdName);
+                      const adNote = adPlanet ? ` ${currentAdName} sits in ${adPlanet.sign} in your ${adPlanet.houseNumber ?? adPlanet.house}${[1,21].includes(adPlanet.houseNumber??adPlanet.house)?'st':[2,22].includes(adPlanet.houseNumber??adPlanet.house)?'nd':[3].includes(adPlanet.houseNumber??adPlanet.house)?'rd':'th'} house, pulling those themes into the foreground of this sub-period.` : '';
+                      return <p className="text-xs text-gray-500 leading-relaxed">The {currentAdName} sub-period within your {currentMdName} Mahadasha brings {currentAdName === currentMdName ? 'the pure, undiluted expression of this period\'s themes' : `the qualities of ${currentAdName} into the broader themes of the ${currentMdName} period — coloring the texture of this specific window of time with ${currentAdName}'s particular energy`}.{adNote}</p>;
+                    })()}
                   </div>
                 )}
 
@@ -2644,7 +2976,11 @@ export default function CosmicPage() {
                   const isFuture  = (md.start ?? '') > today;
                   return (
                     <button key={lord}
-                      onClick={() => setDetail({ title:`${VEDIC_PLANET_SYM[lord]} ${lord} Mahadasha`, subtitle:`${md.start} → ${md.end}`, body: DASHA_DESC[lord] ?? '' })}
+                      onClick={() => {
+                        const dp = planets.find(pl => pl.celestialBody === lord);
+                        const placementLine = dp ? `Your ${lord} sits in ${dp.sign} in the ${dp.houseNumber ?? dp.house}${[1,21,31].includes(dp.houseNumber??dp.house)?'st':[2,22,32].includes(dp.houseNumber??dp.house)?'nd':[3,23].includes(dp.houseNumber??dp.house)?'rd':'th'} house — so this period activates those themes in your life with particular force.` : '';
+                        setDetail({ title:`${VEDIC_PLANET_SYM[lord]} ${lord} Mahadasha`, subtitle:`${md.start} → ${md.end}`, body: [DASHA_DESC[lord], placementLine].filter(Boolean).join('\n\n') });
+                      }}
                       className={`w-full flex items-center gap-3 p-3 rounded-2xl border text-left transition-colors ${isCurrent ? 'bg-rose-50/60 border-rose-200/50 hover:bg-rose-50/80' : isPast ? 'bg-gray-50/40 border-gray-200/30 opacity-50 hover:opacity-75' : 'bg-white/40 border-white/40 hover:bg-white/60'}`}>
                       <span className="text-xl w-8 text-center shrink-0">{VEDIC_PLANET_SYM[lord]}</span>
                       <div className="flex-1 min-w-0">
@@ -2670,7 +3006,11 @@ export default function CosmicPage() {
                     const isPast = (ad.end ?? '') < today;
                     return (
                       <button key={alord}
-                        onClick={() => setDetail({ title:`${alord} Antardasha within ${currentMdName} Mahadasha`, subtitle:`${ad.start} → ${ad.end}`, body:`The ${alord} sub-period within the ${currentMdName} Mahadasha ${alord === currentMdName ? 'expresses the pure, undiluted themes of this period at their most concentrated' : `brings ${alord}\'s energy — ${DASHA_DESC[alord]?.split('.')[0] ?? ''} — into the context of the ${currentMdName} major period`}.` })}
+                        onClick={() => {
+                          const adp = planets.find(pl => pl.celestialBody === alord);
+                          const adPlaceLine = adp ? `\n\nYour ${alord} is placed in ${adp.sign} in the ${adp.houseNumber ?? adp.house}${[1,21].includes(adp.houseNumber??adp.house)?'st':[2,22].includes(adp.houseNumber??adp.house)?'nd':[3].includes(adp.houseNumber??adp.house)?'rd':'th'} house — so this sub-period brings those themes forward within the overarching ${currentMdName} period.` : '';
+                          setDetail({ title:`${alord} Antardasha within ${currentMdName} Mahadasha`, subtitle:`${ad.start} → ${ad.end}`, body:`The ${alord} sub-period within the ${currentMdName} Mahadasha ${alord === currentMdName ? 'expresses the pure, undiluted themes of this period at their most concentrated' : `brings ${alord}'s energy — ${DASHA_DESC[alord]?.split('.')[0] ?? ''} — into the context of the ${currentMdName} major period`}.${adPlaceLine}` });
+                        }}
                         className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl border text-left hover:bg-white/50 transition-colors ${isCur ? 'bg-rose-50/60 border-rose-200/40' : isPast ? 'opacity-40 border-white/10' : 'border-white/20'}`}>
                         <span className="w-5 text-center text-gray-400 shrink-0">{VEDIC_PLANET_SYM[alord]}</span>
                         <div className="flex-1">
@@ -2689,6 +3029,15 @@ export default function CosmicPage() {
 
         // ── VARGA TAB ──────────────────────────────────────────────────────────
         if (vedicTab === 'varga') {
+          const VARGA_EXALT = { Sun:'Aries', Moon:'Taurus', Mars:'Capricorn', Mercury:'Virgo', Jupiter:'Cancer', Venus:'Pisces', Saturn:'Libra' };
+          const VARGA_DEBIL = { Sun:'Libra', Moon:'Scorpio', Mars:'Cancer', Mercury:'Pisces', Jupiter:'Capricorn', Venus:'Virgo', Saturn:'Aries' };
+          const VARGA_OWN   = { Sun:['Leo'], Moon:['Cancer'], Mars:['Aries','Scorpio'], Mercury:['Gemini','Virgo'], Jupiter:['Sagittarius','Pisces'], Venus:['Taurus','Libra'], Saturn:['Capricorn','Aquarius'] };
+          function vargaDig(planet, sign) {
+            if (VARGA_EXALT[planet] === sign)    return 'exalted';
+            if (VARGA_DEBIL[planet] === sign)    return 'debilitated';
+            if (VARGA_OWN[planet]?.includes(sign)) return 'own';
+            return null;
+          }
           const showVargas = ['d9','d10','d3','d7','d12'].filter(k => divCharts[k]);
           const vargaLabel = { d9:'D9 · Navamsa', d10:'D10 · Dasamsa', d3:'D3 · Drekkana', d7:'D7 · Saptamsa', d12:'D12 · Dwadasamsa' };
           const vargaDesc  = {
@@ -2710,25 +3059,56 @@ export default function CosmicPage() {
                 </div>
               )}
               {showVargas.map(key => {
-                const vc      = divCharts[key];
-                const vHouses = vc?.houses ?? [];
-                const vPlanets= vHouses.flatMap(h => (h.occupants ?? []).map(o => ({ ...o, hNum: h.number, hSign: h.sign })));
+                const vc       = divCharts[key];
+                const vHouses  = vc?.houses ?? [];
+                const vPlanets = vHouses.flatMap(h => (h.occupants ?? []).map(o => ({ ...o, hNum: h.number, hSign: h.sign })));
+                const vAsc     = vc?.ascendant;
+                const vAscSig  = vAsc?.sign;
+                const vAscLord = vAscSig ? SIGN_LORDS[vAscSig] : null;
                 return (
                   <div key={key} className="glass-card rounded-3xl p-6 space-y-3">
                     <div>
                       <h3 className="font-playfair text-lg text-gray-700">{vargaLabel[key]}</h3>
                       <p className="text-xs text-gray-500 mt-1 leading-relaxed">{vargaDesc[key] ?? VARGA_PURPOSE[key]}</p>
                     </div>
+                    {vAscSig && (
+                      <div className="flex items-center gap-2 bg-white/50 rounded-2xl px-4 py-2.5 border border-white/40">
+                        <span className="text-xs text-gray-400 uppercase tracking-widest">Lagna</span>
+                        <span className="text-sm font-medium text-gray-700 ml-1">{vAscSig}</span>
+                        {vAscLord && <span className="text-xs text-gray-400">· Ruled by {vAscLord}</span>}
+                        {(() => {
+                          const dig = vargaDig(vAscLord, vAscSig);
+                          const st  = dig ? DIGNITY_STYLE[dig] : null;
+                          return st ? <span className={`text-[10px] px-1.5 py-0.5 rounded-full border ml-auto ${st.bg} ${st.color} ${st.border}`}>{st.label}</span> : null;
+                        })()}
+                      </div>
+                    )}
                     {vPlanets.length > 0 ? (
                       <div className="divide-y divide-white/30">
-                        {vPlanets.map((p, i) => (
-                          <div key={i} className="py-2.5 flex items-center gap-2 text-sm">
+                        {vPlanets.map((p, i) => {
+                          const vSign    = p.sign ?? p.hSign;
+                          const vSignQ   = SIGN_Q[vSign];
+                          const dig      = vargaDig(p.celestialBody, vSign);
+                          const digSt    = dig ? DIGNITY_STYLE[dig] : null;
+                          const vargaPurpose = VARGA_PURPOSE[key];
+                          const d1Planet = planets.find(pl => pl.celestialBody === p.celestialBody);
+                          const d1Info   = d1Planet ? `In your birth chart (D1), ${p.celestialBody} sits in ${d1Planet.sign} in house ${d1Planet.houseNumber ?? d1Planet.house}. ` : '';
+                          const digNote  = dig === 'exalted'     ? `${p.celestialBody} is exalted in ${vSign} — at its peak strength in this chart.`
+                                         : dig === 'debilitated' ? `${p.celestialBody} is debilitated in ${vSign} — challenged in this domain; the lesson becomes the gift.`
+                                         : dig === 'own'         ? `${p.celestialBody} is in its own sign — strong, at home, and able to fully express its qualities here.`
+                                         : '';
+                          const vargaBody = `Your ${p.celestialBody} occupies ${vSign} in the ${vargaLabel[key]}.\n\n${vargaDesc[key] ?? vargaPurpose}\n\n${d1Info}${digNote ? digNote + '\n\n' : ''}${vSignQ ? `In ${vSign}, this domain carries a ${vSignQ.themes} quality — expressed through ${vSignQ.domain}.` : ''}`;
+                          return (
+                          <button key={i} onClick={() => setDetail({ title:`${VEDIC_PLANET_SYM[p.celestialBody] ?? '•'} ${p.celestialBody} in ${vargaLabel[key]}`, subtitle:`${vSign} · House ${p.hNum}${digSt ? ' · ' + digSt.label : ''}`, tags: digSt ? [digSt.label] : [], body: vargaBody })}
+                            className="w-full py-2.5 flex items-center gap-2 text-sm hover:bg-white/40 rounded-xl px-2 -mx-2 transition-colors text-left">
                             <span className="w-6 text-center text-gray-400 shrink-0">{VEDIC_PLANET_SYM[p.celestialBody] ?? '•'}</span>
                             <span className="text-xs text-gray-500 w-20 shrink-0">{p.celestialBody}</span>
-                            <span className="text-gray-700 font-medium flex-1">{p.sign ?? p.hSign}</span>
-                            <span className="text-xs text-gray-400">H{p.hNum}</span>
-                          </div>
-                        ))}
+                            <span className="text-gray-700 font-medium flex-1">{vSign}</span>
+                            {digSt && <span className={`text-[10px] px-1.5 py-0.5 rounded-full border shrink-0 ${digSt.bg} ${digSt.color} ${digSt.border}`}>{digSt.label}</span>}
+                            <span className="text-xs text-gray-400 shrink-0">H{p.hNum}</span>
+                          </button>
+                          );
+                        })}
                       </div>
                     ) : (
                       <p className="text-xs text-gray-400 text-center py-2">No planets in occupied houses.</p>
@@ -2744,7 +3124,10 @@ export default function CosmicPage() {
         if (vedicTab === 'strength') {
           const savEntries  = SIGN_ORDER.map(s => ({ sign:s, pts: sav[s] ?? 0 }));
           const maxSav      = Math.max(...savEntries.map(e => e.pts), 1);
-          const shadbalas   = planets.filter(p => p.shadbala?.Shadbala);
+          const PLANET_ORDER = ['Sun','Moon','Mars','Mercury','Jupiter','Venus','Saturn'];
+          const shadbalas   = PLANET_ORDER
+            .map(name => planets.find(p => p.celestialBody === name))
+            .filter(p => p?.shadbala?.Shadbala);
           return (
             <div className="space-y-4">
               {/* Shadbala intro */}
@@ -2766,17 +3149,17 @@ export default function CosmicPage() {
                           title:`${VEDIC_PLANET_SYM[p.celestialBody]} ${p.celestialBody} · Shadbala`,
                           subtitle:`${rupas.toFixed(2)} Rupas · minimum required: ${minReq}`,
                           tags: [strong ? '✓ Meets requirement' : '✗ Below minimum', p.sign],
-                          body:[
-                            `Total Shadbala: ${(sb.Total ?? 0).toFixed(2)}`,
-                            `Rupas: ${rupas.toFixed(2)} (minimum: ${minReq})`,
-                            ``,
-                            `Sthanabala (Positional): ${p.shadbala.Sthanabala?.Total?.toFixed(1) ?? p.shadbala.Sthanabala?.toFixed?.(1) ?? '—'}`,
-                            `Digbala (Directional): ${p.shadbala.Digbala?.toFixed?.(1) ?? '—'}`,
-                            `Kaalabala (Temporal): ${p.shadbala.Kaalabala?.Total?.toFixed(1) ?? '—'}`,
-                            `Cheshtabala (Motional): ${p.shadbala.Cheshtabala?.toFixed?.(1) ?? '—'}`,
-                            `Naisargikabala (Natural): ${p.shadbala.Naisargikabala?.toFixed?.(1) ?? '—'}`,
-                            `Drikbala (Aspectual): ${p.shadbala.Drikbala?.toFixed?.(1) ?? '—'}`,
-                          ].join('\n'),
+                          body: [
+                            strong
+                              ? `Your ${p.celestialBody} is a strong planet in your chart, scoring ${rupas.toFixed(2)} Rupas against a minimum requirement of ${minReq} — meaning it is fully capable of delivering its significations and fulfilling its promised results.`
+                              : `Your ${p.celestialBody} scores ${rupas.toFixed(2)} Rupas, slightly below the required ${minReq}. In Jyotish this indicates the planet may need extra support — through its dasha period, strong aspects, or remedial measures — to fully deliver its results.`,
+                            `Sthanabala (positional strength) measures how well ${p.celestialBody} is placed by sign, house, and varga position: ${p.shadbala.Sthanabala?.Total?.toFixed(1) ?? '—'} units.`,
+                            `Digbala (directional strength) reflects whether ${p.celestialBody} is in the house of its preferred direction: ${p.shadbala.Digbala?.toFixed?.(1) ?? '—'} units.`,
+                            `Kaalabala (temporal strength) measures the time-based strength — day vs night birth, lunar phase, season: ${p.shadbala.Kaalabala?.Total?.toFixed(1) ?? '—'} units.`,
+                            `Cheshtabala (motional strength) reflects speed of motion — planets at their fastest or at stations gain strength here: ${p.shadbala.Cheshtabala?.toFixed?.(1) ?? '—'} units.`,
+                            `Naisargikabala (natural strength) is fixed for each planet — the Sun is always strongest, Saturn always weakest by nature: ${p.shadbala.Naisargikabala?.toFixed?.(1) ?? '—'} units.`,
+                            `Drikbala (aspectual strength) reflects the benefic or malefic aspects the planet receives from others: ${p.shadbala.Drikbala?.toFixed?.(1) ?? '—'} units.`,
+                          ].join('\n\n'),
                         })}
                         className="w-full flex items-center gap-3 bg-white/50 border border-white/40 rounded-2xl p-3 hover:bg-white/70 transition-colors text-left">
                         <span className="text-sm w-6 text-center shrink-0">{VEDIC_PLANET_SYM[p.celestialBody]}</span>
@@ -2804,16 +3187,27 @@ export default function CosmicPage() {
                   <p className="text-sm text-gray-500 mt-1 leading-relaxed">The Ashtakavarga system assigns benefic points to each sign from the perspective of each of the 7 classical planets plus the Lagna. The Sarvashtakavarga (SAV) is the total of all contributions — a maximum of 56 points per sign. Signs with 28 or more points are considered strong and productive for transits and periods; signs with fewer than 25 points indicate areas of the chart requiring more careful navigation.</p>
                 </div>
                 {savEntries.some(e => e.pts > 0) ? (
-                  <div className="space-y-2">
-                    {savEntries.map(({ sign, pts }) => (
-                      <div key={sign} className="flex items-center gap-2">
-                        <span className="text-xs text-gray-500 w-24 shrink-0">{sign}</span>
-                        <div className="flex-1 h-2 rounded-full bg-white/60 overflow-hidden">
-                          <div className={`h-full rounded-full ${pts >= 28 ? 'bg-green-400' : pts >= 25 ? 'bg-amber-400' : 'bg-rose-300'}`} style={{ width:`${(pts/maxSav)*100}%` }} />
-                        </div>
-                        <span className={`text-xs w-6 text-right shrink-0 font-medium ${pts >= 28 ? 'text-green-600' : pts >= 25 ? 'text-amber-600' : 'text-rose-400'}`}>{pts}</span>
-                      </div>
-                    ))}
+                  <div className="space-y-1.5">
+                    {savEntries.map(({ sign, pts }) => {
+                      const signPlanets = planets.filter(p => p.sign === sign).map(p => p.celestialBody);
+                      const quality = pts >= 28 ? 'strong and productive' : pts >= 25 ? 'moderately supportive' : 'more challenging';
+                      const transitNote = pts >= 28
+                        ? `Transiting planets moving through ${sign} tend to give good and productive results for you — this is one of your most favorable signs for new ventures, important meetings, and key decisions made during those windows.`
+                        : pts >= 25
+                        ? `Transiting planets through ${sign} give moderate results — neither especially favored nor difficult. Standard care and awareness applies during these windows.`
+                        : `Transiting planets through ${sign} require more careful navigation — this is not your most favorable sign for new ventures, and it benefits from extra mindfulness during transit periods here.`;
+                      const occupantNote = signPlanets.length ? `Your natal ${signPlanets.join(' and ')} ${signPlanets.length === 1 ? 'is' : 'are'} placed in ${sign}, making this sign especially significant in your chart.` : '';
+                      return (
+                        <button key={sign} onClick={() => setDetail({ title:`${sign} · SAV ${pts}`, subtitle:`Sarvashtakavarga · ${quality}`, body: `${sign} has ${pts} Sarvashtakavarga points out of a maximum of 56.\n\n${transitNote}\n\n${occupantNote}`.trim() })}
+                          className="w-full flex items-center gap-2 hover:bg-white/40 rounded-xl px-2 py-1 -mx-2 transition-colors text-left">
+                          <span className="text-xs text-gray-500 w-24 shrink-0">{sign}</span>
+                          <div className="flex-1 h-2 rounded-full bg-white/60 overflow-hidden">
+                            <div className={`h-full rounded-full ${pts >= 28 ? 'bg-green-400' : pts >= 25 ? 'bg-amber-400' : 'bg-rose-300'}`} style={{ width:`${(pts/maxSav)*100}%` }} />
+                          </div>
+                          <span className={`text-xs w-6 text-right shrink-0 font-medium ${pts >= 28 ? 'text-green-600' : pts >= 25 ? 'text-amber-600' : 'text-rose-400'}`}>{pts}</span>
+                        </button>
+                      );
+                    })}
                   </div>
                 ) : <p className="text-sm text-gray-400 text-center py-4">Ashtakavarga data not available.</p>}
               </div>
