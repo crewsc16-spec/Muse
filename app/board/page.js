@@ -869,13 +869,12 @@ export default function Home() {
           )}
         </div>
 
-        {/* Board piece toggle — styled as a section divider, not a CTA button */}
+        {/* Board piece toggle — just a divider + caret */}
         <button
           onClick={() => setShowBoardPiece(!showBoardPiece)}
-          className="flex items-center justify-between w-full text-xs font-medium uppercase tracking-widest text-gray-400 py-1 border-t border-white/40 pt-3 transition-colors hover:text-[#b88a92]"
+          className="flex items-center justify-center w-full border-t border-white/40 pt-3 text-gray-300 hover:text-[#b88a92] transition-colors"
         >
-          <span>Add to your board</span>
-          <span className="text-base leading-none">{showBoardPiece ? '▲' : '▼'}</span>
+          <span className="text-sm leading-none">{showBoardPiece ? '▲' : '▼'}</span>
         </button>
 
         {/* Board piece form — shown inline when toggled */}
