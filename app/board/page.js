@@ -529,7 +529,7 @@ export default function Home() {
         const meta = user.user_metadata ?? {};
         if (meta.milestones) setMilestones(meta.milestones);
         if (meta.boardSizes) setItemSizes(meta.boardSizes);
-        loadAll(supabase);
+        loadAll(supabase, true); // seed form on initial load
       }
     });
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
@@ -538,13 +538,13 @@ export default function Home() {
         const meta = session.user.user_metadata ?? {};
         if (meta.milestones) setMilestones(meta.milestones);
         if (meta.boardSizes) setItemSizes(meta.boardSizes);
-        loadAll(supabase);
+        loadAll(supabase, false); // refresh data only, don't re-seed form
       }
     });
     return () => subscription.unsubscribe();
   }, []);
 
-  async function loadAll(supabase) {
+  async function loadAll(supabase, seedForm = false) {
     const [moodData, boardData, goalsData, completionData, cycleData] = await Promise.all([
       getMoodEntries(supabase),
       getVisionItems(supabase),
@@ -557,16 +557,19 @@ export default function Home() {
     setGoals(goalsData);
     setCompletions(completionData);
     setCycleEntries(cycleData);
-    const todayEntry = moodData.find(e => e.date === today);
-    if (todayEntry) {
-      setSelectedMood(todayEntry.mood);
-      setNotes(todayEntry.notes || '');
-    }
-    const todayCycle = cycleData.find(e => e.date === today);
-    if (todayCycle) {
-      setFlow(todayCycle.flow ?? null);
-      setSymptoms(todayCycle.symptoms ?? []);
-      setCycleOpen(true);
+    // Only pre-populate the form on initial page load — not on auth refreshes
+    if (seedForm) {
+      const todayEntry = moodData.find(e => e.date === today);
+      if (todayEntry) {
+        setSelectedMood(todayEntry.mood);
+        setNotes(todayEntry.notes || '');
+      }
+      const todayCycle = cycleData.find(e => e.date === today);
+      if (todayCycle) {
+        setFlow(todayCycle.flow ?? null);
+        setSymptoms(todayCycle.symptoms ?? []);
+        setCycleOpen(true);
+      }
     }
   }
 
