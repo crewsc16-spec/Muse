@@ -99,28 +99,28 @@ export default async function OGImage() {
           Muse
         </div>
 
-        {/* Tagline — readable, warm */}
+        {/* Tagline — large, readable */}
         <div
           style={{
-            fontSize: 24,
-            color: 'rgba(240,230,216,0.6)',
-            letterSpacing: '0.12em',
+            fontSize: 36,
+            color: 'rgba(240,230,216,0.7)',
+            letterSpacing: '0.1em',
             textTransform: 'uppercase',
-            marginBottom: 44,
+            marginBottom: 48,
           }}
         >
           Your cosmic self-discovery guide
         </div>
 
-        {/* Feature words — clearer, warmer */}
+        {/* Feature words */}
         <div
           style={{
             display: 'flex',
             alignItems: 'center',
             gap: 0,
-            fontSize: 16,
-            color: 'rgba(240,230,216,0.45)',
-            letterSpacing: '0.06em',
+            fontSize: 22,
+            color: 'rgba(240,230,216,0.5)',
+            letterSpacing: '0.04em',
           }}
         >
           {['Astrology', 'Human Design', 'Tarot', 'Journaling', 'Vision Board'].map(
