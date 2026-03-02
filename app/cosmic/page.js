@@ -916,6 +916,7 @@ export default function CosmicPage() {
   const [chatAsked,    setChatAsked]    = useState('');
   const [chatSaved,    setChatSaved]    = useState(false);
   const [hdIntroOpen,  setHdIntroOpen]  = useState(false);
+  const [astroIntroOpen, setAstroIntroOpen] = useState(false);
   const [today] = useState(() => new Date().toISOString().slice(0,10));
   const [vedicMode,    setVedicMode]    = useState('western');
   const [vedicData,    setVedicData]    = useState(null);
@@ -1611,12 +1612,127 @@ export default function CosmicPage() {
           )}
 
           {hdData?.designDate && (
-            <div className="glass-card rounded-3xl p-6 space-y-2">
-              <h2 className="font-playfair text-xl text-gray-700">Design Date</h2>
+            <button
+              onClick={() => setDetail({
+                title: 'Design Date',
+                subtitle: fmtDate(hdData.designDate),
+                body: 'In Human Design, your chart has two layers. The first — your Personality — is calculated from the exact moment you were born, just like a natal astrology chart. The second — your Design — is calculated from approximately 88 days before your birth, when the Sun was 88° behind its position at the time of your birth.\n\nThis earlier moment represents your unconscious imprint: the energies, traits, and qualities that are deeply embedded in your body and biology, but that you may not consciously identify with. Other people often see your Design side more clearly than you do yourself.\n\nIn the Body Graph, Personality activations are shown in black (conscious) and Design activations are shown in red (unconscious). Together they form the complete picture of who you are — what you know about yourself and what operates beneath the surface.\n\nYour Design Date is not a birthday or an event — it is a calculated point that anchors the unconscious half of your Human Design chart.',
+              })}
+              className="w-full glass-card rounded-3xl p-6 space-y-2 text-left hover:bg-white/50 transition-colors active:scale-[0.99]">
+              <div className="flex items-center justify-between">
+                <h2 className="font-playfair text-xl text-gray-700">Design Date</h2>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-gray-300 shrink-0"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </div>
               <p className="text-sm text-gray-600">{fmtDate(hdData.designDate)}</p>
-              <p className="text-xs text-gray-400 leading-relaxed">Approximately 88 days before your birth — when your unconscious (Design) imprinting occurred as the Sun transited 88° behind your birth Sun position.</p>
-            </div>
+              <p className="text-xs text-gray-400 leading-relaxed">Approximately 88 days before your birth — tap to learn what this means.</p>
+            </button>
           )}
+
+          {/* ── How Your Chart Works ── */}
+          <div className="glass-card rounded-3xl overflow-hidden">
+            <button
+              onClick={() => setAstroIntroOpen(o => !o)}
+              className="w-full flex items-center justify-between px-6 py-5 text-left"
+            >
+              <div>
+                <h2 className="font-playfair text-xl text-gray-700">How Your Chart Works</h2>
+                <p className="text-xs text-gray-400 mt-0.5">Understanding what you&apos;re looking at</p>
+              </div>
+              <span className="text-gray-300 text-xl leading-none ml-4">{astroIntroOpen ? '−' : '+'}</span>
+            </button>
+
+            {astroIntroOpen && (
+              <div className="px-6 pb-6 space-y-6 border-t border-white/40 pt-5">
+
+                {/* Intro */}
+                <div className="space-y-3">
+                  <p className="text-sm text-gray-600 leading-relaxed">
+                    Your natal chart is a snapshot of the sky at the exact moment and location of your birth. It maps where each planet was positioned across the twelve signs of the zodiac and the twelve houses of your chart — creating a blueprint of your personality, drives, emotional patterns, and life themes.
+                  </p>
+                  <p className="text-sm text-gray-600 leading-relaxed">
+                    No two natal charts are alike. Even people born on the same day will have different rising signs, house placements, and aspect patterns depending on their birth time and location. Your chart is not a horoscope — it is a map of <em>your</em> specific sky.
+                  </p>
+                </div>
+
+                {/* The Building Blocks */}
+                <div className="space-y-3">
+                  <h3 className="font-playfair text-base text-gray-700">The Building Blocks</h3>
+                  <div className="space-y-2">
+                    {[
+                      {
+                        label: 'Planets',
+                        body: 'Each planet represents a different dimension of your psyche. The Sun is your core identity and purpose. The Moon governs your emotions and inner needs. Mercury rules how you think and communicate. Venus shapes how you love and what you value. Mars drives your ambition and desire. Jupiter expands and brings growth. Saturn teaches through discipline and limitation. The outer planets (Uranus, Neptune, Pluto) represent generational and transformative forces. The North and South Nodes point to your soul\'s evolutionary direction.',
+                      },
+                      {
+                        label: 'Signs',
+                        body: 'The twelve zodiac signs describe *how* a planet expresses itself. A planet\'s sign gives it a particular flavor, style, and set of qualities. For example, Venus in Aries loves boldly and impulsively, while Venus in Capricorn loves through loyalty and long-term commitment. Each sign belongs to an element (fire, earth, air, water) and a modality (cardinal, fixed, mutable) that further shape its expression.',
+                      },
+                      {
+                        label: 'Houses',
+                        body: 'The twelve houses describe *where* in your life a planet\'s energy plays out. The 1st house governs identity and first impressions. The 7th house governs partnerships. The 10th house governs career and public reputation. Unlike signs, houses are calculated from your exact birth time and location — which is why birth time matters so much. The sign on each house cusp (starting edge) colors how you experience that life domain.',
+                      },
+                      {
+                        label: 'Aspects',
+                        body: 'Aspects are the geometric angles between planets in your chart. They describe how different parts of your psyche interact with each other. A conjunction (0°) fuses two energies together. A trine (120°) creates easy, flowing harmony. A square (90°) creates productive tension and growth. An opposition (180°) creates a push-pull dynamic that seeks balance. Aspects are what make your chart uniquely yours — they show the internal conversations between your planets.',
+                      },
+                    ].map(({ label, body }) => (
+                      <button key={label}
+                        onClick={() => setDetail({ title: label, subtitle: 'Astrology · Key Concept', body })}
+                        className="w-full bg-white/50 rounded-2xl p-4 border border-white/40 text-left hover:bg-white/70 transition-colors active:scale-[0.99] flex items-center justify-between gap-3">
+                        <p className="text-sm font-medium text-gray-700">{label}</p>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-gray-300 shrink-0"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* The Big Three */}
+                <div className="space-y-3">
+                  <h3 className="font-playfair text-base text-gray-700">Your Big Three</h3>
+                  <p className="text-xs text-gray-400">The three placements most central to who you are.</p>
+                  <div className="space-y-2">
+                    {[
+                      { icon: '☉', label: 'Sun Sign', desc: 'Your core identity, vitality, and the energy you are actively growing into. This is what most people mean when they ask "what\'s your sign."' },
+                      { icon: '☽', label: 'Moon Sign', desc: 'Your emotional inner world, instincts, and what you need to feel safe. Often more accurate than your sun sign for how you actually feel day to day.' },
+                      { icon: 'AC', label: 'Rising Sign (Ascendant)', desc: 'The sign on your 1st house cusp — the mask you wear, how others first perceive you, and the lens through which you approach life. Requires your exact birth time.' },
+                    ].map(({ icon, label, desc }) => (
+                      <div key={label} className="flex gap-3 p-3 bg-white/40 rounded-2xl border border-white/40">
+                        <span className="w-6 h-6 rounded-full bg-gradient-to-br from-amber-200 to-rose-200 text-gray-700 text-xs font-semibold flex items-center justify-center shrink-0 mt-0.5">{icon}</span>
+                        <div>
+                          <p className="text-sm font-medium text-gray-700">{label}</p>
+                          <p className="text-xs text-gray-500 mt-0.5 leading-relaxed">{desc}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Elements & Modalities */}
+                <div className="space-y-3">
+                  <h3 className="font-playfair text-base text-gray-700">Elements &amp; Modalities</h3>
+                  <div className="space-y-2">
+                    {[
+                      { label: 'Fire (Aries, Leo, Sagittarius)', desc: 'Passionate, initiating, action-oriented. Fire signs radiate energy outward.' },
+                      { label: 'Earth (Taurus, Virgo, Capricorn)', desc: 'Grounded, practical, sensory. Earth signs build and sustain.' },
+                      { label: 'Air (Gemini, Libra, Aquarius)', desc: 'Intellectual, social, communicative. Air signs connect and conceptualize.' },
+                      { label: 'Water (Cancer, Scorpio, Pisces)', desc: 'Emotional, intuitive, deep. Water signs feel and absorb.' },
+                    ].map(({ label, desc }) => (
+                      <div key={label} className="flex gap-3 p-3 bg-white/40 rounded-2xl border border-white/40">
+                        <div>
+                          <p className="text-sm font-medium text-gray-700">{label}</p>
+                          <p className="text-xs text-gray-500 mt-0.5 leading-relaxed">{desc}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-xs text-gray-400 leading-relaxed">
+                    <strong className="text-gray-500">Cardinal</strong> signs (Aries, Cancer, Libra, Capricorn) initiate. <strong className="text-gray-500">Fixed</strong> signs (Taurus, Leo, Scorpio, Aquarius) sustain. <strong className="text-gray-500">Mutable</strong> signs (Gemini, Virgo, Sagittarius, Pisces) adapt and transform.
+                  </p>
+                </div>
+
+              </div>
+            )}
+          </div>
         </div>
       )}
 
