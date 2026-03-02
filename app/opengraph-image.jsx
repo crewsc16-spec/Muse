@@ -6,24 +6,23 @@ export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
 export default async function OGImage() {
-  // Load Cormorant Garamond (elegant high-contrast serif) for the title
   const fontData = await fetch(
     'https://fonts.gstatic.com/s/cormorantgaramond/v21/co3umX5slCNuHLi8bLeY9MK7whWMhyjypVO7abI26QOD_iE9GnM.ttf'
   ).then(r => r.arrayBuffer());
 
   const stars = [
-    { x: 110, y: 70, s: 3, o: 0.5 },
-    { x: 240, y: 170, s: 2, o: 0.35 },
-    { x: 1020, y: 90, s: 3, o: 0.45 },
-    { x: 1100, y: 210, s: 2, o: 0.3 },
-    { x: 170, y: 470, s: 2.5, o: 0.35 },
-    { x: 960, y: 500, s: 3, o: 0.4 },
-    { x: 440, y: 60, s: 2, o: 0.3 },
-    { x: 780, y: 80, s: 2.5, o: 0.35 },
-    { x: 80, y: 300, s: 2, o: 0.25 },
-    { x: 1130, y: 390, s: 2.5, o: 0.35 },
-    { x: 550, y: 560, s: 2, o: 0.25 },
-    { x: 680, y: 50, s: 2, o: 0.3 },
+    { x: 110, y: 70, s: 3, o: 0.6 },
+    { x: 240, y: 150, s: 2, o: 0.4 },
+    { x: 1020, y: 90, s: 3.5, o: 0.55 },
+    { x: 1100, y: 210, s: 2, o: 0.35 },
+    { x: 170, y: 470, s: 2.5, o: 0.4 },
+    { x: 960, y: 510, s: 3, o: 0.5 },
+    { x: 440, y: 55, s: 2.5, o: 0.35 },
+    { x: 780, y: 75, s: 2.5, o: 0.4 },
+    { x: 70, y: 290, s: 2, o: 0.3 },
+    { x: 1140, y: 400, s: 2.5, o: 0.4 },
+    { x: 550, y: 560, s: 2, o: 0.3 },
+    { x: 680, y: 45, s: 2.5, o: 0.35 },
   ];
 
   return new ImageResponse(
@@ -36,37 +35,37 @@ export default async function OGImage() {
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          background: 'linear-gradient(160deg, #0c0a0e 0%, #1a1520 35%, #1e1418 65%, #0c0a0e 100%)',
+          background: 'linear-gradient(160deg, #100e14 0%, #1c1724 35%, #211820 65%, #100e14 100%)',
           fontFamily: 'Georgia, serif',
           position: 'relative',
           overflow: 'hidden',
         }}
       >
-        {/* Warm ambient glow — top center */}
+        {/* Central warm spotlight — draws the eye inward */}
         <div
           style={{
             position: 'absolute',
-            top: -80,
+            top: '46%',
             left: '50%',
-            transform: 'translateX(-50%)',
-            width: 800,
+            transform: 'translate(-50%, -50%)',
+            width: 900,
             height: 500,
             borderRadius: '50%',
-            background: 'radial-gradient(ellipse, rgba(196,164,132,0.12) 0%, rgba(196,164,132,0.04) 45%, transparent 70%)',
+            background: 'radial-gradient(ellipse, rgba(220,190,160,0.18) 0%, rgba(200,170,140,0.07) 40%, transparent 68%)',
           }}
         />
 
-        {/* Secondary glow — lower, rose-tinted */}
+        {/* Secondary rose glow — warmth underneath */}
         <div
           style={{
             position: 'absolute',
-            top: '55%',
+            top: '52%',
             left: '50%',
             transform: 'translate(-50%, -50%)',
-            width: 600,
-            height: 350,
+            width: 500,
+            height: 300,
             borderRadius: '50%',
-            background: 'radial-gradient(ellipse, rgba(184,138,146,0.1) 0%, transparent 60%)',
+            background: 'radial-gradient(ellipse, rgba(200,150,155,0.1) 0%, transparent 65%)',
           }}
         />
 
@@ -81,57 +80,47 @@ export default async function OGImage() {
               width: s.s,
               height: s.s,
               borderRadius: '50%',
-              background: `rgba(220,200,180,${s.o})`,
+              background: `rgba(235,220,200,${s.o})`,
             }}
           />
         ))}
 
-        {/* Thin gold rule above title */}
+        {/* Title — Cormorant Garamond, high contrast */}
         <div
           style={{
-            width: 60,
-            height: 1,
-            background: 'linear-gradient(90deg, transparent, rgba(196,174,142,0.5), transparent)',
-            marginBottom: 32,
-          }}
-        />
-
-        {/* Title — Cormorant Garamond */}
-        <div
-          style={{
-            fontSize: 108,
+            fontSize: 116,
             fontFamily: 'Cormorant Garamond',
             fontWeight: 600,
-            color: '#d4c0a8',
+            color: '#f0e6d8',
             letterSpacing: '0.06em',
-            marginBottom: 14,
+            marginBottom: 18,
           }}
         >
           Muse
         </div>
 
-        {/* Tagline */}
+        {/* Tagline — readable, warm */}
         <div
           style={{
-            fontSize: 22,
-            color: 'rgba(196,174,142,0.55)',
-            letterSpacing: '0.14em',
+            fontSize: 24,
+            color: 'rgba(240,230,216,0.6)',
+            letterSpacing: '0.12em',
             textTransform: 'uppercase',
-            marginBottom: 52,
+            marginBottom: 44,
           }}
         >
           Your cosmic self-discovery guide
         </div>
 
-        {/* Feature words — minimal, no pills, just a quiet line */}
+        {/* Feature words — clearer, warmer */}
         <div
           style={{
             display: 'flex',
             alignItems: 'center',
             gap: 0,
-            fontSize: 15,
-            color: 'rgba(196,174,142,0.4)',
-            letterSpacing: '0.08em',
+            fontSize: 16,
+            color: 'rgba(240,230,216,0.45)',
+            letterSpacing: '0.06em',
           }}
         >
           {['Astrology', 'Human Design', 'Tarot', 'Journaling', 'Vision Board'].map(
@@ -143,8 +132,8 @@ export default async function OGImage() {
                       width: 3,
                       height: 3,
                       borderRadius: '50%',
-                      background: 'rgba(196,174,142,0.25)',
-                      margin: '0 16px',
+                      background: 'rgba(240,230,216,0.3)',
+                      margin: '0 18px',
                     }}
                   />
                 )}
@@ -154,7 +143,7 @@ export default async function OGImage() {
           )}
         </div>
 
-        {/* Bottom accent — warm gold fade */}
+        {/* Bottom accent line */}
         <div
           style={{
             position: 'absolute',
@@ -162,7 +151,7 @@ export default async function OGImage() {
             left: 0,
             right: 0,
             height: 2,
-            background: 'linear-gradient(90deg, transparent 15%, rgba(196,174,142,0.3) 50%, transparent 85%)',
+            background: 'linear-gradient(90deg, transparent 10%, rgba(220,190,160,0.35) 50%, transparent 90%)',
           }}
         />
       </div>
