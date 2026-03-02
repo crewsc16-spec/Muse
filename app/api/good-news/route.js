@@ -16,7 +16,7 @@ export async function GET() {
     const headlines = (data.items ?? []).slice(0, 5).map(item => ({
       title: item.title,
       link: item.link,
-      snippet: item.description?.replace(/<[^>]*>/g, '').trim().slice(0, 150),
+      snippet: item.description?.replace(/<[^>]*>/g, '').trim().split(/(?<=[.!?])\s/).slice(0, 2).join(' '),
     }));
 
     cache = { headlines, ts: Date.now() };

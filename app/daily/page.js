@@ -335,7 +335,7 @@ export default function DailyPage() {
         {goodNews.length > 0 && (
           <section className="glass-card rounded-3xl p-5">
             <p className="text-xs uppercase tracking-widest text-gray-400 mb-3">Good News Today</p>
-            <div className="max-h-52 overflow-y-auto space-y-2 pr-1">
+            <div className="space-y-2">
               {goodNews.map((item, i) => (
                 <a
                   key={i}
