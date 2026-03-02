@@ -119,7 +119,7 @@ export default async function OGImage() {
             letterSpacing: '0.06em',
           }}
         >
-          Astrology · Human Design · Tarot · Journaling
+          Astrology · Human Design · Journaling · Vision Board
         </div>
 
         {/* Bottom accent line */}
