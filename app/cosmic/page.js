@@ -624,6 +624,173 @@ function InfoModal({ item, onClose }) {
   );
 }
 
+// ─── Vedic constants ──────────────────────────────────────────────────────────
+const VEDIC_PLANETS = ['Sun','Moon','Mars','Mercury','Jupiter','Venus','Saturn','Rahu','Ketu'];
+const VEDIC_PLANET_SYM = { Sun:'☉', Moon:'☽', Mars:'♂', Mercury:'☿', Jupiter:'♃', Venus:'♀', Saturn:'♄', Rahu:'☊', Ketu:'☋' };
+const SIGN_LORDS = { Aries:'Mars', Taurus:'Venus', Gemini:'Mercury', Cancer:'Moon', Leo:'Sun', Virgo:'Mercury', Libra:'Venus', Scorpio:'Mars', Sagittarius:'Jupiter', Capricorn:'Saturn', Aquarius:'Saturn', Pisces:'Jupiter' };
+const NAKSHATRA_DATA = [
+  {name:'Ashwini',lord:'Ketu',symbol:'🐴'},{name:'Bharani',lord:'Venus',symbol:'⚖️'},
+  {name:'Krittika',lord:'Sun',symbol:'🔪'},{name:'Rohini',lord:'Moon',symbol:'🌸'},
+  {name:'Mrigashira',lord:'Mars',symbol:'🦌'},{name:'Ardra',lord:'Rahu',symbol:'💎'},
+  {name:'Punarvasu',lord:'Jupiter',symbol:'🏹'},{name:'Pushya',lord:'Saturn',symbol:'🌺'},
+  {name:'Ashlesha',lord:'Mercury',symbol:'🐍'},{name:'Magha',lord:'Ketu',symbol:'🦁'},
+  {name:'Purva Phalguni',lord:'Venus',symbol:'🛏️'},{name:'Uttara Phalguni',lord:'Sun',symbol:'🌿'},
+  {name:'Hasta',lord:'Moon',symbol:'✋'},{name:'Chitra',lord:'Mars',symbol:'💫'},
+  {name:'Swati',lord:'Rahu',symbol:'🌬️'},{name:'Vishakha',lord:'Jupiter',symbol:'⚡'},
+  {name:'Anuradha',lord:'Saturn',symbol:'🌸'},{name:'Jyeshtha',lord:'Mercury',symbol:'👑'},
+  {name:'Mula',lord:'Ketu',symbol:'🌿'},{name:'Purva Ashadha',lord:'Venus',symbol:'🐘'},
+  {name:'Uttara Ashadha',lord:'Sun',symbol:'🐘'},{name:'Shravana',lord:'Moon',symbol:'👂'},
+  {name:'Dhanishta',lord:'Mars',symbol:'🥁'},{name:'Shatabhisha',lord:'Rahu',symbol:'⭕'},
+  {name:'Purva Bhadrapada',lord:'Jupiter',symbol:'⚔️'},{name:'Uttara Bhadrapada',lord:'Saturn',symbol:'🐍'},
+  {name:'Revati',lord:'Mercury',symbol:'🐟'},
+];
+const NAKSHATRA_DESC = {
+  'Ashwini':'The twin horse-headed healers — swift, pioneering, and gifted with natural healing energy. Ashwini begins the zodiac and embodies the pure impulse to act, to arrive, and to restore. Those born under this star move quickly and carry an instinctive gift for renewal.',
+  'Bharani':'Ruled by Yama, lord of dharma and death. Bharani holds the fierce creative and destructive power of existence — the womb and the tomb in one. This nakshatra carries intense life force, moral seriousness, and the capacity to bear what others cannot.',
+  'Krittika':'The sharp blades of transformation, ruled by the Sun. Krittika cuts through what is false, purifies what remains, and burns with the fire of truth. Those touched by this star are warriors of clarity — honest, direct, and impossible to deceive.',
+  'Rohini':'The most beloved nakshatra of the Moon — lush, creative, and sensually rooted. Rohini governs beauty, abundance, and the deep pleasure of being fully in the body. It is where growth is most natural, most fertile, and most graceful.',
+  'Mrigashira':'The searching deer — gentle, curious, and eternally seeking. Mrigashira carries a restless intelligence that is always reaching for what lies just beyond the visible. It governs the mind\'s natural longing for beauty, truth, and the perfect thing.',
+  'Ardra':'The storm — Rahu\'s nakshatra of dissolution and radical renewal. Ardra carries the energy of Shiva\'s dance of destruction: what it touches, it transforms. This star governs genius, disruption, and the painful gift of seeing through all illusions.',
+  'Punarvasu':'Return, renewal, and the restoration of goodness. Governed by Jupiter, Punarvasu brings back what was lost and restores faith after hardship. Its energy is generous, philosophical, and marked by a deep and enduring optimism about the human journey.',
+  'Pushya':'The most auspicious nakshatra — the nourisher, governed by Saturn. Pushya feeds, sustains, and provides for all who come to it. It governs nourishment in every form: food, love, dharma, and the slow, patient accumulation of wisdom across time.',
+  'Ashlesha':'The coiled serpent, ruled by Mercury. Ashlesha holds the raw, primordial kundalini energy — penetrating, hypnotic, and capable of enormous transformation. This star governs depth of perception, the capacity to hold paradox, and the mysteries of the unconscious.',
+  'Magha':'The throne — ancestral power, royal dignity, and deep karmic lineage. Magha carries the weight and blessing of those who came before. Its energy is commanding, proud, and oriented toward greatness earned through the honoring of roots and tradition.',
+  'Purva Phalguni':'Rest, pleasure, and the joy of creative expression. Governed by Venus, this nakshatra governs the arts, romance, and the luxury of being fully alive and at ease. It is the resting place before effort — the celebration that restores and prepares.',
+  'Uttara Phalguni':'The generous patron — ruled by the Sun. Where Purva Phalguni rests, Uttara Phalguni gives. This nakshatra governs service, agreement, and the sacred contracts between human beings. Its energy is warm, principled, and naturally oriented toward others\' flourishing.',
+  'Hasta':'Dexterity, skill, and the power of the hands. Governed by the Moon, Hasta is the craftsperson, the healer, the one who makes with care and precision. This star governs the practical intelligence that translates vision into form.',
+  'Chitra':'The bright jewel — beauty, artistry, and the creative intelligence of Mars. Chitra governs the capacity to see and make what is truly beautiful. Its energy is magnetic, precise, and marked by an almost supernatural gift for aesthetic truth.',
+  'Swati':'The independent wind — Rahu\'s nakshatra of freedom and self-becoming. Swati governs the sword that cuts its own path. Its energy is flexible, adaptable, and driven by the deep need for autonomy and the right to define itself on its own terms.',
+  'Vishakha':'Single-pointed aim and eventual triumph — Jupiter\'s star of the seeker who reaches the goal. Vishakha governs the drive toward a purpose that sustains across time. Its energy is fierce, focused, and capable of delayed but complete fulfillment.',
+  'Anuradha':'Devoted friendship, collaboration, and the love that sustains across distance. Saturn\'s nakshatra of loyalty governs the bonds that endure through difficulty. Its energy is warm, inclusive, and marked by a deep and genuine care for those it loves.',
+  'Jyeshtha':'The eldest — Mercury\'s nakshatra of authority, seniority, and the weight of responsibility. Jyeshtha governs leadership born from seniority, the capacity to carry what others cannot, and the fierce protectiveness of those who hold the highest position.',
+  'Mula':'The root — Ketu\'s nakshatra of radical dissolution and going to the source. Mula strips away everything that is not essential. Its energy is investigative, transformative, and not afraid of destruction — because it knows that something more real lives beneath.',
+  'Purva Ashadha':'Early victory — Venus\'s nakshatra of invincibility and the refusal to be defeated. Purva Ashadha carries a deep pride and the energy of the warrior who will not surrender. It governs purification, rejuvenation, and the courage of the unbroken spirit.',
+  'Uttara Ashadha':'Final victory — the Sun\'s nakshatra of complete and lasting achievement. Uttara Ashadha governs the triumph that endures: the kind that is earned through discipline, righteousness, and the willingness to stand for what is true no matter the cost.',
+  'Shravana':'Listening — the Moon\'s nakshatra of reception, learning, and transmission. Shravana governs the sacred act of truly hearing — wisdom received through attentive silence. Its energy is receptive, intelligent, and marked by the profound gift of knowing how to listen.',
+  'Dhanishta':'The drum — Mars\'s nakshatra of rhythm, abundance, and the music of being alive. Dhanishta governs wealth, prosperity, and the power to move through the world with strength and joy. Its energy is vibrant, martial, and marked by a natural charisma.',
+  'Shatabhisha':'The hundred healers — Rahu\'s nakshatra of mystery, healing, and the veiled truth. Shatabhisha governs what is hidden, the occult, and the healing that comes from seeing through the surface of things. Its energy is secretive, investigative, and profoundly unusual.',
+  'Purva Bhadrapada':'The fire of purification — Jupiter\'s nakshatra of radical transformation through burning. Purva Bhadrapada governs the ascetic fire that destroys what is gross so that what is refined may emerge. Its energy is intense, otherworldly, and marked by spiritual power.',
+  'Uttara Bhadrapada':'Deep wisdom and the stillness of the depths — Saturn\'s nakshatra of compassion across lifetimes. Uttara Bhadrapada governs the capacity to hold the full spectrum of experience without being destroyed by it. Its energy is ancient, wise, and boundlessly compassionate.',
+  'Revati':'The final nakshatra — Mercury\'s star of completion, abundance, and the journey home. Revati governs the completion of cycles, the guidance of those who are lost, and the gentle transition between worlds. Its energy is nurturing, psychic, and marked by a profound and quiet grace.',
+};
+const DASHA_DESC = {
+  Sun:'A period of clarity, authority, and the illumination of your deepest purpose. The Sun mahadasha brings you into greater alignment with your authentic self — your visibility increases, your willpower strengthens, and life calls you toward leadership and integrity.',
+  Moon:'A period of deep feeling, inner attunement, and the nourishing of what matters most. The Moon mahadasha heightens emotional sensitivity, brings significant events around home, mother, and belonging, and opens the inner life in ways that ask for genuine self-care.',
+  Mars:'A period of energy, courage, and decisive action. Mars mahadasha brings ambition to the surface, sharpens your drive, and calls you to pursue your goals with force and focus. Conflict may arise, but so does the capacity to meet it and prevail.',
+  Rahu:'A period of expansion beyond familiar boundaries — disorienting, ambitious, and ultimately transformative. Rahu mahadasha pulls you toward what is new, foreign, and outside your comfort zone. It is the time of the seeker, the shape-shifter, and the one who outgrows the life they were born into.',
+  Jupiter:'A period of grace, expansion, and deepening wisdom. Jupiter mahadasha brings abundance, opportunity, and the blessings of dharma. It is often the most fortunate and growth-filled period in a life — a time when the doors open and the spirit expands.',
+  Saturn:'A period of discipline, restriction, and the slow building of something real and lasting. Saturn mahadasha asks you to do the work — not quickly, not easily, but with the kind of sustained effort that produces genuine mastery. What you build here endures.',
+  Mercury:'A period of intellectual vitality, communication, and the rapid exchange of ideas. Mercury mahadasha quickens the mind, multiplies connections, and brings education, commerce, and conversation into prominence. It rewards curiosity, adaptability, and the intelligent use of information.',
+  Ketu:'A period of spiritual deepening, release of the material, and dissolution of what no longer serves. Ketu mahadasha turns the gaze inward, away from worldly ambition and toward the essential. It can feel like loss — but what falls away is what was never truly yours.',
+  Venus:'A period of beauty, love, abundance, and the flowering of all that gives life its richness. Venus mahadasha is often one of the most pleasurable and creatively prolific periods — relationships deepen, beauty multiplies, and the heart opens to what is most genuinely delightful.',
+};
+const YOGA_DESC = {
+  'Vishkumbha':'Powerful and determined — struggles are overcome through persistent effort.',
+  'Priti':'Beloved and affectionate — naturally delightful to others.',
+  'Ayushman':'Long-lived and vigorous — full of sustaining life force.',
+  'Saubhagya':'Fortunate — blessed with natural grace and good luck.',
+  'Shobhana':'Beautiful and radiant — marked by natural elegance.',
+  'Atiganda':'Potentially challenging — opportunities arise through overcoming obstacles.',
+  'Sukarman':'Meritorious and industrious — naturally skilled in one\'s work.',
+  'Dhriti':'Patient and steadfast — capable of holding a course through difficulty.',
+  'Shula':'Sharp, penetrating intelligence — direct and sometimes cutting.',
+  'Ganda':'Requires extra care — energy best directed toward overcoming hidden challenges.',
+  'Vriddhi':'Growth and increase — natural expansion flows in all directions.',
+  'Dhruva':'Stable, reliable, and enduringly steadfast in all endeavors.',
+  'Vyaghata':'Bold and forceful — an energy that breaks through resistance.',
+  'Harshana':'Joyful and celebratory — naturally uplifting to all around you.',
+  'Vajra':'Adamantine strength — unyielding and capable of cutting through all obstacles.',
+  'Siddhi':'Achievement and success — the natural completion of what is begun.',
+  'Vyatipata':'Caution and attentiveness are called for — awareness brings protection.',
+  'Variyan':'Comfort and ease — the natural enjoyment of life\'s pleasures.',
+  'Parigha':'Patience required — barriers become doorways with perseverance.',
+  'Shiva':'Auspicious and blessed — deeply aligned with higher purpose.',
+  'Siddha':'Accomplished and naturally gifted — capable of remarkable achievement.',
+  'Sadhya':'Goals are within reach — consistent effort brings accomplishment.',
+  'Shubha':'Benefic and auspicious — naturally inclined toward the good.',
+  'Shukla':'Pure, clear, and luminous in character.',
+  'Brahma':'High spiritual potential — marked by deep knowledge and wisdom.',
+  'Indra':'Leadership and power — the natural authority of one who commands.',
+  'Vaidhriti':'A time for completion, release, and turning the page.',
+};
+const VAARA_DESC = {
+  Sunday:'The Sun\'s day — ideal for authority, visibility, health, and matters of the father.',
+  Monday:'The Moon\'s day — ideal for emotional matters, home, mother, and intuitive work.',
+  Tuesday:'Mars\'s day — favorable for courage, decisive action, and competitive endeavors.',
+  Wednesday:'Mercury\'s day — excellent for communication, commerce, learning, and travel.',
+  Thursday:'Jupiter\'s day — the most auspicious day for dharmic, educational, and spiritual work.',
+  Friday:'Venus\'s day — favorable for beauty, love, creativity, luxury, and all artistic work.',
+  Saturday:'Saturn\'s day — suited for discipline, hard work, service, and long-term projects.',
+};
+const KARANA_DESC = {
+  Bava:'Auspicious for all new beginnings.',
+  Balava:'Gentle and pleasant — good for creative and social activities.',
+  Kaulava:'Friendly energy — favors cooperation and mutual support.',
+  Taitila:'Favorable for trade, commerce, and practical endeavors.',
+  Garaja:'Steady and enduring — good for long-term commitments.',
+  Vanija:'The merchant — excellent for trade, negotiation, and exchange.',
+  Vishti:'Inauspicious — best for introspection rather than new action.',
+  Shakuni:'Clever and resourceful — unexpected solutions arise.',
+  Chatushpada:'Stability and endurance — favorable for foundations.',
+  Naga:'Depth and power — favorable for deep work and transformation.',
+  Kimstughna:'Purifying — good for clearing and releasing what is complete.',
+};
+const DIGNITY_STYLE = {
+  exalted:     {label:'Exalted',     color:'text-amber-600', bg:'bg-amber-50',   border:'border-amber-200/60'},
+  own:         {label:'Own Sign',    color:'text-green-600', bg:'bg-green-50',   border:'border-green-200/60'},
+  moolatrikona:{label:'Moolatrikona',color:'text-emerald-600',bg:'bg-emerald-50',border:'border-emerald-200/60'},
+  friendly:    {label:'Friend',      color:'text-sky-600',   bg:'bg-sky-50',     border:'border-sky-200/60'},
+  neutral:     {label:'Neutral',     color:'text-gray-500',  bg:'bg-gray-50',    border:'border-gray-200/60'},
+  enemy:       {label:'Enemy',       color:'text-orange-600',bg:'bg-orange-50',  border:'border-orange-200/60'},
+  debilitated: {label:'Debilitated', color:'text-rose-600',  bg:'bg-rose-50',    border:'border-rose-200/60'},
+};
+const VARGA_PURPOSE = {
+  d9:'Marriage, dharma, and the deeper purpose beneath the surface of your life.',
+  d10:'Career, profession, and your public contribution to the world.',
+  d3:'Courage, siblings, and the quality of your personal efforts.',
+  d7:'Children, creativity, and the legacy you leave.',
+  d12:'Parents, ancestors, and the inheritance of your lineage.',
+};
+const SIGN_ORDER = ['Aries','Taurus','Gemini','Cancer','Leo','Virgo','Libra','Scorpio','Sagittarius','Capricorn','Aquarius','Pisces'];
+
+const VEDIC_PLANET_DESC = {
+  Sun:     { title:'Surya · The Sun', body:'Surya is the soul — the self, the source of light and life in Jyotish. It governs the father, authority, government, and vital life force. Its placement reveals your soul\'s purpose, your relationship with authority and the masculine, and where your light shines most naturally. A strong Sun brings confidence, leadership, and vitality. Its nakshatra and house show the domain of life where purpose and identity are meant to shine most brightly.' },
+  Moon:    { title:'Chandra · The Moon', body:'Chandra is the mind — the emotions, the mother, and the capacity for nourishment. In Jyotish the Moon is often considered more important than the Sun, because it governs your felt, lived experience of life. The Moon\'s nakshatra (Janma Nakshatra) is the most personally significant placement in the chart, revealing your deepest psychological nature, emotional needs, and the quality of your inner world. A strong Moon brings peace of mind, loving relationships, and emotional resilience.' },
+  Mars:    { title:'Mangala · Mars', body:'Mangala is the warrior — energy, courage, action, and protection. In Jyotish, Mars governs younger siblings, landed property, engineering, surgery, and all competitive pursuits. It rules blood, muscles, and the vital force behind action. Mars placed in the first, fourth, seventh, eighth, or twelfth house creates Mangal Dosha, which traditionally calls for attention in marriage compatibility. A strong Mars bestows courage, athletic ability, and decisive leadership.' },
+  Mercury: { title:'Budha · Mercury', body:'Budha is the intellect — the communicator, the merchant, and the student. In Jyotish, Mercury governs trade, mathematics, writing, speech, and all forms of skillful discernment. It rules the nervous system and the faculty of discrimination. Mercury within 8° of the Sun becomes combust (Astangata) and may reduce the clarity of self-expression. A strong Mercury bestows wit, business acumen, and the gift of clear and persuasive communication.' },
+  Jupiter: { title:'Guru · Jupiter', body:'Guru is the great benefic — the teacher, the priest, the bestower of wisdom, children, and fortune. In Jyotish, Jupiter governs dharma, children, wealth, higher education, philosophy, and divine grace. It is the most important benefic in the chart — its strength and placement are among the strongest indicators of overall life fortune. Jupiter expands whatever it touches, and its aspect on a house or planet blesses it with protection and growth.' },
+  Venus:   { title:'Shukra · Venus', body:'Shukra is the benefic of material life — beauty, love, luxury, art, and the refinements of earthly existence. In Jyotish, Venus governs marriage (especially for men), partnership, vehicles, gems, and all the pleasures that make life beautiful. It rules the reproductive system, the kidneys, and our capacity for relating. A strong Venus brings a beautiful life, loving relationships, and artistic gifts. Shukra is the guru of the asuras — the one who knows both the pleasures and the deeper magic of material existence.' },
+  Saturn:  { title:'Shani · Saturn', body:'Shani is the great karmic teacher — discipline, delay, restriction, and the slow harvest of what has been sown across lifetimes. In Jyotish, Saturn governs longevity, service, the masses, and professions requiring sustained effort over time. Sade Sati (7½ years of Saturn transiting moon sign and adjacent signs) is one of the most significant transit periods in a life. A weak or afflicted Saturn brings chronic difficulties; a strong Saturn — especially in exaltation, own sign, or a kendra — confers remarkable endurance, authority, and the ability to build something truly lasting.' },
+  Rahu:    { title:'Rahu · North Node', body:'Rahu is the shadow planet of insatiable desire, obsession, and the hunger for worldly experience. In Jyotish, Rahu represents what the soul is reaching for in this incarnation — the new, the foreign, the unconventional. It always moves retrograde and functions as an amplifier, intensifying whatever sign and house it occupies. Rahu governs technology, foreigners, illusion, and the cutting edge of the new. Its Mahadasha (18 years) is often the most dramatic period of worldly rise — and the deepest encounter with illusion and longing.' },
+  Ketu:    { title:'Ketu · South Node', body:'Ketu is the shadow planet of liberation, past-life mastery, and spiritual detachment. Where Rahu grasps, Ketu releases. In Jyotish, Ketu represents what the soul has already mastered in previous lifetimes — abilities that feel innate but somehow incomplete or unsatisfying. It governs moksha, psychic ability, occult knowledge, and the path of renunciation. Ketu\'s placement reveals where you are naturally gifted yet strangely detached. Its Mahadasha (7 years) often initiates a turning inward and a releasing of worldly attachment in favor of something more essential.' },
+};
+
+const VEDIC_HOUSE_DESC = {
+  1:  { name:'Lagna · First House',    themes:'Self, body, personality, dharma', body:'The first house is the Lagna — the most important house in Jyotish. It represents your physical body, personality, temperament, overall vitality, and the lens through which your soul experiences this life. The rising sign and any planets here color everything about how you show up in the world. The Lagna lord is the most important planet in the entire chart — its strength, placement, and aspects profoundly shape your overall life quality and direction.' },
+  2:  { name:'Dhana · Second House',   themes:'Wealth, family, speech, food, face', body:'The second house governs accumulated wealth, the immediate family, speech, food habits, the face, and the right eye. It reveals your relationship with your family of origin, your capacity to accumulate material resources, and the quality of your communication. Benefics here tend to bless with good speech and financial stability; malefics can create difficulties with family or indicate a more cutting or caustic manner of speaking.' },
+  3:  { name:'Sahaja · Third House',   themes:'Courage, siblings, communication, effort', body:'The third house governs younger siblings, courage, short journeys, communication, hands, and personal sustained effort. It is the house of willpower and initiative — what you can make happen through your own determined effort. A strong third house indicates brave, communicative, and creatively active energy. Planets here reveal the quality of your relationship with siblings and your own gutsy, self-initiating energy.' },
+  4:  { name:'Sukha · Fourth House',   themes:'Mother, home, inner peace, property', body:'The fourth house governs the mother, home, property, vehicles, inner happiness, and the chest. It reveals the quality of your home life and your fundamental capacity for contentment. A strong fourth house indicates a nurturing mother, a stable and pleasant home, and an overall sense of inner peace. Planets here reveal the nature of your domestic life, your relationship with your mother, and your deeply felt sense of belonging in the world.' },
+  5:  { name:'Putra · Fifth House',    themes:'Children, intelligence, creativity, past-life merit', body:'The fifth house governs children, creative intelligence, speculation, romance, mantras, and the accumulated merit of past lives (purva punya). It is one of the most important trikona houses — its strength indicates the blessings of dharma flowing into this lifetime. Planets here reveal your relationship with children, your creative gifts, and the quality of your intuition and intellect. A strong fifth house is a profound blessing.' },
+  6:  { name:'Ari · Sixth House',      themes:'Enemies, disease, debt, service, competition', body:'The sixth house governs enemies, disease, debt, service, litigation, and competition. Paradoxically, it is also the house of victory over these challenges — planets here can both generate and overcome obstacles. Benefics in the sixth can indicate healing gifts and ability to defeat competition; malefics (especially Mars and Saturn) can be powerful in the sixth, granting the strength to overcome enemies and illness. It is an Upachaya house — one that improves with time.' },
+  7:  { name:'Kalatra · Seventh House', themes:'Marriage, partnership, spouse, public', body:'The seventh house governs marriage, the spouse, business partnerships, and the public. It is the house of the other — your most important one-on-one relationships and the mirror that partnership holds up to you. Planets here color the nature of the spouse and the quality of relational life. The seventh lord\'s strength and placement are among the most important factors in assessing marriage timing and quality. Opposite the Lagna, it also governs how you appear to and engage with the world at large.' },
+  8:  { name:'Ayur · Eighth House',    themes:'Longevity, transformation, hidden, inheritance', body:'The eighth house governs longevity, sudden events, transformation, inheritance, chronic illness, occult knowledge, and the hidden depths of life. It is the house of death and rebirth — not just physical death, but the constant dying and becoming that marks a genuine life. Planets here reveal the nature of transformative experiences, the manner of sudden changes, and access to hidden or occult knowledge. A well-supported eighth house can bestow longevity, deep research ability, and occult gifts.' },
+  9:  { name:'Dharma · Ninth House',   themes:'Fortune, father, guru, higher learning, dharma', body:'The ninth house is considered the most auspicious house in Jyotish — the house of dharma, fortune, the father, the guru, higher education, long journeys, and divine grace. A strong ninth house is one of the most powerful indicators of a fortunate, protected, and meaningful life. Planets here reveal your relationship with your father and teachers, the philosophical or spiritual path that gives life meaning, and the quality of the divine grace flowing through your chart.' },
+  10: { name:'Karma · Tenth House',    themes:'Career, status, action, public life, authority', body:'The tenth house governs career, public status, profession, the government or employer, and the actions for which you become known. It is the most visible house — planets here have tremendous power to shape your public life and professional path. A strong tenth house and a well-placed tenth lord indicate a prominent and fulfilling career. The tenth from the Moon is equally important for assessing career potential. This is the house of Karma — what you actually do in the world.' },
+  11: { name:'Labha · Eleventh House', themes:'Gains, income, friends, aspirations, elder siblings', body:'The eleventh house governs income, gains, the fulfillment of desires, elder siblings, influential friends, and social networks. All planets tend to give good results in the eleventh — it is a house of gain and the realization of hopes. A strong eleventh indicates steady income, well-connected friendships, and the satisfying fulfillment of your most important aspirations. The eleventh lord\'s placement and strength reveal how easily and through what means gains flow into your life.' },
+  12: { name:'Vyaya · Twelfth House',  themes:'Liberation, expenses, foreign, sleep, spirituality', body:'The twelfth house governs liberation (moksha), expenses, losses, foreign lands, sleep, retreat, and the dissolution of the ego into something larger. It is the house of endings and of what lies beyond the visible world — the ashram, the hospital, foreign soil, and the meditative stillness of the final stage. A spiritually strong twelfth house (with Jupiter or a strong twelfth lord) can indicate deep spiritual gifts, meaningful time in foreign countries, and genuine capacity for renunciation and liberation.' },
+};
+
+const PURPOSE_STYLE = {
+  Dharma: 'bg-amber-50 text-amber-600 border-amber-200/50',
+  Artha:  'bg-green-50 text-green-600 border-green-200/50',
+  Kama:   'bg-rose-50 text-rose-500 border-rose-200/50',
+  Moksha: 'bg-violet-50 text-violet-600 border-violet-200/50',
+  Kendra: 'bg-sky-50 text-sky-600 border-sky-200/50',
+  Trikona:'bg-amber-50 text-amber-700 border-amber-300/50',
+  Upachaya:'bg-emerald-50 text-emerald-600 border-emerald-200/50',
+  Dusthana:'bg-gray-50 text-gray-500 border-gray-200/50',
+};
+
 // ─── Main page ────────────────────────────────────────────────────────────────
 export default function CosmicPage() {
   const [birthData,    setBirthData]    = useState(null);
@@ -640,6 +807,10 @@ export default function CosmicPage() {
   const [chatSaved,    setChatSaved]    = useState(false);
   const [hdIntroOpen,  setHdIntroOpen]  = useState(false);
   const [today] = useState(() => new Date().toISOString().slice(0,10));
+  const [vedicMode,    setVedicMode]    = useState('western');
+  const [vedicData,    setVedicData]    = useState(null);
+  const [vedicLoading, setVedicLoading] = useState(false);
+  const [vedicTab,     setVedicTab]     = useState('rasi');
 
   useEffect(() => {
     async function load() {
@@ -678,6 +849,28 @@ export default function CosmicPage() {
     }
     load();
   }, [today]);
+
+  useEffect(() => {
+    if (vedicMode !== 'vedic' || vedicData || vedicLoading) return;
+    if (!birthData?.date || !birthData?.time || birthData?.birthLat == null) return;
+    setVedicLoading(true);
+    fetch('/api/vedic', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        birthDate:      birthData.date,
+        birthTime:      birthData.time,
+        timezoneOffset: birthData.utcOffset ?? 0,
+        latitude:       birthData.birthLat,
+        longitude:      birthData.birthLon,
+        name:           displayName,
+        locationName:   birthData.birthPlace ?? '',
+      }),
+    })
+      .then(r => r.ok ? r.json() : null)
+      .catch(() => null)
+      .then(data => { setVedicData(data); setVedicLoading(false); });
+  }, [vedicMode, vedicData, vedicLoading, birthData, displayName]);
 
   const natalLons = {};
   if (hdData?.personality) for (const [b,{gate,line}] of Object.entries(hdData.personality)) natalLons[b] = gateLineToLon(gate,line);
@@ -942,6 +1135,13 @@ export default function CosmicPage() {
     {id:'synthesis',  label:'Synthesis'},
     {id:'transits',   label:'Transits'},
   ];
+  const VEDIC_TABS = [
+    {id:'rasi',     label:'Rasi Chart'},
+    {id:'panchanga',label:'Panchanga'},
+    {id:'dashas',   label:'Dashas'},
+    {id:'varga',    label:'Varga'},
+    {id:'strength', label:'Strength'},
+  ];
 
   if (loading) return (
     <div className="max-w-2xl mx-auto space-y-4">
@@ -979,10 +1179,27 @@ export default function CosmicPage() {
         </p>
       </div>
 
+      {/* ── Western / Vedic toggle ── */}
+      <div className="flex items-center gap-3">
+        <div className="flex gap-1 bg-white/50 border border-white/40 rounded-full p-1">
+          <button
+            onClick={() => setVedicMode('western')}
+            className={`px-4 py-1.5 rounded-full text-xs font-medium transition-all ${vedicMode==='western'?'btn-gradient text-white shadow-sm':'text-gray-500 hover:text-gray-700'}`}
+          >Western</button>
+          <button
+            onClick={() => setVedicMode('vedic')}
+            className={`px-4 py-1.5 rounded-full text-xs font-medium transition-all ${vedicMode==='vedic'?'btn-gradient text-white shadow-sm':'text-gray-500 hover:text-gray-700'}`}
+          >Vedic ✦</button>
+        </div>
+        {vedicMode==='vedic' && (
+          <span className="text-xs text-gray-400">Sidereal · JPL DE421 · Lahiri ayanamsha</span>
+        )}
+      </div>
+
       <div className="flex gap-2 flex-wrap">
-        {TABS.map(t => (
-          <button key={t.id} onClick={()=>setTab(t.id)}
-            className={`px-4 py-2 rounded-full text-xs font-medium transition-all ${tab===t.id?'btn-gradient text-white shadow-sm':'bg-white/60 text-gray-500 border border-white/50 hover:bg-white/80'}`}>
+        {(vedicMode==='western' ? TABS : VEDIC_TABS).map(t => (
+          <button key={t.id} onClick={()=> vedicMode==='western' ? setTab(t.id) : setVedicTab(t.id)}
+            className={`px-4 py-2 rounded-full text-xs font-medium transition-all ${(vedicMode==='western'?tab:vedicTab)===t.id?'btn-gradient text-white shadow-sm':'bg-white/60 text-gray-500 border border-white/50 hover:bg-white/80'}`}>
             {t.label}
           </button>
         ))}
@@ -1063,7 +1280,7 @@ export default function CosmicPage() {
       </div>
 
       {/* ════ OVERVIEW ════ */}
-      {tab === 'overview' && (
+      {vedicMode === 'western' && tab === 'overview' && (
         <div className="space-y-4">
           <div className="glass-card rounded-3xl p-6 space-y-4">
             <h2 className="font-playfair text-xl text-gray-700">{displayName || 'Your'} Cosmic Identity</h2>
@@ -1165,7 +1382,7 @@ export default function CosmicPage() {
       )}
 
       {/* ════ ASTROLOGY ════ */}
-      {tab === 'astrology' && (
+      {vedicMode === 'western' && tab === 'astrology' && (
         <div className="space-y-4">
           {Object.keys(natalLons).length > 0 && (
             <div className="glass-card rounded-3xl p-6 space-y-3">
@@ -1291,7 +1508,7 @@ export default function CosmicPage() {
       )}
 
       {/* ════ HUMAN DESIGN ════ */}
-      {tab === 'hd' && (
+      {vedicMode === 'western' && tab === 'hd' && (
         <div className="space-y-4">
 
           {/* ── What is Human Design? ── */}
@@ -1565,7 +1782,7 @@ export default function CosmicPage() {
       )}
 
       {/* ════ NUMEROLOGY ════ */}
-      {tab === 'numerology' && (
+      {vedicMode === 'western' && tab === 'numerology' && (
         <div className="space-y-4">
           {lifePath && LIFE_PATH[lifePath] && (
             <div className="glass-card rounded-3xl p-6 space-y-4">
@@ -1627,7 +1844,7 @@ export default function CosmicPage() {
       )}
 
       {/* ════ SYNTHESIS ════ */}
-      {tab === 'synthesis' && (
+      {vedicMode === 'western' && tab === 'synthesis' && (
         <div className="space-y-4">
           {hdData && lifePath && sunSign ? (() => {
             // ── helpers ──────────────────────────────────────────────────────
@@ -1813,7 +2030,7 @@ export default function CosmicPage() {
       )}
 
       {/* ════ TRANSITS ════ */}
-      {tab === 'transits' && (
+      {vedicMode === 'western' && tab === 'transits' && (
         <div className="space-y-4">
 
           {/* ── Affecting You Now ── */}
@@ -1885,12 +2102,49 @@ export default function CosmicPage() {
                 Sextile:     (nd) => `Pluto is opening a subtle channel of transformation through ${nd} — power and depth are quietly becoming available in this area of your life.`,
               },
             };
+            const TRANSIT_NAMES = {
+              jupiter: {
+                Conjunction: 'The Lucky Break',
+                Square:      'The Growth Spurt',
+                Opposition:  'The Balancing Act',
+                Trine:       'The Golden Door',
+                Sextile:     'The Gentle Nudge',
+              },
+              saturn: {
+                Conjunction: 'The Masterclass',
+                Square:      'The Stress Test',
+                Opposition:  'The Reality Check',
+                Trine:       'The Slow Reward',
+                Sextile:     'The Quiet Build',
+              },
+              uranus: {
+                Conjunction: 'The Plot Twist',
+                Square:      'The Shake-Up',
+                Opposition:  'The Great Reinvention',
+                Trine:       'The Electric Spark',
+                Sextile:     'The Fresh Start',
+              },
+              neptune: {
+                Conjunction: 'The Fog & The Dream',
+                Square:      'The Rose-Colored Glasses',
+                Opposition:  'The Veil Thins',
+                Trine:       'The Muse Arrives',
+                Sextile:     'The Soft Opening',
+              },
+              pluto: {
+                Conjunction: 'The Phoenix Season',
+                Square:      'The Power Struggle',
+                Opposition:  'The Great Unraveling',
+                Trine:       'The Deep Current',
+                Sextile:     'The Quiet Revolution',
+              },
+            };
             const ASP_HEADLINE = {
-              Conjunction: (tp, np) => `${cap(tp)} is joining your ${PLANET_LBL[np] ?? np}`,
-              Square:      (tp, np) => `${cap(tp)} is testing your ${PLANET_LBL[np] ?? np}`,
-              Opposition:  (tp, np) => `${cap(tp)} is polarizing your ${PLANET_LBL[np] ?? np}`,
-              Trine:       (tp, np) => `${cap(tp)} is blessing your ${PLANET_LBL[np] ?? np}`,
-              Sextile:     (tp, np) => `${cap(tp)} is opening your ${PLANET_LBL[np] ?? np}`,
+              Conjunction: (tp, np) => TRANSIT_NAMES[tp]?.Conjunction ?? `${cap(tp)} conjunct ${PLANET_LBL[np] ?? np}`,
+              Square:      (tp, np) => TRANSIT_NAMES[tp]?.Square      ?? `${cap(tp)} square ${PLANET_LBL[np] ?? np}`,
+              Opposition:  (tp, np) => TRANSIT_NAMES[tp]?.Opposition  ?? `${cap(tp)} opposite ${PLANET_LBL[np] ?? np}`,
+              Trine:       (tp, np) => TRANSIT_NAMES[tp]?.Trine       ?? `${cap(tp)} trine ${PLANET_LBL[np] ?? np}`,
+              Sextile:     (tp, np) => TRANSIT_NAMES[tp]?.Sextile     ?? `${cap(tp)} sextile ${PLANET_LBL[np] ?? np}`,
             };
             const MAJOR = new Set(['Conjunction','Square','Opposition','Trine','Sextile']);
 
@@ -1937,6 +2191,7 @@ export default function CosmicPage() {
                   const body = fn ? fn(nd) : null;
                   if (!body) return null;
                   const headline = (ASP_HEADLINE[a.aspName] ?? ((tp,np)=>`${cap(tp)} × ${PLANET_LBL[np]??np}`))(a.transit, a.natal);
+                  const planetsLine = `${cap(a.transit)} ${a.aspName.toLowerCase()} your ${PLANET_LBL[a.natal] ?? a.natal}`;
                   return (
                     <button key={`${a.transit}-${a.natal}`}
                       onClick={() => {
@@ -1944,7 +2199,7 @@ export default function CosmicPage() {
                         if (!asp) return;
                         setDetail({
                           title: headline,
-                          subtitle: `${OUTER_EMOJI[a.transit]} ${a.aspName} ${asp.symbol} · ${a.orb}° orb · ${OUTER_DURATION[a.transit]}`,
+                          subtitle: `${OUTER_EMOJI[a.transit]} ${planetsLine} · ${a.orb}° orb · ${OUTER_DURATION[a.transit]}`,
                           tags: [a.aspName, cap(a.transit), OUTER_DURATION[a.transit]],
                           body,
                         });
@@ -1957,7 +2212,7 @@ export default function CosmicPage() {
                             <span className="text-lg">{OUTER_EMOJI[a.transit]}</span>
                             <span className="font-playfair text-base text-gray-700">{headline}</span>
                           </div>
-                          <p className="text-xs text-gray-400 pl-7">{a.aspName} {ASPECT_DESC[a.aspName]?.symbol} · {a.orb}° orb</p>
+                          <p className="text-xs text-gray-400 pl-7">{planetsLine} · {a.orb}°</p>
                         </div>
                         <span className={`shrink-0 text-xs px-2.5 py-1 rounded-full font-medium ${c.pill}`}>
                           {OUTER_DURATION[a.transit]}
@@ -2065,6 +2320,376 @@ export default function CosmicPage() {
           })()}
         </div>
       )}
+
+      {/* ════ VEDIC MODE ════ */}
+      {vedicMode === 'vedic' && (() => {
+        if (vedicLoading) return (
+          <div className="glass-card rounded-3xl p-12 text-center space-y-2">
+            <p className="text-gray-500 text-sm">Calculating your Vedic chart…</p>
+            <p className="text-xs text-gray-400">JPL DE421 ephemeris · Chitra Paksha ayanamsha</p>
+          </div>
+        );
+        if (!vedicData && !birthData?.birthLat) return (
+          <div className="glass-card rounded-3xl p-10 text-center space-y-3">
+            <p className="text-gray-500 text-sm">Birth location required for Vedic chart.</p>
+            <p className="text-xs text-gray-400">Add your birth city on <a href="/profile" className="text-[#b88a92] underline">Profile</a> to unlock Jyotish calculations.</p>
+          </div>
+        );
+        if (!vedicData) return (
+          <div className="glass-card rounded-3xl p-10 text-center space-y-3">
+            <p className="text-gray-500 text-sm">Vedic chart unavailable.</p>
+            <p className="text-xs text-gray-400">The Vedic service may be starting up — try again in a moment.</p>
+          </div>
+        );
+
+        const planets    = vedicData?.d1_chart?.planets ?? [];
+        const houses     = vedicData?.d1_chart?.houses  ?? [];
+        const lagna      = houses[0];
+        const panchanga  = vedicData?.panchanga ?? {};
+        const ayanamsa   = vedicData?.ayanamsa;
+        const mahadashas = vedicData?.dashas?.upcoming?.mahadashas ?? {};
+        const sav        = vedicData?.ashtakavarga?.sav ?? {};
+        const bhav       = vedicData?.ashtakavarga?.bhav ?? {};
+        const today2     = today;
+
+        const currentMd     = Object.entries(mahadashas).find(([,md]) => md.start <= today2 && today2 <= md.end);
+        const currentMdName = currentMd?.[0];
+        const currentMdData = currentMd?.[1];
+        const antardashas   = currentMdData?.antardashas ?? {};
+        const currentAd     = Object.entries(antardashas).find(([,ad]) => ad.start <= today2 && today2 <= ad.end);
+        const currentAdName = currentAd?.[0];
+        const currentAdData = currentAd?.[1];
+
+        const moonPlanet  = planets.find(p => p.celestial_body === 'Moon');
+        const moonNak     = moonPlanet?.nakshatra;
+        const moonNakData = NAKSHATRA_DATA.find(n => n.name === moonNak);
+        const lagnaSign   = lagna?.sign;
+        const lagnaLord   = lagnaSign ? SIGN_LORDS[lagnaSign] : null;
+
+        function openNakshatra(name) {
+          const d  = NAKSHATRA_DESC[name];
+          const nd = NAKSHATRA_DATA.find(n => n.name === name);
+          if (!d) return;
+          setDetail({ title:`${nd?.symbol ?? '✦'} ${name}`, subtitle:`Ruled by ${nd?.lord ?? '—'}`, body: d });
+        }
+
+        if (vedicTab === 'rasi') return (
+          <div className="space-y-4">
+            <div className="glass-card rounded-3xl p-6 space-y-4">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-xs text-gray-400 uppercase tracking-widest">Lagna · Ascendant</p>
+                  <p className="font-playfair text-2xl text-gray-700 mt-0.5">{lagnaSign ?? '—'}</p>
+                  {lagnaLord && <p className="text-xs text-gray-400 mt-1">Ruled by {lagnaLord}</p>}
+                </div>
+                {moonNak && (
+                  <button onClick={() => openNakshatra(moonNak)}
+                    className="text-right bg-white/50 border border-white/40 rounded-2xl px-4 py-2 hover:bg-white/70 transition-colors">
+                    <p className="text-xs text-gray-400">Moon Nakshatra</p>
+                    <p className="text-sm font-medium text-gray-700 mt-0.5">{moonNakData?.symbol} {moonNak}</p>
+                    <p className="text-xs text-gray-400">pada {moonPlanet?.pada ?? '—'} · {moonNakData?.lord}</p>
+                  </button>
+                )}
+              </div>
+              {ayanamsa && (
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-gray-400">Lahiri ayanamsha</span>
+                  <span className="text-xs font-medium text-gray-600">{(typeof ayanamsa === 'object' ? ayanamsa.value : Number(ayanamsa))?.toFixed(4)}°</span>
+                  <span className="text-xs text-gray-300">· JPL DE421</span>
+                </div>
+              )}
+            </div>
+
+            <div className="glass-card rounded-3xl p-6 space-y-3">
+              <div>
+                <h2 className="font-playfair text-xl text-gray-700">Planetary Positions</h2>
+                <p className="text-xs text-gray-400 mt-1">Sidereal · Tap a nakshatra to learn more.</p>
+              </div>
+              <div className="divide-y divide-white/30">
+                {planets.map(p => {
+                  const sym   = VEDIC_PLANET_SYM[p.celestial_body] ?? '•';
+                  const dig   = p.dignities?.dignity?.toLowerCase();
+                  const digSt = DIGNITY_STYLE[dig] ?? DIGNITY_STYLE.neutral;
+                  const nakD  = NAKSHATRA_DATA.find(n => n.name === p.nakshatra);
+                  return (
+                    <div key={p.celestial_body} className="py-2.5 flex items-center gap-2 flex-wrap">
+                      <span className="text-sm w-5 text-center text-gray-400 shrink-0">{sym}</span>
+                      <span className="text-xs text-gray-500 w-16 shrink-0">{p.celestial_body}</span>
+                      <span className="text-sm font-medium text-gray-700 w-24 shrink-0">{p.sign}</span>
+                      <span className="text-xs text-gray-400 w-6 shrink-0">H{p.house}</span>
+                      {p.nakshatra && (
+                        <button onClick={() => openNakshatra(p.nakshatra)}
+                          className="text-xs text-[#b88a92] hover:underline shrink-0">
+                          {nakD?.symbol} {p.nakshatra} P{p.pada}
+                        </button>
+                      )}
+                      {dig && (
+                        <span className={`text-xs px-2 py-0.5 rounded-full border ${digSt.bg} ${digSt.color} ${digSt.border} ml-auto shrink-0`}>
+                          {digSt.label}
+                        </span>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="glass-card rounded-3xl p-6 space-y-3">
+              <h2 className="font-playfair text-xl text-gray-700">House Signs</h2>
+              <div className="grid grid-cols-3 gap-2">
+                {houses.slice(0,12).map(h => (
+                  <div key={h.house_number} className="bg-white/50 border border-white/40 rounded-2xl p-3">
+                    <p className="text-xs text-gray-400">House {h.house_number}</p>
+                    <p className="text-sm font-medium text-gray-700 mt-0.5">{h.sign}</p>
+                    {h.occupants?.length > 0 && (
+                      <p className="text-xs text-[#b88a92] mt-0.5">{h.occupants.map(o => o.celestial_body).join(', ')}</p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        );
+
+        if (vedicTab === 'panchanga') return (
+          <div className="space-y-4">
+            <div className="glass-card rounded-3xl p-6 space-y-2">
+              <h2 className="font-playfair text-xl text-gray-700">Panchanga at Birth</h2>
+              <p className="text-xs text-gray-400">The five limbs of the Vedic almanac — the cosmic quality of your birth moment.</p>
+            </div>
+            {[
+              { label:'Tithi',     value:panchanga.tithi,    subtitle:'Lunar day',            desc: 'The lunar day at the moment of your birth — one of 30 divisions of the lunar month, each carrying its own quality and presiding deity.' },
+              { label:'Nakshatra', value:panchanga.nakshatra, subtitle:'Moon\'s constellation', desc: NAKSHATRA_DESC[panchanga.nakshatra] ?? 'The nakshatra the Moon occupied at birth — one of 27 lunar mansions, each a distinct cosmic frequency.' },
+              { label:'Yoga',      value:panchanga.yoga,     subtitle:'Sun + Moon combination', desc: YOGA_DESC[panchanga.yoga] ? `${panchanga.yoga}: ${YOGA_DESC[panchanga.yoga]}` : 'The yoga formed by the combined longitude of Sun and Moon. Each of 27 yogas carries a distinct energetic quality.' },
+              { label:'Karana',    value:panchanga.karana,   subtitle:'Half lunar day',         desc: KARANA_DESC[panchanga.karana] ? `${panchanga.karana}: ${KARANA_DESC[panchanga.karana]}` : 'A karana is half a tithi. There are 11 karanas cycling through the lunar month, each coloring the quality of action.' },
+              { label:'Vaara',     value:panchanga.vaara,    subtitle:'Weekday',                desc: VAARA_DESC[panchanga.vaara] ?? 'Each weekday is ruled by a planetary deity whose energy colors the day.' },
+            ].map(item => (
+              <button key={item.label} onClick={() => setDetail({ title:`${item.label} · ${item.value}`, subtitle:item.subtitle, body:item.desc ?? '' })}
+                className="w-full glass-card rounded-3xl p-6 text-left hover:bg-white/80 transition-colors space-y-2">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <p className="text-xs text-gray-400 uppercase tracking-widest">{item.label}</p>
+                    <p className="font-playfair text-xl text-gray-700 mt-0.5">{item.value ?? '—'}</p>
+                    <p className="text-xs text-gray-400 mt-0.5">{item.subtitle}</p>
+                  </div>
+                  <span className="text-gray-200 text-xl">›</span>
+                </div>
+                <p className="text-xs text-gray-500 leading-relaxed line-clamp-2">{item.desc}</p>
+              </button>
+            ))}
+          </div>
+        );
+
+        if (vedicTab === 'dashas') return (
+          <div className="space-y-4">
+            {currentMdName && (
+              <div className="glass-card rounded-3xl p-6 space-y-4" style={{ borderLeft:'3px solid #b88a92' }}>
+                <div>
+                  <p className="text-xs text-gray-400 uppercase tracking-widest">Current Mahadasha</p>
+                  <p className="font-playfair text-2xl text-gray-700 mt-1">{VEDIC_PLANET_SYM[currentMdName]} {currentMdName} Mahadasha</p>
+                  <p className="text-xs text-gray-400 mt-1">{currentMdData?.start} → {currentMdData?.end}</p>
+                </div>
+                <p className="text-sm text-gray-600 leading-relaxed">{DASHA_DESC[currentMdName] ?? ''}</p>
+                {currentAdName && (
+                  <div className="bg-white/50 border border-white/40 rounded-2xl p-4 space-y-1">
+                    <p className="text-xs text-gray-400 uppercase tracking-widest">Current Antardasha</p>
+                    <p className="text-sm font-medium text-gray-700">{VEDIC_PLANET_SYM[currentAdName]} {currentAdName} · within {currentMdName} Mahadasha</p>
+                    <p className="text-xs text-gray-400">{currentAdData?.start} → {currentAdData?.end}</p>
+                  </div>
+                )}
+              </div>
+            )}
+            <div className="glass-card rounded-3xl p-6 space-y-3">
+              <h2 className="font-playfair text-xl text-gray-700">Vimshottari Dasha Timeline</h2>
+              <p className="text-xs text-gray-400">120-year planetary period cycle. Tap any period to learn more.</p>
+              <div className="space-y-2">
+                {Object.entries(mahadashas).map(([lord, md]) => {
+                  const isCurrent = lord === currentMdName;
+                  const isPast    = md.end < today2;
+                  return (
+                    <button key={lord}
+                      onClick={() => setDetail({ title:`${lord} Mahadasha`, subtitle:`${md.start} → ${md.end}`, body:DASHA_DESC[lord] ?? '' })}
+                      className={`w-full flex items-center gap-3 p-3 rounded-2xl border text-left transition-colors ${isCurrent ? 'bg-rose-50/60 border-rose-200/50 hover:bg-rose-50/80' : isPast ? 'bg-gray-50/40 border-gray-200/30 opacity-50' : 'bg-white/40 border-white/40 hover:bg-white/60'}`}>
+                      <span className="text-lg w-7 text-center shrink-0">{VEDIC_PLANET_SYM[lord]}</span>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-700">{lord}</p>
+                        <p className="text-xs text-gray-400">{md.start} → {md.end}</p>
+                      </div>
+                      {isCurrent && <span className="text-xs px-2 py-0.5 rounded-full bg-rose-100 text-rose-500 shrink-0">now</span>}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+            {currentMdName && Object.keys(antardashas).length > 0 && (
+              <div className="glass-card rounded-3xl p-6 space-y-3">
+                <h2 className="font-playfair text-xl text-gray-700">{currentMdName} Antardasha Periods</h2>
+                <div className="space-y-1.5">
+                  {Object.entries(antardashas).map(([alord, ad]) => {
+                    const isCur  = alord === currentAdName;
+                    const isPast = ad.end < today2;
+                    return (
+                      <div key={alord} className={`flex items-center gap-3 px-3 py-2 rounded-xl border text-sm ${isCur ? 'bg-rose-50/60 border-rose-200/40' : isPast ? 'opacity-40 border-white/10' : 'border-white/20'}`}>
+                        <span className="w-5 text-center text-gray-400 shrink-0">{VEDIC_PLANET_SYM[alord]}</span>
+                        <span className={`flex-1 ${isCur ? 'text-gray-700 font-medium' : 'text-gray-500'}`}>{alord}</span>
+                        <span className="text-xs text-gray-400">{ad.start} → {ad.end}</span>
+                        {isCur && <span className="text-xs px-1.5 py-0.5 rounded-full bg-rose-100 text-rose-400">now</span>}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+        );
+
+        if (vedicTab === 'varga') {
+          const divCharts  = vedicData?.divisional_charts ?? {};
+          const showVargas = ['d9','d10','d3','d7','d12'].filter(k => divCharts[k]);
+          const vargaLabel = { d9:'D9 · Navamsa', d10:'D10 · Dasamsa', d3:'D3 · Drekkana', d7:'D7 · Saptamsa', d12:'D12 · Dwadasamsa' };
+          return (
+            <div className="space-y-4">
+              <div className="glass-card rounded-3xl p-6 space-y-2">
+                <h2 className="font-playfair text-xl text-gray-700">Divisional Charts</h2>
+                <p className="text-xs text-gray-400">Each varga reveals a different domain of your life — a harmonic lens applied to the birth chart.</p>
+              </div>
+              {showVargas.length === 0 && (
+                <div className="glass-card rounded-3xl p-8 text-center">
+                  <p className="text-sm text-gray-400">Divisional chart data not available.</p>
+                </div>
+              )}
+              {showVargas.map(key => {
+                const vc      = divCharts[key];
+                const vPlanets= vc?.planets ?? vc?.houses?.flatMap(h => (h.occupants ?? []).map(o => ({ ...o, house: h.house_number }))) ?? [];
+                return (
+                  <div key={key} className="glass-card rounded-3xl p-6 space-y-3">
+                    <div>
+                      <h3 className="font-playfair text-lg text-gray-700">{vargaLabel[key]}</h3>
+                      {VARGA_PURPOSE[key] && <p className="text-xs text-gray-400 mt-0.5">{VARGA_PURPOSE[key]}</p>}
+                    </div>
+                    <div className="divide-y divide-white/30">
+                      {vPlanets.map((p, i) => (
+                        <div key={i} className="py-2 flex items-center gap-2 text-sm">
+                          <span className="w-5 text-center text-gray-400 shrink-0">{VEDIC_PLANET_SYM[p.celestial_body] ?? '•'}</span>
+                          <span className="text-xs text-gray-500 w-20 shrink-0">{p.celestial_body}</span>
+                          <span className="text-gray-700 font-medium">{p.sign}</span>
+                          {p.house && <span className="text-xs text-gray-400 ml-auto">H{p.house}</span>}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          );
+        }
+
+        if (vedicTab === 'strength') {
+          const savEntries = SIGN_ORDER.map(s => ({ sign:s, pts: sav[s] ?? 0 }));
+          const maxSav     = Math.max(...savEntries.map(e => e.pts), 1);
+          const SHADBALA_MIN = { Sun:390, Moon:360, Mars:300, Mercury:420, Jupiter:390, Venus:330, Saturn:300 };
+          return (
+            <div className="space-y-4">
+              <div className="glass-card rounded-3xl p-6 space-y-4">
+                <div>
+                  <h2 className="font-playfair text-xl text-gray-700">Shadbala · Six-Fold Strength</h2>
+                  <p className="text-xs text-gray-400 mt-1">Tap any planet for a full breakdown.</p>
+                </div>
+                <div className="space-y-2">
+                  {planets.filter(p => p.shadbala?.Shadbala).map(p => {
+                    const sb     = p.shadbala.Shadbala;
+                    const rupas  = sb.Rupas ?? 0;
+                    const req    = SHADBALA_MIN[p.celestial_body];
+                    const pct    = req ? Math.min(rupas / req * 100, 100) : 50;
+                    const strong = req ? rupas >= req : true;
+                    return (
+                      <button key={p.celestial_body}
+                        onClick={() => setDetail({
+                          title:`${p.celestial_body} Shadbala`,
+                          subtitle:`${rupas.toFixed(2)} Rupas · ${(sb.Total ?? 0).toFixed(0)} total`,
+                          body:[
+                            `Positional (Sthanabala): ${sb.Sthanabala?.toFixed(1) ?? '—'}`,
+                            `Temporal (Kaalabala): ${sb.Kaalabala?.toFixed(1) ?? '—'}`,
+                            `Directional (Digbala): ${sb.Digbala?.toFixed(1) ?? '—'}`,
+                            `Motional (Cheshtabala): ${sb.Cheshtabala?.toFixed(1) ?? '—'}`,
+                            `Natural (Naisargikabala): ${sb.Naisargikabala?.toFixed(1) ?? '—'}`,
+                            `Aspectual (Drikbala): ${sb.Drikbala?.toFixed(1) ?? '—'}`,
+                          ].join('\n'),
+                        })}
+                        className="w-full flex items-center gap-3 bg-white/50 border border-white/40 rounded-2xl p-3 hover:bg-white/70 transition-colors text-left">
+                        <span className="text-sm w-5 text-center shrink-0">{VEDIC_PLANET_SYM[p.celestial_body]}</span>
+                        <span className="text-xs text-gray-500 w-16 shrink-0">{p.celestial_body}</span>
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="text-xs text-gray-600">{rupas.toFixed(2)} rupas</span>
+                            {req && <span className={`text-xs ${strong ? 'text-green-500' : 'text-orange-400'}`}>{strong ? '✓ strong' : `min ${req}`}</span>}
+                          </div>
+                          <div className="h-1.5 rounded-full bg-white/60 overflow-hidden">
+                            <div className={`h-full rounded-full ${strong ? 'bg-green-400' : 'bg-orange-300'}`} style={{ width:`${pct}%` }} />
+                          </div>
+                        </div>
+                      </button>
+                    );
+                  })}
+                  {planets.filter(p => p.shadbala?.Shadbala).length === 0 && (
+                    <p className="text-sm text-gray-400 text-center py-4">Shadbala data not available.</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="glass-card rounded-3xl p-6 space-y-4">
+                <div>
+                  <h2 className="font-playfair text-xl text-gray-700">Sarvashtakavarga</h2>
+                  <p className="text-xs text-gray-400 mt-1">Total benefic points per sign (out of 56). 28+ = strong · below 25 = needs attention.</p>
+                </div>
+                {savEntries.some(e => e.pts > 0) ? (
+                  <div className="space-y-1.5">
+                    {savEntries.map(({ sign, pts }) => (
+                      <div key={sign} className="flex items-center gap-2">
+                        <span className="text-xs text-gray-500 w-24 shrink-0">{sign}</span>
+                        <div className="flex-1 h-2 rounded-full bg-white/60 overflow-hidden">
+                          <div className={`h-full rounded-full ${pts >= 28 ? 'bg-green-400' : pts >= 25 ? 'bg-amber-400' : 'bg-rose-300'}`} style={{ width:`${(pts/maxSav)*100}%` }} />
+                        </div>
+                        <span className={`text-xs w-6 text-right shrink-0 font-medium ${pts >= 28 ? 'text-green-600' : pts >= 25 ? 'text-amber-600' : 'text-rose-400'}`}>{pts}</span>
+                      </div>
+                    ))}
+                  </div>
+                ) : <p className="text-sm text-gray-400 text-center py-4">Ashtakavarga data not available.</p>}
+              </div>
+
+              {Object.keys(bhav).length > 0 && (
+                <div className="glass-card rounded-3xl p-6 space-y-3">
+                  <h2 className="font-playfair text-xl text-gray-700">Bhinnashtakavarga</h2>
+                  <p className="text-xs text-gray-400">Each planet's contribution across the 12 signs.</p>
+                  <div className="space-y-3">
+                    {Object.entries(bhav).map(([planet, signPts]) => (
+                      <div key={planet}>
+                        <p className="text-xs font-medium text-gray-500 mb-1">{VEDIC_PLANET_SYM[planet]} {planet}</p>
+                        <div className="flex gap-1">
+                          {SIGN_ORDER.map(s => {
+                            const pts = signPts[s] ?? 0;
+                            return (
+                              <div key={s} className="flex-1 text-center">
+                                <div className={`h-4 rounded-sm mx-0.5 ${pts >= 4 ? 'bg-green-300' : pts === 3 ? 'bg-amber-200' : 'bg-rose-100'}`} />
+                                <p className="text-[9px] text-gray-400 mt-0.5">{pts}</p>
+                              </div>
+                            );
+                          })}
+                        </div>
+                        <div className="flex text-[8px] text-gray-300 mt-0.5">
+                          {SIGN_ORDER.map(s => <div key={s} className="flex-1 text-center truncate px-0.5">{s.slice(0,3)}</div>)}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        }
+
+        return null;
+      })()}
 
     </div>
   );
