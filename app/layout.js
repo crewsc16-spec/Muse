@@ -35,13 +35,18 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className={`${geist.variable} ${playfair.variable} antialiased`}>
         <ThemeInitializer />
-        <Navbar />
-        <InstallBanner />
         <SpeedInsights />
         <Analytics />
-        <main className="max-w-4xl mx-auto px-4 pt-16 pb-24 md:py-8">
-          {children}
-        </main>
+        {/* Fixed full-screen shell — navbar never inside the scroll container */}
+        <div className="fixed inset-0 flex flex-col overflow-hidden">
+          <Navbar />
+          <InstallBanner />
+          <main className="flex-1 overflow-y-auto" style={{ WebkitOverflowScrolling: 'touch' }}>
+            <div className="max-w-4xl mx-auto px-4 py-6 pb-24 md:pb-8">
+              {children}
+            </div>
+          </main>
+        </div>
       </body>
     </html>
   );

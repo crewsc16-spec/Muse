@@ -164,7 +164,7 @@ export default function Navbar() {
   return (
     <>
       {/* ── Top bar ── */}
-      <nav className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md bg-white/60 border-b border-white/30 px-4 py-3">
+      <nav className="shrink-0 z-50 backdrop-blur-md bg-white/60 border-b border-white/30 px-4 py-3">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <Link href="/" className="font-playfair text-xl tracking-tight" style={{ color: '#b88a92' }}>
             Muse
