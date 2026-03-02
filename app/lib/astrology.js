@@ -1,3 +1,5 @@
+import { GATE_WHEEL } from './hd-common.js';
+
 const ZODIAC = [
   { sign: 'Aries',       element: 'fire',  modality: 'cardinal', from: [3,21],  to: [4,19]  },
   { sign: 'Taurus',      element: 'earth', modality: 'fixed',    from: [4,20],  to: [5,20]  },
@@ -186,4 +188,107 @@ export function computeChart(birthData, todayStr) {
     // Primary selection driver — changes daily based on transits
     dailyBlend,
   };
+}
+
+// ─── Shared aspect definitions (9 aspects) ──────────────────────────────────
+export const ASPECT_DEFS = [
+  { name: 'Conjunction',    angle:   0, orb: 8 },
+  { name: 'Semisextile',    angle:  30, orb: 2 },
+  { name: 'Semisquare',     angle:  45, orb: 2 },
+  { name: 'Sextile',        angle:  60, orb: 4 },
+  { name: 'Square',         angle:  90, orb: 6 },
+  { name: 'Trine',          angle: 120, orb: 6 },
+  { name: 'Sesquiquadrate', angle: 135, orb: 2 },
+  { name: 'Quincunx',       angle: 150, orb: 3 },
+  { name: 'Opposition',     angle: 180, orb: 8 },
+];
+
+// ─── Gate+line → ecliptic longitude ──────────────────────────────────────────
+export function gateLineToLon(gate, line) {
+  const idx = GATE_WHEEL.indexOf(gate);
+  if (idx === -1) return 0;
+  return ((302 + idx * 5.625 + (line - 0.5) * 0.9375) % 360 + 360) % 360;
+}
+
+// ─── Transit-to-natal cross-aspects ──────────────────────────────────────────
+export function computeCrossAspects(natalLons, transitLons) {
+  const aspects = [];
+  for (const [transitBody, tLon] of Object.entries(transitLons)) {
+    for (const [natalBody, nLon] of Object.entries(natalLons)) {
+      const diff  = ((tLon - nLon) % 360 + 360) % 360;
+      const angle = Math.min(diff, 360 - diff);
+      for (const asp of ASPECT_DEFS) {
+        if (Math.abs(angle - asp.angle) <= asp.orb) {
+          aspects.push({ transit: transitBody, natal: natalBody, name: asp.name, angle: asp.angle });
+          break;
+        }
+      }
+    }
+  }
+  return aspects;
+}
+
+// ─── Personal year (numerology) ──────────────────────────────────────────────
+export function getPersonalYear(birthDateStr, todayStr) {
+  const [bm, bd] = birthDateStr.split('-').slice(1).map(Number);
+  const year = parseInt(todayStr.split('-')[0], 10);
+  const digits = `${bm}${bd}${year}`.split('').map(Number);
+  let sum = digits.reduce((a, b) => a + b, 0);
+  while (sum > 9 && sum !== 11 && sum !== 22) {
+    sum = String(sum).split('').map(Number).reduce((a, b) => a + b, 0);
+  }
+  return sum > 9 ? (sum % 9 || 9) : sum; // reduce master numbers to 1-9 for matching
+}
+
+// ─── Vedic Panchanga (client-side approximation) ─────────────────────────────
+// Uses Lahiri ayanamsha ≈ 24.17° (2025 epoch, drifts ~0.014°/yr — close enough)
+const LAHIRI_AYANAMSHA = 24.17;
+
+export const NAKSHATRA_META = [
+  { name: 'Ashwini',       animal: 'horse',    lord: 'Ketu',    element: 'fire'  },
+  { name: 'Bharani',       animal: 'elephant',  lord: 'Venus',   element: 'earth' },
+  { name: 'Krittika',      animal: 'goat',      lord: 'Sun',     element: 'fire'  },
+  { name: 'Rohini',        animal: 'serpent',   lord: 'Moon',    element: 'earth' },
+  { name: 'Mrigashira',    animal: 'serpent',   lord: 'Mars',    element: 'air'   },
+  { name: 'Ardra',         animal: 'dog',       lord: 'Rahu',    element: 'water' },
+  { name: 'Punarvasu',     animal: 'cat',       lord: 'Jupiter', element: 'air'   },
+  { name: 'Pushya',        animal: 'goat',      lord: 'Saturn',  element: 'water' },
+  { name: 'Ashlesha',      animal: 'cat',       lord: 'Mercury', element: 'water' },
+  { name: 'Magha',         animal: 'rat',       lord: 'Ketu',    element: 'fire'  },
+  { name: 'Purva Phalguni',animal: 'rat',       lord: 'Venus',   element: 'fire'  },
+  { name: 'Uttara Phalguni',animal:'cow',       lord: 'Sun',     element: 'earth' },
+  { name: 'Hasta',         animal: 'buffalo',   lord: 'Moon',    element: 'air'   },
+  { name: 'Chitra',        animal: 'tiger',     lord: 'Mars',    element: 'fire'  },
+  { name: 'Swati',         animal: 'buffalo',   lord: 'Rahu',    element: 'air'   },
+  { name: 'Vishakha',      animal: 'tiger',     lord: 'Jupiter', element: 'fire'  },
+  { name: 'Anuradha',      animal: 'deer',      lord: 'Saturn',  element: 'water' },
+  { name: 'Jyeshtha',      animal: 'deer',      lord: 'Mercury', element: 'water' },
+  { name: 'Mula',          animal: 'dog',       lord: 'Ketu',    element: 'fire'  },
+  { name: 'Purva Ashadha', animal: 'monkey',    lord: 'Venus',   element: 'earth' },
+  { name: 'Uttara Ashadha',animal: 'mongoose',  lord: 'Sun',     element: 'earth' },
+  { name: 'Shravana',      animal: 'monkey',    lord: 'Moon',    element: 'air'   },
+  { name: 'Dhanishta',     animal: 'lion',      lord: 'Mars',    element: 'air'   },
+  { name: 'Shatabhisha',   animal: 'horse',     lord: 'Rahu',    element: 'air'   },
+  { name: 'Purva Bhadrapada',animal:'lion',     lord: 'Jupiter', element: 'water' },
+  { name: 'Uttara Bhadrapada',animal:'cow',     lord: 'Saturn',  element: 'water' },
+  { name: 'Revati',        animal: 'elephant',  lord: 'Mercury', element: 'earth' },
+];
+
+export function computePanchanga(sunLon, moonLon) {
+  const sideralMoon = ((moonLon - LAHIRI_AYANAMSHA) % 360 + 360) % 360;
+  const sideralSun  = ((sunLon  - LAHIRI_AYANAMSHA) % 360 + 360) % 360;
+
+  // Nakshatra (Moon's sidereal position / 13.333°)
+  const nakIdx = Math.floor(sideralMoon / (360 / 27)) % 27;
+  const nakshatra = NAKSHATRA_META[nakIdx];
+
+  // Tithi (Moon–Sun elongation / 12°, 30 tithis)
+  const elongation = ((moonLon - sunLon) % 360 + 360) % 360;
+  const tithiNum = Math.floor(elongation / 12) + 1; // 1–30
+
+  // Yoga (Sun + Moon sidereal positions / 13.333°, 27 yogas)
+  const yogaSum = ((sideralSun + sideralMoon) % 360 + 360) % 360;
+  const yogaIdx = Math.floor(yogaSum / (360 / 27)) % 27;
+
+  return { nakshatra, nakIdx, tithiNum, yogaIdx };
 }

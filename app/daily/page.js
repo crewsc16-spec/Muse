@@ -3,7 +3,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { createClient } from '@/app/lib/supabase/client';
 import { getDailyContent, TAROT_IMAGES, ANIMAL_IMAGE_QUERIES } from '@/app/lib/daily-content';
-import { computeChart, getLunarPhase } from '@/app/lib/astrology';
+import { computeChart, getLunarPhase, gateLineToLon, computeCrossAspects, getPersonalYear, computePanchanga } from '@/app/lib/astrology';
+import { calculateHDChart } from '@/app/lib/hd-chart';
 import { saveVisionItem, getJournalEntries, createJournalEntry, updateJournalEntry } from '@/app/lib/storage';
 
 const VIBE_DATA = {
@@ -136,11 +137,79 @@ export default function DailyPage() {
         const dateStr = getTodayStr();
         const meta = user.user_metadata ?? {};
         let chartData = null;
+        let enrichedTransit = null;
         try {
           const bd = meta.birthData ?? JSON.parse(localStorage.getItem('birthData') ?? 'null');
-          if (bd) chartData = computeChart(bd, dateStr);
+          if (bd) {
+            chartData = computeChart(bd, dateStr);
+
+            // ── Build enriched transit data ──────────────────────────────
+            try {
+              // Natal HD chart
+              const natalHD  = calculateHDChart(bd.date, bd.time, bd.utcOffset);
+              // Transit HD chart (today noon UTC)
+              const transitHD = calculateHDChart(dateStr, '12:00', 0);
+
+              // Build longitude maps from gate+line
+              const natalLons = {};
+              if (natalHD?.personality) {
+                for (const [body, { gate, line }] of Object.entries(natalHD.personality)) {
+                  natalLons[`p_${body}`] = gateLineToLon(gate, line);
+                }
+              }
+              if (natalHD?.design) {
+                for (const [body, { gate, line }] of Object.entries(natalHD.design)) {
+                  natalLons[`d_${body}`] = gateLineToLon(gate, line);
+                }
+              }
+
+              const transitLons = {};
+              if (transitHD?.personality) {
+                for (const [body, { gate, line }] of Object.entries(transitHD.personality)) {
+                  transitLons[body] = gateLineToLon(gate, line);
+                }
+              }
+
+              // Transit-to-natal cross-aspects
+              const crossAspects = computeCrossAspects(natalLons, transitLons);
+
+              // Find transit gates hitting natal defined channels
+              const natalChannelGates = new Set();
+              for (const [g1, g2] of (natalHD?.definedChannels ?? [])) {
+                natalChannelGates.add(g1);
+                natalChannelGates.add(g2);
+              }
+              const hitChannels = [];
+              if (transitHD?.personality) {
+                for (const [body, { gate }] of Object.entries(transitHD.personality)) {
+                  if (natalChannelGates.has(gate)) hitChannels.push({ body, gate });
+                }
+              }
+
+              // Active transit planet names
+              const transitPlanets = transitHD?.personality ? Object.keys(transitHD.personality) : [];
+
+              // Compute panchanga from transit Sun/Moon longitudes
+              const panchanga = (transitLons.sun != null && transitLons.moon != null)
+                ? computePanchanga(transitLons.sun, transitLons.moon)
+                : null;
+
+              // Personal year
+              const personalYear = getPersonalYear(bd.date, dateStr);
+
+              enrichedTransit = {
+                crossAspects,
+                hitChannels,
+                transitPlanets,
+                panchanga,
+                personalYear,
+              };
+            } catch (e) {
+              console.error('[daily] enriched transit', e);
+            }
+          }
         } catch {}
-        const dailyContent = getDailyContent(user.id, dateStr, chartData);
+        const dailyContent = getDailyContent(user.id, dateStr, chartData, enrichedTransit);
         setContent({ ...dailyContent, chartData });
 
         // Load today's journal entry (overrides localStorage)

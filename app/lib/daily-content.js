@@ -582,6 +582,73 @@ const _AUTHORITY_QUOTE_CATS = {
   lunar:              ['spirituality','nature','love'],
 };
 
+// ─── Transit planet theme mappings ───────────────────────────────────────────
+const TRANSIT_PLANET_THEMES = {
+  sun:      { keywords: ['vitality','identity','purpose','leadership'],     element: 'fire',  cats: ['motivation','career'] },
+  moon:     { keywords: ['emotion','intuition','nurturing','receptivity'],  element: 'water', cats: ['love','spirituality'] },
+  mercury:  { keywords: ['communication','intellect','learning','travel'],  element: 'air',   cats: ['growth','travel'] },
+  venus:    { keywords: ['love','beauty','harmony','abundance'],            element: 'earth', cats: ['love','creativity'] },
+  mars:     { keywords: ['courage','action','drive','passion'],             element: 'fire',  cats: ['motivation','career'] },
+  jupiter:  { keywords: ['expansion','wisdom','abundance','philosophy'],    element: 'fire',  cats: ['growth','spirituality'] },
+  saturn:   { keywords: ['discipline','structure','responsibility','patience'],element:'earth',cats: ['career','health'] },
+  uranus:   { keywords: ['innovation','freedom','awakening','change'],      element: 'air',   cats: ['growth','creativity'] },
+  neptune:  { keywords: ['intuition','dreams','spirituality','compassion'], element: 'water', cats: ['spirituality','creativity'] },
+  pluto:    { keywords: ['transformation','power','rebirth','depth'],       element: 'water', cats: ['spirituality','motivation'] },
+  northNode:{ keywords: ['destiny','growth','purpose','soul-searching'],    element: 'fire',  cats: ['growth','spirituality'] },
+  southNode:{ keywords: ['release','wisdom','past','surrender'],            element: 'water', cats: ['spirituality','nature'] },
+};
+
+// ─── Aspect theme mappings ───────────────────────────────────────────────────
+const ASPECT_THEMES = {
+  Conjunction:    { energy: 'amplifying',  keywords: ['focus','intensity','merging'] },
+  Sextile:        { energy: 'flowing',     keywords: ['opportunity','ease','creativity'] },
+  Square:         { energy: 'tension',     keywords: ['challenge','growth','action'] },
+  Trine:          { energy: 'flowing',     keywords: ['harmony','flow','grace'] },
+  Opposition:     { energy: 'tension',     keywords: ['balance','awareness','polarity'] },
+  Semisextile:    { energy: 'flowing',     keywords: ['adjustment','subtlety'] },
+  Semisquare:     { energy: 'tension',     keywords: ['friction','irritation'] },
+  Sesquiquadrate: { energy: 'tension',     keywords: ['agitation','pressure'] },
+  Quincunx:       { energy: 'tension',     keywords: ['adjustment','discomfort','recalibration'] },
+};
+
+// ─── Nakshatra animal → closest Muse spirit animal ──────────────────────────
+const NAKSHATRA_ANIMAL_MAP = {
+  horse: 'Horse', elephant: 'Elephant', goat: 'Deer', serpent: 'Snake',
+  dog: 'Wolf', cat: 'Lynx', rat: 'Fox', cow: 'Buffalo', buffalo: 'Buffalo',
+  tiger: 'Tiger', deer: 'Deer', monkey: 'Fox', mongoose: 'Snake',
+  lion: 'Lion',
+};
+
+// ─── Personal year → quote categories & element ─────────────────────────────
+const PERSONAL_YEAR_CATS = {
+  1: ['motivation','career'],     2: ['love','growth'],
+  3: ['creativity','motivation'], 4: ['career','health'],
+  5: ['travel','creativity'],     6: ['love','nature'],
+  7: ['spirituality','growth'],   8: ['career','motivation'],
+  9: ['spirituality','love'],
+};
+const PERSONAL_YEAR_ELEMENTS = {
+  1: 'fire', 2: 'water', 3: 'air', 4: 'earth',
+  5: 'fire', 6: 'earth', 7: 'water', 8: 'earth', 9: 'fire',
+};
+
+// ─── Tarot aspect-energy tags ────────────────────────────────────────────────
+// Cards associated with challenge/tension energy
+const _TENSION_CARDS = new Set([
+  'The Tower','Death','The Devil','Five of Wands','Five of Cups','Five of Swords','Five of Pentacles',
+  'Seven of Swords','Eight of Swords','Nine of Swords','Ten of Swords','Ten of Wands',
+  'Three of Swords','The Chariot','Seven of Wands','The Hanged Man',
+]);
+// Cards associated with flowing/harmony energy
+const _FLOWING_CARDS = new Set([
+  'The Star','The Sun','The Empress','Temperance','The World','The Lovers','Wheel of Fortune',
+  'Ace of Cups','Three of Cups','Nine of Cups','Ten of Cups','Six of Cups',
+  'Ace of Pentacles','Nine of Pentacles','Ten of Pentacles','Six of Pentacles','Six of Wands','Four of Wands',
+]);
+
+// ─── Spirit animal planet-body archetypes ────────────────────────────────────
+const _GROUNDING_ANIMALS = new Set(['Bear','Elephant','Buffalo','Turtle','Moose','Horse']);
+const _COMMUNICATION_ANIMALS = new Set(['Dolphin','Hummingbird','Hawk','Fox','Raven','Crow']);
 
 // ─── Question → element (by index, 0–59) ─────────────────────────────────────
 // fire=action/courage, earth=values/legacy, air=mind/belief, water=emotion/depth
@@ -879,7 +946,7 @@ function scoredPick(arr, scoreFn, seed) {
 const _EL_TO_HD = { fire: 'manifestor', earth: 'generator', air: 'projector', water: 'reflector' };
 
 // ─── Seeding function ─────────────────────────────────────────────────────────
-export function getDailyContent(userId, dateStr, chartData = null) {
+export function getDailyContent(userId, dateStr, chartData = null, enrichedTransit = null) {
   function seed(type) {
     return hashCode(userId + dateStr + type);
   }
@@ -887,6 +954,62 @@ export function getDailyContent(userId, dateStr, chartData = null) {
   const blend    = chartData?.dailyBlend ?? [];   // ranked elements, most cosmic-active first
   const primary  = blend[0] ?? null;              // today's dominant element
   const secondary = blend[1] ?? null;
+
+  // ── Pre-compute enriched transit data sets ──────────────────────────────────
+  const et = enrichedTransit ?? {};
+  const activeKeywords = new Set();
+  const activeAspectEnergies = new Set();
+  const activeCats = new Set();
+  let nakElement = null;
+  let nakAnimalName = null;
+  let nakLord = null;
+  let pyElement = null;
+  let pyCats = [];
+  let hitChannels = et.hitChannels ?? [];
+
+  // Build keyword / category sets from transit planets
+  if (et.transitPlanets) {
+    for (const planet of et.transitPlanets) {
+      const theme = TRANSIT_PLANET_THEMES[planet];
+      if (theme) {
+        theme.keywords.forEach(k => activeKeywords.add(k));
+        theme.cats.forEach(c => activeCats.add(c));
+      }
+    }
+  }
+
+  // Build aspect energy sets
+  if (et.crossAspects) {
+    for (const asp of et.crossAspects) {
+      const theme = ASPECT_THEMES[asp.name];
+      if (theme) {
+        activeAspectEnergies.add(theme.energy);
+        theme.keywords.forEach(k => activeKeywords.add(k));
+      }
+    }
+  }
+
+  // Nakshatra data
+  if (et.panchanga?.nakshatra) {
+    nakElement = et.panchanga.nakshatra.element;
+    nakLord = et.panchanga.nakshatra.lord;
+    const vedAnimal = et.panchanga.nakshatra.animal;
+    nakAnimalName = vedAnimal ? (NAKSHATRA_ANIMAL_MAP[vedAnimal] ?? null) : null;
+  }
+
+  // Personal year
+  if (et.personalYear) {
+    pyElement = PERSONAL_YEAR_ELEMENTS[et.personalYear] ?? null;
+    pyCats = PERSONAL_YEAR_CATS[et.personalYear] ?? [];
+  }
+
+  // Nakshatra lord → extra quote categories
+  const _LORD_CATS = {
+    Sun: ['motivation','career'], Moon: ['love','spirituality'], Mars: ['motivation','health'],
+    Mercury: ['growth','travel'], Jupiter: ['spirituality','growth'], Venus: ['love','creativity'],
+    Saturn: ['career','health'], Rahu: ['growth','creativity'], Ketu: ['spirituality','nature'],
+  };
+  const lordCats = nakLord ? (_LORD_CATS[nakLord] ?? []) : [];
 
   // ── Tarot ──────────────────────────────────────────────────────────────────
   // All 78 cards eligible. Cards matching today's cosmic elements score higher.
@@ -898,6 +1021,23 @@ export function getDailyContent(userId, dateStr, chartData = null) {
     if (el === secondary)             s += 2; // today's secondary element
     if (el === chartData.sunElement)  s += 2; // natal sun resonance
     if (el === chartData.moonElement) s += 1; // natal moon undertone
+    // Enriched: transit keyword overlap with card keywords
+    if (c.keywords && activeKeywords.size) {
+      let overlap = 0;
+      for (const kw of c.keywords) {
+        if (activeKeywords.has(kw)) overlap++;
+      }
+      s += Math.min(overlap * 2, 6);
+    }
+    // Enriched: nakshatra element match
+    if (nakElement && el === nakElement) s += 2;
+    // Enriched: aspect energy match
+    if (activeAspectEnergies.has('tension')  && _TENSION_CARDS.has(c.name)) s += 2;
+    if (activeAspectEnergies.has('flowing')  && _FLOWING_CARDS.has(c.name)) s += 2;
+    // Enriched: personal year element
+    if (pyElement && el === pyElement) s += 1;
+    // Enriched: transit hitting natal channels → transformation/power cards
+    if (hitChannels.length > 0 && (c.keywords?.includes('transformation') || c.keywords?.includes('power') || c.keywords?.includes('awakening'))) s += 2;
     return s;
   }, seed('tarot'));
 
@@ -911,6 +1051,24 @@ export function getDailyContent(userId, dateStr, chartData = null) {
     if (secondary && a.hdTypes.includes(_EL_TO_HD[secondary]))           s += 1; // secondary cosmic element
     if (chartData.sunElement && a.hdTypes.includes(_EL_TO_HD[chartData.sunElement])) s += 2; // natal sun
     if (chartData.hdProfileLine1 && (_PROFILE_ANIMALS[chartData.hdProfileLine1] ?? []).includes(a.name)) s += 3; // profile line affinity
+    // Enriched: nakshatra animal match
+    if (nakAnimalName && a.name === nakAnimalName) s += 4;
+    // Enriched: medicine text keyword overlap with transit themes
+    if (a.medicine && activeKeywords.size) {
+      const medLower = a.medicine.toLowerCase();
+      let overlap = 0;
+      for (const kw of activeKeywords) {
+        if (medLower.includes(kw)) overlap++;
+      }
+      s += Math.min(overlap, 3);
+    }
+    // Enriched: planet-body type match
+    if (et.transitPlanets) {
+      const hasGrounding = et.transitPlanets.some(p => p === 'saturn' || p === 'pluto');
+      const hasComm      = et.transitPlanets.some(p => p === 'mercury' || p === 'venus');
+      if (hasGrounding && _GROUNDING_ANIMALS.has(a.name))       s += 2;
+      if (hasComm      && _COMMUNICATION_ANIMALS.has(a.name))   s += 2;
+    }
     return s;
   }, seed('animal'));
 
@@ -928,6 +1086,12 @@ export function getDailyContent(userId, dateStr, chartData = null) {
     if (natalCats.includes(q.category))   s += 1; // natal resonance
     const authCats = chartData.hdAuthority ? (_AUTHORITY_QUOTE_CATS[chartData.hdAuthority] ?? []) : [];
     if (authCats.includes(q.category))    s += 2; // authority resonance
+    // Enriched: transit aspect categories
+    if (activeCats.has(q.category))       s += 3;
+    // Enriched: nakshatra lord theme
+    if (lordCats.includes(q.category))    s += 2;
+    // Enriched: personal year categories
+    if (pyCats.includes(q.category))      s += 3;
     return s;
   }, seed('quote'));
 
@@ -939,6 +1103,17 @@ export function getDailyContent(userId, dateStr, chartData = null) {
     if (w.element === secondary)             s += 2;
     if (w.element === chartData.sunElement)  s += 2;
     if (w.element === chartData.moonElement) s += 1;
+    // Enriched: transit planet element
+    if (et.transitPlanets) {
+      for (const p of et.transitPlanets) {
+        const theme = TRANSIT_PLANET_THEMES[p];
+        if (theme && theme.element === w.element) { s += 1; break; }
+      }
+    }
+    // Enriched: personal year element
+    if (pyElement && w.element === pyElement) s += 2;
+    // Enriched: nakshatra element
+    if (nakElement && w.element === nakElement) s += 2;
     return s;
   }, seed('word'));
 
@@ -951,17 +1126,44 @@ export function getDailyContent(userId, dateStr, chartData = null) {
     if (qEl === secondary)             s += 2;
     if (qEl === chartData.sunElement)  s += 2;
     if (qEl === chartData.moonElement) s += 1;
+    // Enriched: transit planet element
+    if (et.transitPlanets) {
+      for (const p of et.transitPlanets) {
+        const theme = TRANSIT_PLANET_THEMES[p];
+        if (theme && theme.element === qEl) { s += 1; break; }
+      }
+    }
+    // Enriched: aspect energy type mapping
+    if (activeAspectEnergies.has('tension')  && (qEl === 'fire' || qEl === 'water')) s += 2;
+    if (activeAspectEnergies.has('flowing')  && (qEl === 'air'  || qEl === 'earth')) s += 2;
+    // Enriched: personal year element
+    if (pyElement && qEl === pyElement) s += 1;
     return s;
   }, seed('question'));
 
   // ── Lucky number ───────────────────────────────────────────────────────────
-  // Always changes daily; life path adds personal resonance
+  // 40% life-path / 30% personal-year / 30% cosmic chance
   const lifePathNum = chartData?.lifePath
     ? (chartData.lifePath > 9 ? (chartData.lifePath % 9 || 9) : chartData.lifePath)
     : null;
+  const personalYearNum = et.personalYear
+    ? (et.personalYear > 9 ? (et.personalYear % 9 || 9) : et.personalYear)
+    : null;
   const numSeed = seed('number');
+  const numRoll = seed('num_astro') % 10;
   let numerologyNumber;
-  if (lifePathNum && (seed('num_astro') % 10) < 7) {
+  if (lifePathNum && personalYearNum) {
+    if (numRoll < 4) {
+      // 40% life path influence
+      numerologyNumber = ((lifePathNum - 1 + numSeed) % 9) + 1;
+    } else if (numRoll < 7) {
+      // 30% personal year influence
+      numerologyNumber = ((personalYearNum - 1 + numSeed) % 9) + 1;
+    } else {
+      // 30% cosmic chance
+      numerologyNumber = (numSeed % 9) + 1;
+    }
+  } else if (lifePathNum && numRoll < 7) {
     numerologyNumber = ((lifePathNum - 1 + numSeed) % 9) + 1;
   } else {
     numerologyNumber = (numSeed % 9) + 1;

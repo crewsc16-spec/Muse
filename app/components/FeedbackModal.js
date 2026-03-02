@@ -21,7 +21,16 @@ export default function FeedbackModal({ onClose }) {
 
     setSubmitting(true);
     const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+      alert('You need to be logged in to send feedback.');
+      setSubmitting(false);
+      return;
+    }
+
     const { error } = await supabase.from('feedback').insert({
+      user_id: user.id,
       message: message.trim(),
       category,
       page_url: window.location.href,
@@ -30,6 +39,7 @@ export default function FeedbackModal({ onClose }) {
     setSubmitting(false);
 
     if (error) {
+      console.error('Feedback insert error:', error);
       alert('Something went wrong — please try again.');
       return;
     }
