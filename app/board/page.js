@@ -869,14 +869,13 @@ export default function Home() {
           )}
         </div>
 
-        {/* Board piece toggle */}
+        {/* Board piece toggle — styled as a section divider, not a CTA button */}
         <button
           onClick={() => setShowBoardPiece(!showBoardPiece)}
-          className="flex items-center gap-2 text-sm font-medium transition-colors"
-          style={{ color: showBoardPiece ? '#b88a92' : '#c4b4b8' }}
+          className="flex items-center justify-between w-full text-xs font-medium uppercase tracking-widest text-gray-400 py-1 border-t border-white/40 pt-3 transition-colors hover:text-[#b88a92]"
         >
-          <span className="text-lg leading-none">{showBoardPiece ? '−' : '+'}</span>
-          Add to your board
+          <span>Add to your board</span>
+          <span className="text-base leading-none">{showBoardPiece ? '▲' : '▼'}</span>
         </button>
 
         {/* Board piece form — shown inline when toggled */}
@@ -1043,12 +1042,34 @@ export default function Home() {
         <h2 className="font-playfair text-2xl text-gray-600 mb-4">Your Board</h2>
 
         {boardItems.length === 0 ? (
-          <div className="text-center py-16">
-            <div className="flex justify-center gap-3 mb-4 opacity-30">
-              {[1, 3, 5].map(v => <MoodFace key={v} mood={v} size={28} />)}
+          <div className="glass-card rounded-3xl p-8 sm:p-10 text-center space-y-6">
+            <div className="flex justify-center gap-3">
+              {[1, 2, 3, 4, 5].map(v => <MoodFace key={v} mood={v} size={32} />)}
             </div>
-            <p className="font-playfair text-lg text-gray-400">Your board is empty</p>
-            <p className="text-sm text-gray-300 mt-1">Save today&apos;s entry to get started</p>
+            <div>
+              <p className="font-playfair text-2xl text-gray-600 mb-2">Your board is empty</p>
+              <p className="text-sm text-gray-400 max-w-sm mx-auto leading-relaxed">
+                This is your living vision board — a mix of moods, images, quotes, and affirmations that tell the story of where you are and where you&apos;re going.
+              </p>
+            </div>
+            <div className="grid sm:grid-cols-3 gap-3 text-left max-w-lg mx-auto">
+              <div className="bg-white/50 border border-white/60 rounded-2xl p-4 space-y-1">
+                <p className="text-base">🌙</p>
+                <p className="text-xs font-medium text-gray-600">Log your mood</p>
+                <p className="text-xs text-gray-400">Track how you feel each day with the form above.</p>
+              </div>
+              <div className="bg-white/50 border border-white/60 rounded-2xl p-4 space-y-1">
+                <p className="text-base">✨</p>
+                <p className="text-xs font-medium text-gray-600">Add to your board</p>
+                <p className="text-xs text-gray-400">Save images, quotes, or affirmations that inspire you.</p>
+              </div>
+              <div className="bg-white/50 border border-white/60 rounded-2xl p-4 space-y-1">
+                <p className="text-base">🌸</p>
+                <p className="text-xs font-medium text-gray-600">Watch it grow</p>
+                <p className="text-xs text-gray-400">Your board builds over time into a record of your journey.</p>
+              </div>
+            </div>
+            <p className="text-xs text-gray-300">Start by saving today&apos;s mood entry above.</p>
           </div>
         ) : (
           <div className="columns-2 gap-0">
