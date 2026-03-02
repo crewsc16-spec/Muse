@@ -111,15 +111,16 @@ export default async function OGImage() {
           Your cosmic self-discovery guide
         </div>
 
-        {/* Feature words */}
+        {/* Feature words — smaller, spaced, uppercase to contrast with tagline */}
         <div
           style={{
-            fontSize: 38,
-            color: '#c4b49e',
-            letterSpacing: '0.06em',
+            fontSize: 24,
+            color: 'rgba(196,174,142,0.6)',
+            letterSpacing: '0.25em',
+            textTransform: 'uppercase',
           }}
         >
-          Astrology · Human Design · Journaling · Vision Board
+          Astrology · Human Design · Journaling · Quizzes
         </div>
 
         {/* Bottom accent line */}
