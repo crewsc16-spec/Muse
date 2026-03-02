@@ -2982,6 +2982,103 @@ const QUIZZES = [
       },
     },
   },
+  {
+    id: 'mbti',
+    emoji: '🧠',
+    title: 'What\'s Your MBTI Type?',
+    description: '70 questions across 4 dimensions — Introvert/Extrovert, Sensing/Intuition, Thinking/Feeling, Judging/Perceiving — to find your Myers-Briggs type.',
+    scoreType: 'mbti',
+    questions: [
+      { text: 'At a party do you:', options: [{ label: 'Interact with many, including strangers', value: 'e' }, { label: 'Interact with a few, known to you', value: 'i' }] },
+      { text: 'Are you more:', options: [{ label: 'Realistic than speculative', value: 's' }, { label: 'Speculative than realistic', value: 'n' }] },
+      { text: 'Is it worse to:', options: [{ label: 'Have your head in the clouds', value: 's' }, { label: 'Be in a rut', value: 'n' }] },
+      { text: 'Are you more impressed by:', options: [{ label: 'Principles', value: 't' }, { label: 'Emotions', value: 'f' }] },
+      { text: 'Are you more drawn toward the:', options: [{ label: 'Convincing', value: 't' }, { label: 'Touching', value: 'f' }] },
+      { text: 'Do you prefer to work:', options: [{ label: 'To deadlines', value: 'j' }, { label: 'Just whenever', value: 'p' }] },
+      { text: 'Do you tend to choose:', options: [{ label: 'Rather carefully', value: 'j' }, { label: 'Somewhat impulsively', value: 'p' }] },
+      { text: 'At parties do you:', options: [{ label: 'Stay late, with increasing energy', value: 'e' }, { label: 'Leave early with decreased energy', value: 'i' }] },
+      { text: 'Are you more attracted to:', options: [{ label: 'Sensible people', value: 's' }, { label: 'Imaginative people', value: 'n' }] },
+      { text: 'Are you more interested in:', options: [{ label: 'What is actual', value: 's' }, { label: 'What is possible', value: 'n' }] },
+      { text: 'In judging others are you more swayed by:', options: [{ label: 'Laws than circumstances', value: 't' }, { label: 'Circumstances than laws', value: 'f' }] },
+      { text: 'In approaching others is your inclination to be somewhat:', options: [{ label: 'Objective', value: 't' }, { label: 'Personal', value: 'f' }] },
+      { text: 'Are you more:', options: [{ label: 'Punctual', value: 'j' }, { label: 'Leisurely', value: 'p' }] },
+      { text: 'Does it bother you more having things:', options: [{ label: 'Incomplete', value: 'j' }, { label: 'Completed', value: 'p' }] },
+      { text: 'In your social groups do you:', options: [{ label: 'Keep abreast of others\' happenings', value: 'e' }, { label: 'Get behind on the news', value: 'i' }] },
+      { text: 'In doing ordinary things are you more likely to:', options: [{ label: 'Do it the usual way', value: 's' }, { label: 'Do it your own way', value: 'n' }] },
+      { text: 'Writers should:', options: [{ label: 'Say what they mean and mean what they say', value: 's' }, { label: 'Express things more by use of analogy', value: 'n' }] },
+      { text: 'Which appeals to you more:', options: [{ label: 'Consistency of thought', value: 't' }, { label: 'Harmonious human relationships', value: 'f' }] },
+      { text: 'Are you more comfortable in making:', options: [{ label: 'Logical judgments', value: 't' }, { label: 'Value judgments', value: 'f' }] },
+      { text: 'Do you want things:', options: [{ label: 'Settled and decided', value: 'j' }, { label: 'Unsettled and undecided', value: 'p' }] },
+      { text: 'Would you say you are more:', options: [{ label: 'Serious and determined', value: 'j' }, { label: 'Easy-going', value: 'p' }] },
+      { text: 'In phoning do you:', options: [{ label: 'Rarely question that it will all be said', value: 'e' }, { label: 'Rehearse what you\'ll say', value: 'i' }] },
+      { text: 'Facts:', options: [{ label: 'Speak for themselves', value: 's' }, { label: 'Illustrate principles', value: 'n' }] },
+      { text: 'Are visionaries:', options: [{ label: 'Somewhat annoying', value: 's' }, { label: 'Rather fascinating', value: 'n' }] },
+      { text: 'Are you more often:', options: [{ label: 'A cool-headed person', value: 't' }, { label: 'A warm-hearted person', value: 'f' }] },
+      { text: 'Is it worse to be:', options: [{ label: 'Unjust', value: 't' }, { label: 'Merciless', value: 'f' }] },
+      { text: 'Should one usually let events occur:', options: [{ label: 'By careful selection and choice', value: 'j' }, { label: 'Randomly and by chance', value: 'p' }] },
+      { text: 'Do you feel better about:', options: [{ label: 'Having purchased', value: 'j' }, { label: 'Having the option to buy', value: 'p' }] },
+      { text: 'In company do you:', options: [{ label: 'Initiate conversation', value: 'e' }, { label: 'Wait to be approached', value: 'i' }] },
+      { text: 'Common sense is:', options: [{ label: 'Rarely questionable', value: 's' }, { label: 'Frequently questionable', value: 'n' }] },
+      { text: 'Children often do not:', options: [{ label: 'Make themselves useful enough', value: 's' }, { label: 'Exercise their imagination enough', value: 'n' }] },
+      { text: 'In making decisions do you feel more comfortable with:', options: [{ label: 'Standards', value: 't' }, { label: 'Feelings', value: 'f' }] },
+      { text: 'Are you more:', options: [{ label: 'Firm than gentle', value: 't' }, { label: 'Gentle than firm', value: 'f' }] },
+      { text: 'Which is more admirable:', options: [{ label: 'The ability to organize and be methodical', value: 'j' }, { label: 'The ability to adapt and make do', value: 'p' }] },
+      { text: 'Do you put more value on being:', options: [{ label: 'Definite', value: 'j' }, { label: 'Open-minded', value: 'p' }] },
+      { text: 'Does new and non-routine interaction:', options: [{ label: 'Stimulate and energize you', value: 'e' }, { label: 'Tax your reserves', value: 'i' }] },
+      { text: 'Are you more frequently:', options: [{ label: 'A practical sort of person', value: 's' }, { label: 'A fanciful sort of person', value: 'n' }] },
+      { text: 'Are you more likely to:', options: [{ label: 'See how others are useful', value: 's' }, { label: 'See how others see', value: 'n' }] },
+      { text: 'Which is more satisfying:', options: [{ label: 'To discuss an issue thoroughly', value: 't' }, { label: 'To arrive at agreement on an issue', value: 'f' }] },
+      { text: 'Which rules you more:', options: [{ label: 'Your head', value: 't' }, { label: 'Your heart', value: 'f' }] },
+      { text: 'Are you more comfortable with work that is:', options: [{ label: 'Contracted and structured', value: 'j' }, { label: 'Done on a casual basis', value: 'p' }] },
+      { text: 'Do you tend to look for:', options: [{ label: 'The orderly', value: 'j' }, { label: 'Whatever turns up', value: 'p' }] },
+      { text: 'Do you prefer:', options: [{ label: 'Many friends with brief contact', value: 'e' }, { label: 'A few friends with more in-depth contact', value: 'i' }] },
+      { text: 'Do you go more by:', options: [{ label: 'Facts', value: 's' }, { label: 'Principles', value: 'n' }] },
+      { text: 'Are you more interested in:', options: [{ label: 'Production and distribution', value: 's' }, { label: 'Design and research', value: 'n' }] },
+      { text: 'Which is more of a compliment:', options: [{ label: '"There is a very logical person"', value: 't' }, { label: '"There is a very compassionate person"', value: 'f' }] },
+      { text: 'Do you value in yourself more that you are:', options: [{ label: 'Unwavering', value: 't' }, { label: 'Devoted', value: 'f' }] },
+      { text: 'Do you more often prefer the:', options: [{ label: 'Final and unalterable statement', value: 'j' }, { label: 'Tentative and preliminary statement', value: 'p' }] },
+      { text: 'Are you more comfortable:', options: [{ label: 'After a decision', value: 'j' }, { label: 'Before a decision', value: 'p' }] },
+      { text: 'Do you:', options: [{ label: 'Speak easily and at length with strangers', value: 'e' }, { label: 'Find little to say to strangers', value: 'i' }] },
+      { text: 'Are you more likely to trust your:', options: [{ label: 'Experience', value: 's' }, { label: 'Hunch', value: 'n' }] },
+      { text: 'Do you feel:', options: [{ label: 'More practical than ingenious', value: 's' }, { label: 'More ingenious than practical', value: 'n' }] },
+      { text: 'Which person is more to be admired — one of:', options: [{ label: 'Clear reason', value: 't' }, { label: 'Strong feeling', value: 'f' }] },
+      { text: 'Are you inclined more to be:', options: [{ label: 'Fair-minded', value: 't' }, { label: 'Sympathetic', value: 'f' }] },
+      { text: 'Is it preferable mostly to:', options: [{ label: 'Make sure things are arranged', value: 'j' }, { label: 'Just let things happen', value: 'p' }] },
+      { text: 'In relationships should most things be:', options: [{ label: 'Agreed upon', value: 'j' }, { label: 'Left open and flexible', value: 'p' }] },
+      { text: 'When the phone rings do you:', options: [{ label: 'Hasten to get to it first', value: 'e' }, { label: 'Hope someone else will answer', value: 'i' }] },
+      { text: 'Do you prize more in yourself:', options: [{ label: 'A strong sense of reality', value: 's' }, { label: 'A vivid imagination', value: 'n' }] },
+      { text: 'Are you drawn more to:', options: [{ label: 'Fundamentals', value: 's' }, { label: 'Overtones', value: 'n' }] },
+      { text: 'Which seems the greater error:', options: [{ label: 'To be too passionate', value: 't' }, { label: 'To be too objective', value: 'f' }] },
+      { text: 'Do you see yourself as basically:', options: [{ label: 'Hard-headed', value: 't' }, { label: 'Soft-hearted', value: 'f' }] },
+      { text: 'Which situation appeals to you more:', options: [{ label: 'The structured and scheduled', value: 'j' }, { label: 'The unstructured and unscheduled', value: 'p' }] },
+      { text: 'Are you a person that is more:', options: [{ label: 'Routinized than whimsical', value: 'j' }, { label: 'Whimsical than routinized', value: 'p' }] },
+      { text: 'Are you more inclined to be:', options: [{ label: 'Easy to approach', value: 'e' }, { label: 'Somewhat reserved', value: 'i' }] },
+      { text: 'In writings do you prefer:', options: [{ label: 'The more literal', value: 's' }, { label: 'The more figurative', value: 'n' }] },
+      { text: 'Is it harder for you to:', options: [{ label: 'Identify with others', value: 's' }, { label: 'Utilize others', value: 'n' }] },
+      { text: 'Which do you wish more for yourself:', options: [{ label: 'Clarity of reason', value: 't' }, { label: 'Strength of compassion', value: 'f' }] },
+      { text: 'Which is the greater fault:', options: [{ label: 'Being indiscriminate', value: 't' }, { label: 'Being critical', value: 'f' }] },
+      { text: 'Do you prefer the:', options: [{ label: 'Planned event', value: 'j' }, { label: 'Unplanned event', value: 'p' }] },
+      { text: 'Do you tend to be more:', options: [{ label: 'Deliberate than spontaneous', value: 'j' }, { label: 'Spontaneous than deliberate', value: 'p' }] },
+    ],
+    results: {
+      infj: { title: 'INFJ — The Advocate', emoji: '🌙', tagline: 'Rare, deep, and quietly world-changing.', description: 'You are among the rarest types — complex, intuitive, and driven by a profound sense of purpose. You see beneath the surface of people and situations with uncanny accuracy, and you feel the weight of the world\'s need for meaning. Your gift is holding both vision and compassion at once, and your presence changes people in ways they can\'t always explain.', keywords: ['Insight', 'Empathy', 'Purpose', 'Vision', 'Depth'] },
+      infp: { title: 'INFP — The Mediator', emoji: '🌱', tagline: 'A gentle idealist on a quest for meaning.', description: 'You are driven by your values and a deep longing for authenticity. Your inner world is rich, complex, and beautifully creative. You see the best in others and in the world — even when it\'s hard to find — and you champion what matters with quiet, fierce dedication. Your imagination and empathy are rare gifts.', keywords: ['Idealism', 'Empathy', 'Creativity', 'Authenticity', 'Depth'] },
+      intj: { title: 'INTJ — The Architect', emoji: '🔭', tagline: 'Strategic, independent, and relentlessly purposeful.', description: 'You are a rare combination of visionary and executor — you see systems, patterns, and flaws with unusual clarity, and you quietly build toward ambitious goals. You don\'t need approval; you need progress. Your biggest challenge is remembering that people aren\'t projects, and that patience is a strategy too.', keywords: ['Strategy', 'Independence', 'Vision', 'Precision', 'Determination'] },
+      intp: { title: 'INTP — The Logician', emoji: '⚗️', tagline: 'The quiet architect of complex ideas.', description: 'You live in a world of systems, theories, and questions. Your mind moves fast in abstract territory, connecting concepts others miss and taking nothing at face value. You are endlessly curious, deeply analytical, and at your best when you\'re taking something apart to truly understand how it works.', keywords: ['Logic', 'Analysis', 'Curiosity', 'Innovation', 'Precision'] },
+      isfj: { title: 'ISFJ — The Defender', emoji: '🌿', tagline: 'Devoted, practical, and quietly irreplaceable.', description: 'You show love through service — through remembering, showing up, and doing the quiet work that holds everything together. You have an extraordinary memory for the people you care for, and you work tirelessly behind the scenes. Your superpower is making others feel genuinely seen and cared for.', keywords: ['Loyalty', 'Service', 'Reliability', 'Warmth', 'Dedication'] },
+      isfp: { title: 'ISFP — The Adventurer', emoji: '🎨', tagline: 'Free, sensory, and beautifully present.', description: 'You experience life through your senses and live fully in the present moment. You\'re adaptable, artistic, and deeply in tune with beauty in all its forms. You don\'t need to argue for your values — you live them. Your authenticity is magnetic and your kindness runs quietly but very deep.', keywords: ['Spontaneity', 'Beauty', 'Kindness', 'Presence', 'Adaptability'] },
+      istj: { title: 'ISTJ — The Logistician', emoji: '📐', tagline: 'Dependable, thorough, and quietly essential.', description: 'You are the backbone of every organization and relationship you\'re part of. Reliable, methodical, and deeply responsible, you take your commitments seriously and follow through completely. You don\'t seek the spotlight — you seek a world that runs as it should, and you make it happen.', keywords: ['Reliability', 'Duty', 'Order', 'Precision', 'Integrity'] },
+      istp: { title: 'ISTP — The Virtuoso', emoji: '🔧', tagline: 'Calm under pressure, brilliant in action.', description: 'You are a natural problem-solver who processes the world through observation and action. You move through situations with quiet confidence, understanding how things work at a mechanical level others can\'t access. You are most alive when something needs building, fixing, or figuring out in real time.', keywords: ['Pragmatism', 'Observation', 'Skill', 'Independence', 'Calm'] },
+      enfj: { title: 'ENFJ — The Protagonist', emoji: '🌟', tagline: 'Charismatic, empathetic, and built to lead.', description: 'You are a natural leader who genuinely sees the potential in the people around you — and makes them believe it too. You are warm, organized, and driven by the conviction that people and the world can be better. Your challenge is learning that you can\'t carry everyone, and that your own needs matter too.', keywords: ['Charisma', 'Empathy', 'Leadership', 'Vision', 'Connection'] },
+      enfp: { title: 'ENFP — The Campaigner', emoji: '✨', tagline: 'Electric, imaginative, and endlessly enthusiastic.', description: 'You are a whirlwind of ideas, connections, and possibility. You see potential everywhere — in people, in concepts, in what could be — and your enthusiasm is genuinely contagious. You are at your best as an inspirer, a connector, and a creative force who makes others feel that anything is possible.', keywords: ['Enthusiasm', 'Creativity', 'Connection', 'Possibility', 'Warmth'] },
+      entj: { title: 'ENTJ — The Commander', emoji: '⚡', tagline: 'Bold, strategic, and built to lead at scale.', description: 'You are a natural commander — you see inefficiency, you see opportunity, and you move swiftly toward both. Your confidence is not arrogance; it is a genuine belief that problems are solvable and that you have what it takes to solve them. Your challenge is slowing down enough to bring people with you.', keywords: ['Leadership', 'Strategy', 'Ambition', 'Decisiveness', 'Vision'] },
+      entp: { title: 'ENTP — The Debater', emoji: '🔥', tagline: 'Brilliant, provocative, and always questioning.', description: 'You are energized by ideas, arguments, and the sport of dismantling weak thinking. You see multiple sides of any issue with ease and rarely meet a question you don\'t want to push further. Your challenge is follow-through: you love the problem more than the solution, and the debate more than the resolution.', keywords: ['Wit', 'Curiosity', 'Challenge', 'Innovation', 'Adaptability'] },
+      esfj: { title: 'ESFJ — The Consul', emoji: '🤝', tagline: 'Warm, dutiful, and deeply community-minded.', description: 'You are the social glue — the person who remembers everyone, makes sure no one is left out, and creates genuine belonging wherever you go. You are deeply attuned to others\' needs and work actively to meet them. Your challenge is learning that your own needs are equally worthy of that same devotion.', keywords: ['Warmth', 'Community', 'Loyalty', 'Care', 'Harmony'] },
+      esfp: { title: 'ESFP — The Entertainer', emoji: '🎉', tagline: 'Spontaneous, joyful, and fully alive.', description: 'You are the embodiment of joy in motion — you live fully in the present, find fun in almost anything, and bring everyone along for the ride. You are warm, sensory, and magnetic in a way that makes people feel genuinely welcome. Life is too short for the theoretical when the actual is right here.', keywords: ['Spontaneity', 'Joy', 'Presence', 'Warmth', 'Adaptability'] },
+      estj: { title: 'ESTJ — The Executive', emoji: '📋', tagline: 'Organized, decisive, and built to execute.', description: 'You are a natural organizer who sees what needs to be done and does it — efficiently, thoroughly, and without unnecessary drama. You value structure, clear accountability, and following through. You are the person others rely on to make things happen, and you take that responsibility seriously.', keywords: ['Organization', 'Leadership', 'Decisiveness', 'Responsibility', 'Efficiency'] },
+      estp: { title: 'ESTP — The Entrepreneur', emoji: '🚀', tagline: 'Bold, perceptive, and fully in the moment.', description: 'You are at your best in the thick of it — reading the room, thinking on your feet, and turning problems into opportunities in real time. You are energetic, direct, and deeply practical, with a gift for seeing what\'s actually happening rather than what\'s supposed to happen. Action is your native language.', keywords: ['Boldness', 'Perception', 'Action', 'Pragmatism', 'Energy'] },
+    },
+  },
 ];
 
 // ─── Quiz Groups ──────────────────────────────────────────────────────────────
@@ -2991,7 +3088,7 @@ const QUIZ_GROUPS = [
     label: 'Self & Psychology',
     emoji: '🔍',
     description: 'Patterns, wounds, and the architecture of your inner world.',
-    ids: ['enneagram', 'attachment', 'wound', 'shadow', 'healing-stage', 'money-story'],
+    ids: ['enneagram', 'attachment', 'wound', 'shadow', 'healing-stage', 'money-story', 'mbti'],
   },
   {
     label: 'Spiritual & Cosmic',
@@ -3063,16 +3160,30 @@ export default function QuizzesPage() {
     if (step < questions.length - 1) {
       setStep(step + 1);
     } else {
-      // Tally votes
-      const tally = {};
-      for (const v of newAnswers) tally[v] = (tally[v] ?? 0) + 1;
-      const sorted = Object.keys(activeQuiz.results).sort(
-        (a, b) => (tally[b] ?? 0) - (tally[a] ?? 0)
-      );
-      setResult(activeQuiz.results[sorted[0]]);
-      const runnerUpKey = sorted[1];
-      const runnerUpScore = tally[runnerUpKey] ?? 0;
-      setSecondaryResult(runnerUpScore >= 2 ? activeQuiz.results[runnerUpKey] : null);
+      if (activeQuiz.scoreType === 'mbti') {
+        // MBTI: score 4 dimensions independently
+        const counts = { e: 0, i: 0, s: 0, n: 0, t: 0, f: 0, j: 0, p: 0 };
+        for (const v of newAnswers) counts[v] = (counts[v] ?? 0) + 1;
+        const type = [
+          counts.e >= counts.i ? 'e' : 'i',
+          counts.s >= counts.n ? 's' : 'n',
+          counts.t >= counts.f ? 't' : 'f',
+          counts.j >= counts.p ? 'j' : 'p',
+        ].join('');
+        setResult(activeQuiz.results[type] ?? null);
+        setSecondaryResult(null);
+      } else {
+        // Standard tally
+        const tally = {};
+        for (const v of newAnswers) tally[v] = (tally[v] ?? 0) + 1;
+        const sorted = Object.keys(activeQuiz.results).sort(
+          (a, b) => (tally[b] ?? 0) - (tally[a] ?? 0)
+        );
+        setResult(activeQuiz.results[sorted[0]]);
+        const runnerUpKey = sorted[1];
+        const runnerUpScore = tally[runnerUpKey] ?? 0;
+        setSecondaryResult(runnerUpScore >= 2 ? activeQuiz.results[runnerUpKey] : null);
+      }
     }
   }
 
