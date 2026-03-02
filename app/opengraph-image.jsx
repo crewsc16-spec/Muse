@@ -8,7 +8,7 @@ export const contentType = 'image/png';
 export default async function OGImage() {
   // Load Cormorant Garamond (elegant high-contrast serif) for the title
   const fontData = await fetch(
-    'https://fonts.gstatic.com/s/cormorantgaramond/v16/co3YmX5slCNuHLi8bLeY9MK7whWMhyjYqXtK.ttf'
+    'https://fonts.gstatic.com/s/cormorantgaramond/v21/co3umX5slCNuHLi8bLeY9MK7whWMhyjypVO7abI26QOD_iE9GnM.ttf'
   ).then(r => r.arrayBuffer());
 
   const stars = [
