@@ -39,7 +39,7 @@ export default function RootLayout({ children }) {
         <InstallBanner />
         <SpeedInsights />
         <Analytics />
-        <main className="max-w-4xl mx-auto px-4 py-8 pb-24 md:pb-8">
+        <main className="max-w-4xl mx-auto px-4 pt-16 pb-24 md:py-8">
           {children}
         </main>
       </body>
