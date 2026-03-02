@@ -108,6 +108,94 @@ const LANDING_FEATURES = [
   },
 ];
 
+// ─── UI Preview mockups (landing page) ──────────────────────────────────────
+
+function PreviewDaily() {
+  return (
+    <div className="rounded-2xl overflow-hidden bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-100 p-5 space-y-3">
+      <div className="flex items-center gap-2">
+        <span className="text-lg">🔥</span>
+        <div>
+          <p className="text-xs font-medium text-gray-700">Fire energy</p>
+          <p className="text-[10px] text-gray-400">Moon in Aries · Waxing Crescent</p>
+        </div>
+      </div>
+      <div className="bg-white/60 rounded-xl p-3 space-y-2">
+        <p className="text-[10px] text-gray-400 uppercase tracking-wider">Today&rsquo;s Card</p>
+        <p className="font-playfair text-sm text-gray-700">The Star</p>
+        <p className="text-[10px] text-gray-400 leading-relaxed">Hope, renewal, and a quiet confidence that you&rsquo;re on the right path.</p>
+      </div>
+      <div className="bg-white/60 rounded-xl p-3">
+        <p className="text-[10px] text-gray-400 uppercase tracking-wider">Spirit Animal</p>
+        <p className="font-playfair text-sm text-gray-700">🦅 Hawk</p>
+      </div>
+    </div>
+  );
+}
+
+function PreviewChart() {
+  const placements = [
+    { planet: '☉', label: 'Sun', sign: 'Pisces', gate: 'Gate 22.3' },
+    { planet: '☽', label: 'Moon', sign: 'Leo', gate: 'Gate 30.5' },
+    { planet: '↑', label: 'Rising', sign: 'Scorpio', gate: '' },
+  ];
+  return (
+    <div className="rounded-2xl overflow-hidden bg-gradient-to-br from-indigo-50 to-blue-50 border border-indigo-100 p-5 space-y-3">
+      <div className="flex items-center justify-between">
+        <p className="text-xs font-medium text-gray-700">Your Cosmic Chart</p>
+        <div className="flex gap-1">
+          {['Astrology', 'HD'].map(t => (
+            <span key={t} className="text-[9px] bg-white/60 border border-white/80 rounded-full px-2 py-0.5 text-gray-500">{t}</span>
+          ))}
+        </div>
+      </div>
+      <div className="space-y-1.5">
+        {placements.map(p => (
+          <div key={p.label} className="flex items-center justify-between bg-white/60 rounded-lg px-3 py-2">
+            <div className="flex items-center gap-2">
+              <span className="text-sm">{p.planet}</span>
+              <span className="text-xs text-gray-600">{p.label}</span>
+            </div>
+            <div className="text-right">
+              <span className="text-xs font-medium text-gray-700">{p.sign}</span>
+              {p.gate && <span className="text-[10px] text-gray-400 ml-2">{p.gate}</span>}
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="bg-white/60 rounded-lg px-3 py-2">
+        <p className="text-[10px] text-gray-400">Human Design</p>
+        <p className="text-xs text-gray-700 font-medium">Manifesting Generator · 6/2 · Emotional Authority</p>
+      </div>
+    </div>
+  );
+}
+
+function PreviewJournal() {
+  return (
+    <div className="rounded-2xl overflow-hidden bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-100 p-5 space-y-3">
+      <div className="flex items-center justify-between">
+        <p className="text-xs font-medium text-gray-700">Journal</p>
+        <span className="text-[9px] bg-white/60 border border-white/80 rounded-full px-2 py-0.5 text-gray-500">🌒 Waxing Crescent</span>
+      </div>
+      <div className="bg-white/60 rounded-xl p-3 space-y-2">
+        <p className="text-[10px] text-gray-400 italic">Prompt: What are you ready to release?</p>
+        <p className="text-xs text-gray-600 leading-relaxed">I&rsquo;ve been holding onto the idea that I need to have everything figured out. Today I&rsquo;m letting go of that pressure and trusting the process...</p>
+      </div>
+      <div className="flex gap-2">
+        <div className="flex-1 bg-white/60 rounded-lg px-3 py-2 text-center">
+          <p className="text-lg">😊</p>
+          <p className="text-[10px] text-gray-400">Today</p>
+        </div>
+        <div className="flex-1 bg-white/60 rounded-lg px-3 py-2 text-center">
+          <p className="text-[10px] text-gray-400">Streak</p>
+          <p className="text-sm font-medium text-gray-700">7 days</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Main Page ──────────────────────────────────────────────────────────────
 
 export default function HomePage() {
@@ -148,7 +236,7 @@ export default function HomePage() {
   if (!user) {
     return (
       <div className="min-h-screen">
-        <div className="max-w-4xl mx-auto px-4 py-16 space-y-12">
+        <div className="max-w-4xl mx-auto px-4 py-16 space-y-14">
 
           {/* Hero */}
           <div className="text-center space-y-5">
@@ -156,15 +244,25 @@ export default function HomePage() {
               Muse
             </h1>
             <p className="text-lg text-gray-500 max-w-md mx-auto leading-relaxed">
-              Your cosmic self-discovery guide — astrology, Human Design, tarot, journaling, and vision boards in one beautiful place.
+              Your cosmic self-discovery guide — astrology, Human Design, journaling, and vision boards in one beautiful place.
             </p>
             <div className="flex items-center justify-center gap-3 pt-2">
               <Link href="/signup" className="btn-gradient text-white text-sm px-6 py-2.5 rounded-full font-medium">
-                Get Started
+                Join the Beta
               </Link>
               <Link href="/login" className="text-sm text-gray-400 hover:text-[#b88a92] transition-colors">
                 Sign in
               </Link>
+            </div>
+          </div>
+
+          {/* App previews */}
+          <div className="space-y-3">
+            <p className="text-center text-xs text-gray-400 uppercase tracking-widest">A glimpse inside</p>
+            <div className="grid sm:grid-cols-3 gap-4">
+              <PreviewDaily />
+              <PreviewChart />
+              <PreviewJournal />
             </div>
           </div>
 
@@ -184,9 +282,13 @@ export default function HomePage() {
             ))}
           </div>
 
-          {/* Footer tagline */}
-          <div className="text-center pt-4">
-            <p className="text-xs text-gray-300">yourmuse.app</p>
+          {/* Bottom CTA */}
+          <div className="text-center space-y-4">
+            <p className="font-playfair text-2xl text-gray-700">Ready to meet your Muse?</p>
+            <Link href="/signup" className="btn-gradient text-white text-sm px-8 py-3 rounded-full font-medium inline-block">
+              Join the Beta
+            </Link>
+            <p className="text-xs text-gray-300 pt-2">yourmuse.app</p>
           </div>
 
         </div>
