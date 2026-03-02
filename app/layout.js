@@ -4,6 +4,7 @@ import "./globals.css";
 import Navbar from "./components/Navbar";
 import ThemeInitializer from "./components/ThemeInitializer";
 import InstallBanner from "./components/InstallBanner";
+import AutoUpdater from "./components/AutoUpdater";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/next";
 
@@ -37,6 +38,7 @@ export default function RootLayout({ children }) {
         <ThemeInitializer />
         <SpeedInsights />
         <Analytics />
+        <AutoUpdater />
         {/* Fixed full-screen shell — navbar never inside the scroll container */}
         <div className="fixed inset-0 flex flex-col overflow-hidden">
           <Navbar />
