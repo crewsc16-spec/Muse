@@ -36,19 +36,16 @@ export default function BetaBanner() {
         {/* Body */}
         <div className="p-5 space-y-4">
           <p className="text-sm text-gray-600 leading-relaxed">
-            Muse is still being built! You may run into the occasional hiccup.
+            Muse is still a work in progress — you're getting an early look while we shape things up.
           </p>
           <p className="text-sm text-gray-600 leading-relaxed">
-            If something looks off, try <strong>closing and reopening the app</strong> — that fixes most things.
-          </p>
-          <p className="text-sm text-gray-500 leading-relaxed">
-            Spot something off? Tap the
+            Your feedback genuinely helps. If you notice a glitch, have an idea, or just want to share a thought, tap the
             <span className="inline-flex align-middle mx-1">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
               </svg>
             </span>
-            feedback icon in the top bar anytime.
+            icon in the top bar anytime.
           </p>
         </div>
 
