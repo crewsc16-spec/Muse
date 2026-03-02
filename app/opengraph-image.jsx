@@ -85,28 +85,27 @@ export default async function OGImage() {
           />
         ))}
 
-        {/* Title — Cormorant Garamond, high contrast */}
+        {/* Title — Cormorant Garamond, bold */}
         <div
           style={{
-            fontSize: 116,
+            fontSize: 148,
             fontFamily: 'Cormorant Garamond',
             fontWeight: 600,
-            color: '#f0e6d8',
-            letterSpacing: '0.06em',
-            marginBottom: 18,
+            color: '#f5ede3',
+            letterSpacing: '0.08em',
+            marginBottom: 20,
           }}
         >
           Muse
         </div>
 
-        {/* Tagline — large, readable */}
+        {/* Tagline */}
         <div
           style={{
-            fontSize: 36,
-            color: 'rgba(240,230,216,0.7)',
-            letterSpacing: '0.1em',
-            textTransform: 'uppercase',
-            marginBottom: 48,
+            fontSize: 42,
+            color: '#d4c4b0',
+            letterSpacing: '0.08em',
+            marginBottom: 50,
           }}
         >
           Your cosmic self-discovery guide
@@ -118,22 +117,22 @@ export default async function OGImage() {
             display: 'flex',
             alignItems: 'center',
             gap: 0,
-            fontSize: 22,
-            color: 'rgba(240,230,216,0.5)',
+            fontSize: 28,
+            color: 'rgba(212,196,176,0.7)',
             letterSpacing: '0.04em',
           }}
         >
-          {['Astrology', 'Human Design', 'Tarot', 'Journaling', 'Vision Board'].map(
+          {['Astrology', 'Human Design', 'Tarot', 'Journaling'].map(
             (label, i) => (
               <div key={label} style={{ display: 'flex', alignItems: 'center' }}>
                 {i > 0 && (
                   <div
                     style={{
-                      width: 3,
-                      height: 3,
+                      width: 5,
+                      height: 5,
                       borderRadius: '50%',
-                      background: 'rgba(240,230,216,0.3)',
-                      margin: '0 18px',
+                      background: 'rgba(212,196,176,0.4)',
+                      margin: '0 22px',
                     }}
                   />
                 )}
