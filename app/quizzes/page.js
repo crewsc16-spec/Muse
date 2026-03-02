@@ -85,6 +85,24 @@ const QUIZZES = [
           { label: 'So pulled into feeling — music, a story, a memory — that the external world just dissolves', value: 'water' },
         ],
       },
+      {
+        text: 'The element you feel most personally represented by — not aspirationally, but honestly — is…',
+        options: [
+          { label: 'Fire — I am heat, intensity, and forward momentum; I need expression to feel alive', value: 'fire' },
+          { label: 'Earth — I am patience, substance, and steadiness; I build things that last', value: 'earth' },
+          { label: 'Air — I am ideas, curiosity, and connection; I live in the space between thoughts', value: 'air' },
+          { label: 'Water — I am feeling and depth; my inner world is vaster than my outer one', value: 'water' },
+        ],
+      },
+      {
+        text: 'The thing that brings you most genuinely alive is…',
+        options: [
+          { label: 'A worthy challenge that demands everything you have', value: 'fire' },
+          { label: 'A long, unhurried project you can tend and grow slowly with your hands', value: 'earth' },
+          { label: 'A conversation that genuinely changes how you think about something', value: 'air' },
+          { label: 'A moment of real depth — music, beauty, or memory that breaks you open slightly', value: 'water' },
+        ],
+      },
     ],
     results: {
       fire: {
@@ -197,6 +215,24 @@ const QUIZZES = [
           { label: 'A quality of presence — you\'re genuinely here, without needing anything to be different', value: 'grounded' },
           { label: 'An infectious certainty that something better is not only possible but inevitable', value: 'visionary' },
           { label: 'A quality of attention that makes people feel like the only person in the room', value: 'empath' },
+        ],
+      },
+      {
+        text: 'The spiritual path that honestly fits you most — not the one you aspire to but the one that already is you — is…',
+        options: [
+          { label: 'Esoteric and symbolic — ancient wisdom, hidden meanings, and the unseen world', value: 'mystic' },
+          { label: 'Embodied and earth-based — the sacred found in the daily, seasonal, and physical', value: 'grounded' },
+          { label: 'Purposive and forward-facing — manifestation, vision, and conscious creation', value: 'visionary' },
+          { label: 'Relational and heart-centered — the divine most vivid in love, service, and connection', value: 'empath' },
+        ],
+      },
+      {
+        text: 'The thing you\'re most actively learning not to do is…',
+        options: [
+          { label: 'Seek so much meaning that I miss what\'s directly in front of me', value: 'mystic' },
+          { label: 'Play it so safe that I never let something genuinely new in', value: 'grounded' },
+          { label: 'Live so far in the future that I\'m never actually here', value: 'visionary' },
+          { label: 'Take on others\' pain so completely that I lose my own signal entirely', value: 'empath' },
         ],
       },
     ],
@@ -915,6 +951,24 @@ const QUIZZES = [
           { label: 'Draining — I have real difficulty letting go, even when the change is clearly right', value: 'kapha' },
         ],
       },
+      {
+        text: 'Your physical build and constitution tends to be…',
+        options: [
+          { label: 'Slender and light, with a tendency to forget to eat when absorbed in something', value: 'vata' },
+          { label: 'Variable — my energy, weight, and appetite shift noticeably with the seasons', value: 'vata' },
+          { label: 'Medium and athletic, with a strong metabolism and reliable hunger', value: 'pitta' },
+          { label: 'Solid and sturdy, with a tendency to retain weight easily', value: 'kapha' },
+        ],
+      },
+      {
+        text: 'Under pressure, the quality you most recognise in yourself is…',
+        options: [
+          { label: 'A sharp edge — I become critical, controlling, or perfectionistic under stress', value: 'pitta' },
+          { label: 'Restless urgency — I try to do everything at once and end up scattered', value: 'vata' },
+          { label: 'Slowdown — I go quiet, withdraw, and become harder to move', value: 'kapha' },
+          { label: 'Mental spiral — anxiety floods in and I can\'t stop my mind from racing', value: 'vata' },
+        ],
+      },
     ],
     results: {
       vata: {
@@ -1034,6 +1088,24 @@ const QUIZZES = [
           { label: "Welcome — feedback and encouragement help me move faster", value: 'waxing' },
           { label: "Comfortable — I can receive attention without needing it to define me", value: 'full' },
           { label: "Deliberately reduced — I'm turning the volume down to hear myself", value: 'waning' },
+        ],
+      },
+      {
+        text: 'The phrase that most honestly captures where you are right now is…',
+        options: [
+          { label: "Something is ending — I'm in the quiet before the next thing begins", value: 'new' },
+          { label: "Something is building — I'm putting real effort into something not yet visible", value: 'waxing' },
+          { label: "Something is in full expression — my life is visible and I'm showing up fully", value: 'full' },
+          { label: "Something is completing — I'm in harvest mode, releasing what's done", value: 'waning' },
+        ],
+      },
+      {
+        text: 'Your current relationship with output and visibility is…',
+        options: [
+          { label: "I'm not producing much right now — and something in me knows that's right", value: 'new' },
+          { label: "I'm producing, but it's still rough and not ready to be shared widely", value: 'waxing' },
+          { label: "I'm in full output — sharing, contributing, showing up", value: 'full' },
+          { label: "I'm producing less and reflecting more — this is a slower, more inward season", value: 'waning' },
         ],
       },
     ],
@@ -1162,6 +1234,24 @@ const QUIZZES = [
           { label: 'Living without aliveness — a grey, joyless, sensory-dead existence with no beauty left', value: 'aphrodite' },
           { label: 'Losing your clarity — the ability to think your way through things, to see what others miss', value: 'athena' },
           { label: 'Forced into permanent surface — never allowed to acknowledge the dark or go deep again', value: 'persephone' },
+        ],
+      },
+      {
+        text: 'The drive that has most consistently shaped your choices in life is…',
+        options: [
+          { label: 'Freedom — to stay sovereign, unobligated, and self-directed above all else', value: 'artemis' },
+          { label: 'Love and beauty — to experience life fully, with pleasure and aliveness', value: 'aphrodite' },
+          { label: 'Understanding — to see clearly, solve hard things, and act with precision', value: 'athena' },
+          { label: 'Depth — to never live only on the surface; to go where others won\'t', value: 'persephone' },
+        ],
+      },
+      {
+        text: 'The environment where something sacred and real tends to happen for you is…',
+        options: [
+          { label: 'A fertile garden, orchard, or wild land you tend with your own hands', value: 'demeter' },
+          { label: 'A warm fireside or candlelit room at the heart of a home you\'ve made', value: 'hestia' },
+          { label: 'A moonlit forest, mountain trail, or open wilderness at night', value: 'artemis' },
+          { label: 'The sea at sunset, a rose garden, anywhere that stops you in your tracks with beauty', value: 'aphrodite' },
         ],
       },
     ],
@@ -1304,6 +1394,24 @@ const QUIZZES = [
           { label: 'In the natural world — a moment in a forest, by water, or under the open sky', value: 'nature' },
           { label: 'With others — in ceremony, community, or a moment of profound shared understanding', value: 'community' },
           { label: 'While making something — you crossed into something larger through the act of creating', value: 'creative' },
+        ],
+      },
+      {
+        text: 'The environment where you feel most spiritually at home is…',
+        options: [
+          { label: 'My own private space — altar, candles, incense, complete solitude', value: 'solitary' },
+          { label: 'Outside in the living world — forest, garden, water, or open sky', value: 'nature' },
+          { label: 'In a circle or ceremony with people who share my path', value: 'community' },
+          { label: 'A studio or workspace surrounded by art, music, words, and creative materials', value: 'creative' },
+        ],
+      },
+      {
+        text: 'The spiritual tools you feel most genuinely drawn to are…',
+        options: [
+          { label: 'A journal, oracle cards, incense, and candles', value: 'solitary' },
+          { label: 'Herbs, stones, feathers, and things gathered on walks in the natural world', value: 'nature' },
+          { label: 'Shared ceremony objects, prayer beads, and community altar pieces', value: 'community' },
+          { label: 'Art supplies, collage materials, poetry, paint, and music', value: 'creative' },
         ],
       },
     ],
@@ -1935,6 +2043,24 @@ const QUIZZES = [
           { label: 'The gap between knowing you need to move and actually getting yourself to do it', value: 'movement' },
         ],
       },
+      {
+        text: 'Given a dedicated 20 minutes every morning with no obligations, you\'d most naturally spend it…',
+        options: [
+          { label: 'Writing — morning pages, gratitude, or whatever wants to come out on the page', value: 'journaling' },
+          { label: 'Drawing a card and sitting with whatever it surfaces for the day ahead', value: 'oracle' },
+          { label: 'Sitting in stillness — just breathing and being before the day begins', value: 'meditation' },
+          { label: 'Moving — stretching, yoga, or a walk outside to wake everything up', value: 'movement' },
+        ],
+      },
+      {
+        text: 'The practice tool you feel most genuinely called to — or already return to — is…',
+        options: [
+          { label: 'A journal and pen', value: 'journaling' },
+          { label: 'Oracle or tarot cards', value: 'oracle' },
+          { label: 'A meditation practice, breathwork, or stillness in any form', value: 'meditation' },
+          { label: 'A yoga mat, running shoes, or movement practice of any kind', value: 'movement' },
+        ],
+      },
     ],
     results: {
       journaling: {
@@ -2075,6 +2201,26 @@ const QUIZZES = [
           { label: "A shrug — something else will come together, it always does", value: 'star' },
         ],
       },
+      {
+        text: 'The card that most honestly reflects you right now — not your ideal, your actual — is…',
+        options: [
+          { label: 'The Fool — I am in a beginning, trusting something I cannot fully see', value: 'fool' },
+          { label: 'The High Priestess — I am sitting with what I know but cannot yet prove or say', value: 'priestess' },
+          { label: 'The Empress — I am creating, nurturing, and bringing something into form', value: 'empress' },
+          { label: 'The Hermit — I am withdrawing to find what the world cannot give me', value: 'hermit' },
+          { label: 'The Star — I am tending hope carefully after something that cost me', value: 'star' },
+        ],
+      },
+      {
+        text: 'The journey stage you\'re most honestly in right now is…',
+        options: [
+          { label: 'Beginning — open, unformed, and willing to not know yet', value: 'fool' },
+          { label: 'Knowing — sitting with what I sense but cannot yet speak', value: 'priestess' },
+          { label: 'Creating — building, nurturing, bringing things into tangible form', value: 'empress' },
+          { label: 'Seeking — withdrawing from the ordinary world to find something essential', value: 'hermit' },
+          { label: 'Recovering — carefully tending hope and faith after something difficult', value: 'star' },
+        ],
+      },
     ],
     results: {
       fool: {
@@ -2210,6 +2356,24 @@ const QUIZZES = [
           { label: "How many times I've changed — the discontinuity between my chapters", value: 'phoenix' },
           { label: "How much I feel and how far down I go — that it makes me hard to reach sometimes", value: 'mermaid' },
           { label: "That I'm hard to pin down — that even I don't always know which version is \"the real me\"", value: 'shapeshifter' },
+        ],
+      },
+      {
+        text: 'The creature you feel most honestly connected to — not the most appealing one, the true one — is…',
+        options: [
+          { label: 'The Dragon — ancient, sovereign, a keeper of power and territory', value: 'dragon' },
+          { label: 'The Phoenix — reborn from destruction, again and again', value: 'phoenix' },
+          { label: 'The Mermaid — belonging to two worlds, native to neither entirely', value: 'mermaid' },
+          { label: 'The Shapeshifter — wearing many forms, known fully by almost no one', value: 'shapeshifter' },
+        ],
+      },
+      {
+        text: 'Your power tends to live in…',
+        options: [
+          { label: 'Your authority — the weight of what you know, guard, and will not compromise on', value: 'dragon' },
+          { label: 'Your capacity to return — to be destroyed and begin again stronger', value: 'phoenix' },
+          { label: 'The tension of your in-betweenness — being of more than one world', value: 'mermaid' },
+          { label: 'Your ability to become what the moment needs — fluid, adaptive, hard to pin down', value: 'shapeshifter' },
         ],
       },
     ],
@@ -2350,6 +2514,26 @@ const QUIZZES = [
           { label: "A long walk alone at dusk somewhere strange — the threshold holding you", value: 'hedge' },
           { label: "A clear night sky with no light pollution — the stars doing what they always do", value: 'cosmic' },
           { label: "Your own home, warm, tended, with something good on the stove — the world reduced to this room", value: 'kitchen' },
+        ],
+      },
+      {
+        text: 'The aspect of magical practice that feels most naturally and honestly yours is…',
+        options: [
+          { label: 'Herbalism, plant medicine, earth-based healing, and the garden', value: 'green' },
+          { label: 'Water magic, emotional currents, moon work, and the tides', value: 'sea' },
+          { label: 'Divination, spirit communication, liminal work, and the otherworld', value: 'hedge' },
+          { label: 'Astrology, planetary timing, cosmic cycles, and celestial ritual', value: 'cosmic' },
+          { label: 'Kitchen magic, hearth craft, food as medicine, and the sacred home', value: 'kitchen' },
+        ],
+      },
+      {
+        text: 'The landscape that calls to you most strongly — that feels like it genuinely knows you — is…',
+        options: [
+          { label: 'Deep forest, wild garden, overgrown meadow, old-growth trees', value: 'green' },
+          { label: 'The ocean, a river, a lake at dawn — anywhere vast and moving', value: 'sea' },
+          { label: 'The moors, a crossroads, the woods at dusk, a threshold place', value: 'hedge' },
+          { label: 'An open hillside at night with an unobstructed view of the sky', value: 'cosmic' },
+          { label: 'A warm kitchen, a candlelit room, anywhere that smells like something good', value: 'kitchen' },
         ],
       },
     ],
