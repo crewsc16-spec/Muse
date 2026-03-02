@@ -588,7 +588,7 @@ function InfoModal({ item, onClose }) {
   if (!item) return null;
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
       onClick={onClose}
     >
       <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" />
@@ -618,7 +618,9 @@ function InfoModal({ item, onClose }) {
             ))}
           </div>
         )}
-        <p className="text-sm text-gray-600 leading-relaxed">{item.body}</p>
+        {item.body?.split('\n\n').map((para, i) => (
+          <p key={i} className="text-sm text-gray-600 leading-relaxed">{para}</p>
+        ))}
       </div>
     </div>
   );
@@ -2102,6 +2104,43 @@ export default function CosmicPage() {
                 Sextile:     (nd) => `Pluto is opening a subtle channel of transformation through ${nd} — power and depth are quietly becoming available in this area of your life.`,
               },
             };
+            const TRANSIT_GUIDANCE = {
+              jupiter: {
+                Conjunction: 'This is one of the luckiest transits you can experience. Opportunities are literally knocking — say yes to things that excite you, even if they feel bigger than you\'re ready for. You\'re ready. Trust your expansion right now and don\'t shrink yourself to fit into old containers.',
+                Square:      'Growth rarely feels graceful in the moment. You might feel restless, overcommitted, or like everything is happening at once. That\'s the point — you\'re outgrowing something. Don\'t try to control it. Let yourself be stretched and trust that the discomfort is building your capacity.',
+                Opposition:  'Something or someone is showing you where you\'ve been playing too small — or too big. This is a balancing act between your inner knowing and what the world is reflecting back. You don\'t have to choose one side. Hold both and let the tension teach you.',
+                Trine:       'Things are flowing with unusual ease right now. Doors are opening quietly. You might not even notice how supported you are because it feels so natural. That\'s the gift — lean into the grace and take action while the current is carrying you.',
+                Sextile:     'A small window of opportunity is open. It won\'t force itself on you — you have to notice it and step through. Pay attention to invitations, conversations, and ideas that spark something. One small yes could set something beautiful in motion.',
+              },
+              saturn: {
+                Conjunction: 'This is a defining chapter. Saturn is asking you to get serious about something that matters — to build it properly, to show up with integrity, to do the hard thing. It will feel heavy at times. But what you construct during this transit has the bones to last decades. Don\'t cut corners.',
+                Square:      'You\'re being tested — not to break you, but to show you what\'s actually solid in your life and what\'s been held together by habit. Frustration and delays are Saturn\'s way of redirecting you toward what\'s real. Push through with patience, not force.',
+                Opposition:  'A reality check is arriving from the outside — through other people, circumstances, or consequences of past choices. This isn\'t punishment. It\'s Saturn showing you what needs to be restructured so you can stand on firmer ground. Face it honestly.',
+                Trine:       'Your hard work is quietly paying off. This isn\'t dramatic or flashy — it\'s the steady reward of showing up consistently. Lean into discipline and structure right now. The universe is matching your effort with tangible results.',
+                Sextile:     'There\'s an opening to build something lasting if you\'re willing to put in the focused effort. This won\'t hand you anything, but it will reward every intentional step you take. Small, consistent actions now create something that endures.',
+              },
+              uranus: {
+                Conjunction: 'Expect the unexpected — and then expect it again. Something in your life is ready to break free from its old form. This can feel destabilizing, but it\'s liberation in disguise. The version of you that emerges from this transit will be more authentically you than anything that came before.',
+                Square:      'Things are being shaken loose whether you\'re ready or not. Resistance will only make it harder. The part of your life that feels most unstable right now is the part that was most overdue for change. Let it rearrange. You\'ll find your footing on the other side.',
+                Opposition:  'Someone or something is challenging you to become a completely new version of yourself. The old way isn\'t working anymore and you can feel it. This transit can be electric and disorienting — but it\'s pointing you toward a freedom you didn\'t know you needed.',
+                Trine:       'Change is flowing in with surprising ease. New ideas, new connections, new ways of being — they\'re arriving without the usual upheaval. This is your chance to reinvent something in your life while the energy actually supports it. Be bold.',
+                Sextile:     'A subtle spark of change is available. It\'s not demanding transformation — it\'s inviting it. Try something new. Break a small pattern. Say the thing you\'ve been holding back. This transit rewards experimentation and curiosity.',
+              },
+              neptune: {
+                Conjunction: 'The boundaries of your reality are dissolving. This can feel magical and disorienting in equal measure. You may not have clarity right now — and that\'s okay. Something is being dreamed into existence through you. Trust your intuition over your logic during this time and let beauty guide you.',
+                Square:      'Be honest with yourself about where you\'re seeing what you want to see instead of what\'s actually there. Neptune\'s fog can romanticize, escape, and confuse. Ground yourself in your body, your daily practices, and the people who tell you the truth. Clarity will return.',
+                Opposition:  'The veil between your inner world and outer reality is thin right now. You may feel unusually sensitive, empathic, or confused about boundaries. Not everything you\'re feeling is yours. Be gentle with yourself and discerning about what you take on.',
+                Trine:       'Your imagination, spirituality, and creative instincts are heightened in the most beautiful way. This is a time to create, to dream, to connect with something larger than yourself. Art, music, prayer, nature — whatever feeds your soul, feed it more right now.',
+                Sextile:     'A gentle channel of inspiration is open. You might notice more synchronicities, more vivid dreams, more moments of quiet knowing. Pay attention to the subtle nudges. Spirit is whispering — you just have to slow down enough to hear it.',
+              },
+              pluto: {
+                Conjunction: 'This is one of the most transformative transits you\'ll ever experience — and it only happens once. Something in you is dying so something truer can be born. It can feel like loss, obsession, or an identity crisis. But on the other side, you\'ll be more powerful and more authentically yourself than you\'ve ever been. Surrender to the process.',
+                Square:      'A power struggle is surfacing — with someone else, with a situation, or with a part of yourself you\'ve been avoiding. Pluto doesn\'t do surface-level. Whatever is being dredged up has been buried for a long time. Face it. The only way out is through.',
+                Opposition:  'Something you\'ve been holding onto is being pulled away — or someone is forcing a confrontation with a truth you\'ve avoided. This is Pluto asking you to release control and trust that what falls away was never really yours to keep. What remains is unshakable.',
+                Trine:       'Deep transformation is underway, but it feels more like a powerful undercurrent than a tidal wave. You have unusual access to your own depth right now. Use it for healing, for releasing old patterns, for stepping into a power that doesn\'t need to prove itself.',
+                Sextile:     'A quiet revolution is possible. Pluto is offering you a chance to transform something important without the drama. Look at where you\'ve been giving your power away and gently take it back. Small, honest shifts now create profound change over time.',
+              },
+            };
             const TRANSIT_NAMES = {
               jupiter: {
                 Conjunction: 'The Lucky Break',
@@ -2198,11 +2237,13 @@ export default function CosmicPage() {
                       onClick={() => {
                         const asp = ASPECT_DESC[a.aspName];
                         if (!asp) return;
+                        const guidance = TRANSIT_GUIDANCE[a.transit]?.[a.aspName] ?? '';
+                        const fullBody = body + (guidance ? '\n\n' + guidance : '');
                         setDetail({
                           title: headline,
                           subtitle: `${OUTER_EMOJI[a.transit]} ${planetsLine} · ${a.orb}° orb · ${OUTER_DURATION[a.transit]}`,
                           tags: [a.aspName, cap(a.transit), OUTER_DURATION[a.transit]],
-                          body,
+                          body: fullBody,
                         });
                       }}
                       className={`w-full text-left bg-gradient-to-br ${c.bg} border ${c.border} rounded-3xl p-5 space-y-3 hover:shadow-sm active:scale-[0.99] transition-all`}
