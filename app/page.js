@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { getLunarPhase } from './lib/astrology';
 import { getQuotes } from './lib/quotes';
 import { createClient } from './lib/supabase/client';
+import InviteButton from './components/InviteButton';
 
 // ─── Moon SVG ─────────────────────────────────────────────────────────────────
 
@@ -45,7 +46,7 @@ function MoonPhaseIcon({ dateStr, size = 36 }) {
   );
 }
 
-// ─── Feature cards ─────────────────────────────────────────────────────────────
+// ─── Feature cards (logged-in dashboard) ────────────────────────────────────
 
 const FEATURES = [
   {
@@ -82,10 +83,36 @@ const FEATURES = [
   },
 ];
 
-// ─── Main Page ─────────────────────────────────────────────────────────────────
+// ─── Landing feature cards (logged-out) ─────────────────────────────────────
+
+const LANDING_FEATURES = [
+  {
+    emoji: '🌙',
+    label: 'Daily Oracle',
+    description: 'Tarot pulls, spirit animals, lunar vibes, and daily wisdom personalized to your chart.',
+  },
+  {
+    emoji: '🔮',
+    label: 'Cosmic Chart',
+    description: 'Your natal astrology, Human Design type & channels, numerology, and live transits.',
+  },
+  {
+    emoji: '📓',
+    label: 'Journal',
+    description: 'Guided prompts, moon-phase tagging, and a private space for daily reflection.',
+  },
+  {
+    emoji: '✨',
+    label: 'Vision Board',
+    description: 'Curate images, quotes, and intentions into a visual board for your goals.',
+  },
+];
+
+// ─── Main Page ──────────────────────────────────────────────────────────────
 
 export default function HomePage() {
   const router = useRouter();
+  const [user, setUser]     = useState(undefined); // undefined = loading
   const [name, setName]     = useState('');
   const [phase, setPhase]   = useState(null);
   const [quote, setQuote]   = useState(null);
@@ -94,7 +121,8 @@ export default function HomePage() {
   useEffect(() => {
     const supabase = createClient();
     supabase.auth.getUser().then(({ data: { user } }) => {
-      if (!user) { router.replace('/login'); return; }
+      setUser(user);
+      if (!user) return;
       const dn = user?.user_metadata?.displayName ?? localStorage.getItem('displayName') ?? '';
       if (dn) setName(dn.split(' ')[0]);
     });
@@ -113,6 +141,60 @@ export default function HomePage() {
     weekday: 'long', month: 'long', day: 'numeric',
   });
 
+  // Still loading auth
+  if (user === undefined) return null;
+
+  // ── Logged-out: Landing page ──
+  if (!user) {
+    return (
+      <div className="min-h-screen">
+        <div className="max-w-4xl mx-auto px-4 py-16 space-y-12">
+
+          {/* Hero */}
+          <div className="text-center space-y-5">
+            <h1 className="font-playfair text-5xl sm:text-6xl" style={{ color: '#b88a92' }}>
+              Muse
+            </h1>
+            <p className="text-lg text-gray-500 max-w-md mx-auto leading-relaxed">
+              Your cosmic self-discovery guide — astrology, Human Design, tarot, journaling, and vision boards in one beautiful place.
+            </p>
+            <div className="flex items-center justify-center gap-3 pt-2">
+              <Link href="/signup" className="btn-gradient text-white text-sm px-6 py-2.5 rounded-full font-medium">
+                Get Started
+              </Link>
+              <Link href="/login" className="text-sm text-gray-400 hover:text-[#b88a92] transition-colors">
+                Sign in
+              </Link>
+            </div>
+          </div>
+
+          {/* Feature grid */}
+          <div className="grid sm:grid-cols-2 gap-4">
+            {LANDING_FEATURES.map(f => (
+              <div
+                key={f.label}
+                className="glass-card rounded-2xl p-6 flex flex-col gap-3"
+              >
+                <div className="text-3xl">{f.emoji}</div>
+                <div>
+                  <h2 className="font-playfair text-xl text-gray-800">{f.label}</h2>
+                  <p className="text-xs text-gray-500 mt-1 leading-relaxed">{f.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Footer tagline */}
+          <div className="text-center pt-4">
+            <p className="text-xs text-gray-300">yourmuse.app</p>
+          </div>
+
+        </div>
+      </div>
+    );
+  }
+
+  // ── Logged-in: Dashboard ──
   return (
     <div className="min-h-screen">
       <div className="max-w-4xl mx-auto px-4 py-10 space-y-8">
@@ -203,6 +285,15 @@ export default function HomePage() {
             </div>
           </div>
         </Link>
+
+        {/* ── Invite card ── */}
+        <div className="glass-card rounded-2xl p-5 flex items-center justify-between gap-4">
+          <div>
+            <p className="text-sm text-gray-600 font-medium">Know someone who&rsquo;d love this?</p>
+            <p className="text-xs text-gray-400 mt-0.5">Share Muse with a friend.</p>
+          </div>
+          <InviteButton />
+        </div>
 
       </div>
     </div>

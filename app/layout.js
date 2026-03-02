@@ -22,7 +22,7 @@ const playfair = Playfair_Display({
 
 export const metadata = {
   title: "Muse",
-  description: "Your personal mood journal and vision board",
+  description: "Astrology, Human Design, tarot, journaling, and vision boards — your cosmic self-discovery guide.",
   manifest: "/manifest.webmanifest",
   appleWebApp: {
     capable: true,
@@ -30,6 +30,19 @@ export const metadata = {
     title: "Muse",
   },
   formatDetection: { telephone: false },
+  openGraph: {
+    title: "Muse",
+    description: "Astrology, Human Design, tarot, journaling, and vision boards — your cosmic self-discovery guide.",
+    url: "https://yourmuse.app",
+    siteName: "Muse",
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Muse",
+    description: "Astrology, Human Design, tarot, journaling, and vision boards — your cosmic self-discovery guide.",
+  },
 };
 
 export default function RootLayout({ children }) {

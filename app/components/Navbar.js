@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import { createClient } from '@/app/lib/supabase/client';
 import { applyScheme } from '@/app/lib/color-schemes';
 import FeedbackModal from './FeedbackModal';
+import InviteButton from './InviteButton';
 
 const USER_LS_KEYS = ['displayName', 'profilePhotoUrl', 'birthData', 'milestones', 'colorScheme', 'boardSizes', 'quiz-embeds'];
 
@@ -197,6 +198,7 @@ export default function Navbar() {
                     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
                   </svg>
                 </button>
+                <InviteButton />
                 <button
                   onClick={handleLogout}
                   className="text-xs text-gray-400 hover:text-[#b88a92] transition-colors border border-gray-200 rounded-full px-3 py-1.5 hover:border-[#d4adb6]"
@@ -216,6 +218,7 @@ export default function Navbar() {
                     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
                   </svg>
                 </button>
+                <InviteButton />
                 <button
                   onClick={handleLogout}
                   className="text-xs text-gray-400 hover:text-[#b88a92] transition-colors border border-gray-200 rounded-full px-3 py-1.5"
