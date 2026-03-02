@@ -1133,7 +1133,7 @@ export default function CosmicPage() {
     {id:'hd',         label:'Human Design'},
     {id:'numerology', label:'Numerology'},
     {id:'synthesis',  label:'Synthesis'},
-    {id:'transits',   label:'Transits'},
+    {id:'transits',   label:'Affecting You Now'},
   ];
   const VEDIC_TABS = [
     {id:'rasi',     label:'Rasi Chart'},
@@ -2166,10 +2166,11 @@ export default function CosmicPage() {
               }
             }
 
-            // Deduplicate: keep tightest orb per transit-natal pair, limit to most significant per transit planet
+            // Deduplicate: keep tightest orb per transit-planet × aspect-type combo
+            // (same clever name = same transit+aspect, so only show once with tightest hit)
             const seen = new Map();
             for (const a of outerAspects.sort((x,y)=>+x.orb - +y.orb)) {
-              const k = `${a.transit}-${a.natal}`;
+              const k = `${a.transit}-${a.aspName}`;
               if (!seen.has(k)) seen.set(k, a);
             }
             const active = [...seen.values()].sort((a,b)=>
@@ -2226,6 +2227,31 @@ export default function CosmicPage() {
             );
           })()}
 
+          {hdData?.definedChannels?.length > 0 && (
+            <div className="glass-card rounded-3xl p-6 space-y-3">
+              <h2 className="font-playfair text-xl text-gray-700">Your Channels Today</h2>
+              <p className="text-xs text-gray-400">When a transit planet enters a gate in your defined channels, that channel's energy is amplified. Tap to learn about each channel.</p>
+              <div className="space-y-2">
+                {hdData.definedChannels.map(([g1,g2])=>{
+                  const g1Active=transitGateSet.has(g1);
+                  const g2Active=transitGateSet.has(g2);
+                  const active=g1Active||g2Active;
+                  return (
+                    <button key={`${g1}-${g2}`} onClick={()=>openChannel([g1,g2])}
+                      className={`w-full flex items-start gap-3 p-3 rounded-2xl border text-left transition-colors ${active?'bg-rose-50/60 border-rose-200/50 hover:bg-rose-50/80':'bg-white/30 border-white/30 hover:bg-white/50'}`}>
+                      <div className={`mt-1 w-2 h-2 rounded-full shrink-0 ${active?'bg-rose-400':'bg-gray-200'}`}/>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-semibold text-gray-600">{g1} — {g2}</p>
+                        <p className="text-sm text-gray-600">{channelLabel([g1,g2])}</p>
+                        {active&&<p className="text-xs text-rose-400 mt-0.5">Gate {g1Active?g1:g2} lit up by transit</p>}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
           <div className="glass-card rounded-3xl p-6 space-y-4">
             <div>
               <h2 className="font-playfair text-xl text-gray-700">Current Planetary Positions</h2>
@@ -2255,31 +2281,6 @@ export default function CosmicPage() {
               </div>
             ) : <p className="text-sm text-gray-400">Unable to load current positions.</p>}
           </div>
-
-          {hdData?.definedChannels?.length > 0 && (
-            <div className="glass-card rounded-3xl p-6 space-y-3">
-              <h2 className="font-playfair text-xl text-gray-700">Your Channels Today</h2>
-              <p className="text-xs text-gray-400">When a transit planet enters a gate in your defined channels, that channel's energy is amplified. Tap to learn about each channel.</p>
-              <div className="space-y-2">
-                {hdData.definedChannels.map(([g1,g2])=>{
-                  const g1Active=transitGateSet.has(g1);
-                  const g2Active=transitGateSet.has(g2);
-                  const active=g1Active||g2Active;
-                  return (
-                    <button key={`${g1}-${g2}`} onClick={()=>openChannel([g1,g2])}
-                      className={`w-full flex items-start gap-3 p-3 rounded-2xl border text-left transition-colors ${active?'bg-rose-50/60 border-rose-200/50 hover:bg-rose-50/80':'bg-white/30 border-white/30 hover:bg-white/50'}`}>
-                      <div className={`mt-1 w-2 h-2 rounded-full shrink-0 ${active?'bg-rose-400':'bg-gray-200'}`}/>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-semibold text-gray-600">{g1} — {g2}</p>
-                        <p className="text-sm text-gray-600">{channelLabel([g1,g2])}</p>
-                        {active&&<p className="text-xs text-rose-400 mt-0.5">Gate {g1Active?g1:g2} lit up by transit</p>}
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          )}
 
           {hdData && (()=>{
             const innerPlanets=['sun','moon','mercury','venus','mars'];
@@ -2342,29 +2343,42 @@ export default function CosmicPage() {
           </div>
         );
 
-        const planets    = vedicData?.d1_chart?.planets ?? [];
-        const houses     = vedicData?.d1_chart?.houses  ?? [];
+        // ── Data extraction (camelCase JSON from jyotishganit) ───────────────
+        const d1Houses   = vedicData?.d1Chart?.houses ?? [];
+        const planets    = d1Houses.flatMap(h => (h.occupants ?? []).map(p => ({ ...p, houseNumber: h.number })));
+        const houses     = d1Houses;
         const lagna      = houses[0];
         const panchanga  = vedicData?.panchanga ?? {};
         const ayanamsa   = vedicData?.ayanamsa;
-        const mahadashas = vedicData?.dashas?.upcoming?.mahadashas ?? {};
+        const allMd      = vedicData?.dashas?.all?.mahadashas ?? {};
+        const curMd      = vedicData?.dashas?.current?.mahadashas ?? {};
+        const divCharts  = vedicData?.divisionalCharts ?? {};
         const sav        = vedicData?.ashtakavarga?.sav ?? {};
-        const bhav       = vedicData?.ashtakavarga?.bhav ?? {};
-        const today2     = today;
+        const bhavMap    = {
+          Sun: vedicData?.ashtakavarga?.sunBhav ?? {},
+          Moon: vedicData?.ashtakavarga?.moonBhav ?? {},
+          Mars: vedicData?.ashtakavarga?.marsBhav ?? {},
+          Mercury: vedicData?.ashtakavarga?.mercuryBhav ?? {},
+          Jupiter: vedicData?.ashtakavarga?.jupiterBhav ?? {},
+          Venus: vedicData?.ashtakavarga?.venusBhav ?? {},
+          Saturn: vedicData?.ashtakavarga?.saturnBhav ?? {},
+        };
 
-        const currentMd     = Object.entries(mahadashas).find(([,md]) => md.start <= today2 && today2 <= md.end);
-        const currentMdName = currentMd?.[0];
-        const currentMdData = currentMd?.[1];
+        const currentMdName = Object.keys(curMd)[0] ?? null;
+        const currentMdData = currentMdName ? curMd[currentMdName] : null;
         const antardashas   = currentMdData?.antardashas ?? {};
-        const currentAd     = Object.entries(antardashas).find(([,ad]) => ad.start <= today2 && today2 <= ad.end);
-        const currentAdName = currentAd?.[0];
-        const currentAdData = currentAd?.[1];
+        const currentAdName = Object.keys(antardashas)[0] ?? null;
+        const currentAdData = currentAdName ? antardashas[currentAdName] : null;
+        const pratyantars   = currentAdData?.pratyantardashas ?? {};
+        const currentPtName = Object.keys(pratyantars)[0] ?? null;
+        const currentPtData = currentPtName ? pratyantars[currentPtName] : null;
 
-        const moonPlanet  = planets.find(p => p.celestial_body === 'Moon');
+        const moonPlanet  = planets.find(p => p.celestialBody === 'Moon');
         const moonNak     = moonPlanet?.nakshatra;
         const moonNakData = NAKSHATRA_DATA.find(n => n.name === moonNak);
         const lagnaSign   = lagna?.sign;
         const lagnaLord   = lagnaSign ? SIGN_LORDS[lagnaSign] : null;
+        const lagnaHouseDesc = VEDIC_HOUSE_DESC[1];
 
         function openNakshatra(name) {
           const d  = NAKSHATRA_DESC[name];
@@ -2372,99 +2386,160 @@ export default function CosmicPage() {
           if (!d) return;
           setDetail({ title:`${nd?.symbol ?? '✦'} ${name}`, subtitle:`Ruled by ${nd?.lord ?? '—'}`, body: d });
         }
+        function openVedicPlanet(p) {
+          const desc = VEDIC_PLANET_DESC[p.celestialBody];
+          if (!desc) return;
+          const dig = p.dignities?.dignity;
+          const digSt = dig ? DIGNITY_STYLE[dig.toLowerCase()] : null;
+          setDetail({
+            title: `${VEDIC_PLANET_SYM[p.celestialBody] ?? ''} ${desc.title}`,
+            subtitle: `${p.sign} · House ${p.houseNumber ?? p.house} · ${p.nakshatra ?? ''} pada ${p.pada ?? ''}${p.motion_type === 'retrograde' ? ' · Retrograde' : ''}`,
+            tags: [p.sign, digSt?.label ?? '', p.motion_type === 'retrograde' ? 'Rx' : ''].filter(Boolean),
+            body: desc.body,
+          });
+        }
+        function openVedicHouse(h) {
+          const desc = VEDIC_HOUSE_DESC[h.number];
+          if (!desc) return;
+          setDetail({
+            title: desc.name,
+            subtitle: `${h.sign} · Ruled by ${h.lord ?? SIGN_LORDS[h.sign]}`,
+            tags: (h.purposes ?? []),
+            body: desc.body,
+          });
+        }
 
+        // ── RASI TAB ──────────────────────────────────────────────────────────
         if (vedicTab === 'rasi') return (
           <div className="space-y-4">
+            {/* Lagna + Moon nakshatra */}
             <div className="glass-card rounded-3xl p-6 space-y-4">
               <div className="flex items-start justify-between gap-4">
-                <div>
+                <button onClick={() => lagna && openVedicHouse(lagna)} className="text-left hover:opacity-80 transition-opacity">
                   <p className="text-xs text-gray-400 uppercase tracking-widest">Lagna · Ascendant</p>
                   <p className="font-playfair text-2xl text-gray-700 mt-0.5">{lagnaSign ?? '—'}</p>
-                  {lagnaLord && <p className="text-xs text-gray-400 mt-1">Ruled by {lagnaLord}</p>}
-                </div>
+                  <p className="text-xs text-gray-400 mt-1">Ruled by {lagnaLord} · tap to learn more</p>
+                </button>
                 {moonNak && (
                   <button onClick={() => openNakshatra(moonNak)}
-                    className="text-right bg-white/50 border border-white/40 rounded-2xl px-4 py-2 hover:bg-white/70 transition-colors">
-                    <p className="text-xs text-gray-400">Moon Nakshatra</p>
+                    className="text-right bg-white/50 border border-white/40 rounded-2xl px-4 py-3 hover:bg-white/70 transition-colors">
+                    <p className="text-xs text-gray-400">Janma Nakshatra</p>
                     <p className="text-sm font-medium text-gray-700 mt-0.5">{moonNakData?.symbol} {moonNak}</p>
-                    <p className="text-xs text-gray-400">pada {moonPlanet?.pada ?? '—'} · {moonNakData?.lord}</p>
+                    <p className="text-xs text-gray-400 mt-0.5">pada {moonPlanet?.pada ?? '—'} · {moonNakData?.lord} dasha</p>
+                    <p className="text-xs text-[#b88a92] mt-1">tap to learn more ›</p>
                   </button>
                 )}
               </div>
               {ayanamsa && (
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-gray-400">Lahiri ayanamsha</span>
-                  <span className="text-xs font-medium text-gray-600">{(typeof ayanamsa === 'object' ? ayanamsa.value : Number(ayanamsa))?.toFixed(4)}°</span>
+                <div className="flex items-center gap-2 pt-1 border-t border-white/30">
+                  <span className="text-xs text-gray-400">Ayanamsha</span>
+                  <span className="text-xs font-medium text-gray-600">{ayanamsa.name ?? 'Lahiri'}</span>
+                  <span className="text-xs text-gray-400">·</span>
+                  <span className="text-xs font-medium text-gray-600">{Number(ayanamsa.value).toFixed(4)}°</span>
                   <span className="text-xs text-gray-300">· JPL DE421</span>
                 </div>
               )}
             </div>
 
+            {/* Planet list — fully tappable */}
             <div className="glass-card rounded-3xl p-6 space-y-3">
               <div>
-                <h2 className="font-playfair text-xl text-gray-700">Planetary Positions</h2>
-                <p className="text-xs text-gray-400 mt-1">Sidereal · Tap a nakshatra to learn more.</p>
+                <h2 className="font-playfair text-xl text-gray-700">Graha · Planetary Positions</h2>
+                <p className="text-xs text-gray-400 mt-1">Sidereal zodiac · Tap any planet for its Jyotish meaning.</p>
               </div>
               <div className="divide-y divide-white/30">
                 {planets.map(p => {
-                  const sym   = VEDIC_PLANET_SYM[p.celestial_body] ?? '•';
-                  const dig   = p.dignities?.dignity?.toLowerCase();
-                  const digSt = DIGNITY_STYLE[dig] ?? DIGNITY_STYLE.neutral;
-                  const nakD  = NAKSHATRA_DATA.find(n => n.name === p.nakshatra);
+                  const sym    = VEDIC_PLANET_SYM[p.celestialBody] ?? '•';
+                  const dig    = p.dignities?.dignity?.toLowerCase();
+                  const digSt  = DIGNITY_STYLE[dig] ?? DIGNITY_STYLE.neutral;
+                  const nakD   = NAKSHATRA_DATA.find(n => n.name === p.nakshatra);
+                  const isRx   = p.motion_type === 'retrograde';
                   return (
-                    <div key={p.celestial_body} className="py-2.5 flex items-center gap-2 flex-wrap">
-                      <span className="text-sm w-5 text-center text-gray-400 shrink-0">{sym}</span>
-                      <span className="text-xs text-gray-500 w-16 shrink-0">{p.celestial_body}</span>
-                      <span className="text-sm font-medium text-gray-700 w-24 shrink-0">{p.sign}</span>
-                      <span className="text-xs text-gray-400 w-6 shrink-0">H{p.house}</span>
-                      {p.nakshatra && (
-                        <button onClick={() => openNakshatra(p.nakshatra)}
-                          className="text-xs text-[#b88a92] hover:underline shrink-0">
-                          {nakD?.symbol} {p.nakshatra} P{p.pada}
-                        </button>
-                      )}
-                      {dig && (
-                        <span className={`text-xs px-2 py-0.5 rounded-full border ${digSt.bg} ${digSt.color} ${digSt.border} ml-auto shrink-0`}>
-                          {digSt.label}
-                        </span>
-                      )}
-                    </div>
+                    <button key={p.celestialBody} onClick={() => openVedicPlanet(p)}
+                      className="w-full py-3 flex items-center gap-2 flex-wrap hover:bg-white/40 rounded-xl px-2 -mx-2 transition-colors text-left">
+                      <span className="text-base w-6 text-center text-gray-500 shrink-0">{sym}</span>
+                      <div className="w-20 shrink-0">
+                        <p className="text-xs font-medium text-gray-600">{p.celestialBody}</p>
+                        {isRx && <p className="text-[10px] text-orange-400">Retrograde</p>}
+                      </div>
+                      <div className="shrink-0">
+                        <p className="text-sm font-medium text-gray-700">{p.sign}</p>
+                        <p className="text-xs text-gray-400">{p.signDegrees?.toFixed(1)}° · H{p.houseNumber ?? p.house}</p>
+                      </div>
+                      <div className="flex-1 text-right space-y-0.5">
+                        {p.nakshatra && (
+                          <p className="text-xs text-[#b88a92]">{nakD?.symbol} {p.nakshatra} P{p.pada}</p>
+                        )}
+                        <span className={`text-[10px] px-1.5 py-0.5 rounded-full border inline-block ${digSt.bg} ${digSt.color} ${digSt.border}`}>{digSt.label}</span>
+                      </div>
+                    </button>
                   );
                 })}
               </div>
             </div>
 
+            {/* House grid — fully tappable */}
             <div className="glass-card rounded-3xl p-6 space-y-3">
-              <h2 className="font-playfair text-xl text-gray-700">House Signs</h2>
-              <div className="grid grid-cols-3 gap-2">
-                {houses.slice(0,12).map(h => (
-                  <div key={h.house_number} className="bg-white/50 border border-white/40 rounded-2xl p-3">
-                    <p className="text-xs text-gray-400">House {h.house_number}</p>
-                    <p className="text-sm font-medium text-gray-700 mt-0.5">{h.sign}</p>
-                    {h.occupants?.length > 0 && (
-                      <p className="text-xs text-[#b88a92] mt-0.5">{h.occupants.map(o => o.celestial_body).join(', ')}</p>
-                    )}
-                  </div>
-                ))}
+              <div>
+                <h2 className="font-playfair text-xl text-gray-700">Bhava · Houses</h2>
+                <p className="text-xs text-gray-400 mt-1">Tap any house to learn its domain and meaning.</p>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                {houses.slice(0,12).map(h => {
+                  const hd = VEDIC_HOUSE_DESC[h.number];
+                  const occs = (h.occupants ?? []).map(o => o.celestialBody);
+                  return (
+                    <button key={h.number} onClick={() => openVedicHouse(h)}
+                      className="bg-white/50 border border-white/40 rounded-2xl p-3 text-left hover:bg-white/70 transition-colors space-y-1">
+                      <div className="flex items-center justify-between">
+                        <p className="text-xs text-gray-400">House {h.number}</p>
+                        <div className="flex gap-1 flex-wrap justify-end">
+                          {(h.purposes ?? []).slice(0,2).map(pu => (
+                            <span key={pu} className={`text-[9px] px-1 py-0.5 rounded border ${PURPOSE_STYLE[pu] ?? 'bg-gray-50 text-gray-400 border-gray-200/40'}`}>{pu}</span>
+                          ))}
+                        </div>
+                      </div>
+                      <p className="text-sm font-medium text-gray-700">{h.sign}</p>
+                      <p className="text-xs text-gray-400">Lord: {h.lord ?? SIGN_LORDS[h.sign]}</p>
+                      {occs.length > 0 && <p className="text-xs text-[#b88a92]">{occs.join(', ')}</p>}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           </div>
         );
 
+        // ── PANCHANGA TAB ──────────────────────────────────────────────────────
         if (vedicTab === 'panchanga') return (
           <div className="space-y-4">
             <div className="glass-card rounded-3xl p-6 space-y-2">
               <h2 className="font-playfair text-xl text-gray-700">Panchanga at Birth</h2>
-              <p className="text-xs text-gray-400">The five limbs of the Vedic almanac — the cosmic quality of your birth moment.</p>
+              <p className="text-sm text-gray-500 leading-relaxed">The Panchanga — "five limbs" — is the Vedic almanac that describes the cosmic quality of any given moment. Your birth panchanga reveals the energetic signature of the instant your soul entered this body: the quality of the lunar day, the Moon's nakshatra, the yoga formed by Sun and Moon, the karana governing the half-day, and the weekday's ruling deity. Together they paint a portrait of the moment you arrived.</p>
             </div>
             {[
-              { label:'Tithi',     value:panchanga.tithi,    subtitle:'Lunar day',            desc: 'The lunar day at the moment of your birth — one of 30 divisions of the lunar month, each carrying its own quality and presiding deity.' },
-              { label:'Nakshatra', value:panchanga.nakshatra, subtitle:'Moon\'s constellation', desc: NAKSHATRA_DESC[panchanga.nakshatra] ?? 'The nakshatra the Moon occupied at birth — one of 27 lunar mansions, each a distinct cosmic frequency.' },
-              { label:'Yoga',      value:panchanga.yoga,     subtitle:'Sun + Moon combination', desc: YOGA_DESC[panchanga.yoga] ? `${panchanga.yoga}: ${YOGA_DESC[panchanga.yoga]}` : 'The yoga formed by the combined longitude of Sun and Moon. Each of 27 yogas carries a distinct energetic quality.' },
-              { label:'Karana',    value:panchanga.karana,   subtitle:'Half lunar day',         desc: KARANA_DESC[panchanga.karana] ? `${panchanga.karana}: ${KARANA_DESC[panchanga.karana]}` : 'A karana is half a tithi. There are 11 karanas cycling through the lunar month, each coloring the quality of action.' },
-              { label:'Vaara',     value:panchanga.vaara,    subtitle:'Weekday',                desc: VAARA_DESC[panchanga.vaara] ?? 'Each weekday is ruled by a planetary deity whose energy colors the day.' },
+              {
+                label:'Vaara', emoji:'🌞', value: panchanga.vaara, subtitle:'Day of the week · Ruling planet',
+                desc: VAARA_DESC[panchanga.vaara] ?? 'Each weekday is ruled by a planetary deity whose energy colors everything that arises during it.',
+              },
+              {
+                label:'Tithi', emoji:'🌙', value: panchanga.tithi, subtitle:'Lunar day · 1 of 30 divisions of the lunar month',
+                desc: 'The tithi is one of the 30 divisions of the lunar cycle, each lasting approximately 12 degrees of angular distance between Sun and Moon. Each tithi has a presiding deity and a distinct quality. Krishna (waning) tithis are generally suited to releasing, introspecting, and completing; Shukla (waxing) tithis to beginning, expanding, and creating. Purnima (full moon) and Amavasya (new moon) are the most potent of all.',
+              },
+              {
+                label:'Nakshatra', emoji:'⭐', value: panchanga.nakshatra, subtitle:'Moon\'s lunar mansion at birth',
+                desc: NAKSHATRA_DESC[panchanga.nakshatra] ?? 'The nakshatra is the lunar mansion the Moon occupies. There are 27 nakshatras, each spanning 13°20\' of the sidereal zodiac, each with a presiding deity, a ruling planet, a symbol, and a distinct psychological and spiritual signature.',
+              },
+              {
+                label:'Yoga', emoji:'☯️', value: panchanga.yoga, subtitle:'Sun + Moon combined longitude ÷ 13°20\'',
+                desc: YOGA_DESC[panchanga.yoga] ? `${panchanga.yoga}: ${YOGA_DESC[panchanga.yoga]}  There are 27 yogas, formed by dividing the combined longitude of Sun and Moon by 13°20'. Each yoga carries a distinct quality — from highly auspicious (Siddhi, Shiva, Brahma) to challenging (Vishkumbha, Ganda, Vyatipata). The yoga of your birth moment colors the overall tone of your life and the quality of your natural energy.` : 'The yoga is formed by the combined longitude of the Sun and Moon. Each of the 27 yogas carries a distinct quality and energetic signature.',
+              },
+              {
+                label:'Karana', emoji:'🌗', value: panchanga.karana, subtitle:'Half of a tithi · 1 of 11 karanas',
+                desc: KARANA_DESC[panchanga.karana] ? `${panchanga.karana}: ${KARANA_DESC[panchanga.karana]}  A karana is half of a tithi — each lunar day has two karanas. There are 11 karanas in total: 7 movable (repeating throughout the month) and 4 fixed (occurring only once). The karana governs the quality of action and initiative appropriate to that half-day.` : 'A karana is half of a tithi. There are 11 karanas cycling through the lunar month, each coloring the quality of action and initiative.',
+              },
             ].map(item => (
-              <button key={item.label} onClick={() => setDetail({ title:`${item.label} · ${item.value}`, subtitle:item.subtitle, body:item.desc ?? '' })}
+              <button key={item.label} onClick={() => setDetail({ title:`${item.emoji} ${item.label} · ${item.value}`, subtitle: item.subtitle, body: item.desc ?? '' })}
                 className="w-full glass-card rounded-3xl p-6 text-left hover:bg-white/80 transition-colors space-y-2">
                 <div className="flex items-center justify-between gap-3">
                   <div>
@@ -2472,69 +2547,98 @@ export default function CosmicPage() {
                     <p className="font-playfair text-xl text-gray-700 mt-0.5">{item.value ?? '—'}</p>
                     <p className="text-xs text-gray-400 mt-0.5">{item.subtitle}</p>
                   </div>
-                  <span className="text-gray-200 text-xl">›</span>
+                  <div className="text-center shrink-0">
+                    <span className="text-2xl">{item.emoji}</span>
+                    <p className="text-xs text-[#b88a92] mt-1">tap ›</p>
+                  </div>
                 </div>
-                <p className="text-xs text-gray-500 leading-relaxed line-clamp-2">{item.desc}</p>
+                <p className="text-xs text-gray-500 leading-relaxed line-clamp-3">{item.desc}</p>
               </button>
             ))}
           </div>
         );
 
+        // ── DASHAS TAB ────────────────────────────────────────────────────────
         if (vedicTab === 'dashas') return (
           <div className="space-y-4">
+            <div className="glass-card rounded-3xl p-6 space-y-2">
+              <h2 className="font-playfair text-xl text-gray-700">Vimshottari Dasha</h2>
+              <p className="text-sm text-gray-500 leading-relaxed">The Vimshottari Dasha is a 120-year cycle of planetary periods that governs the unfolding of your karma across time. The sequence is determined by the Moon's nakshatra at birth, which reveals which planet's period you begin life under. Each Mahadasha (major period) has a dominant planetary theme that colors the events and inner experiences of those years — and within each Mahadasha, Antardashas (sub-periods) bring the flavors of other planets into the mix. Tap any period to learn what it means for you.</p>
+            </div>
+
+            {/* Current period banner */}
             {currentMdName && (
               <div className="glass-card rounded-3xl p-6 space-y-4" style={{ borderLeft:'3px solid #b88a92' }}>
                 <div>
-                  <p className="text-xs text-gray-400 uppercase tracking-widest">Current Mahadasha</p>
+                  <p className="text-xs text-gray-400 uppercase tracking-widest">You are currently in</p>
                   <p className="font-playfair text-2xl text-gray-700 mt-1">{VEDIC_PLANET_SYM[currentMdName]} {currentMdName} Mahadasha</p>
                   <p className="text-xs text-gray-400 mt-1">{currentMdData?.start} → {currentMdData?.end}</p>
                 </div>
                 <p className="text-sm text-gray-600 leading-relaxed">{DASHA_DESC[currentMdName] ?? ''}</p>
+
                 {currentAdName && (
-                  <div className="bg-white/50 border border-white/40 rounded-2xl p-4 space-y-1">
-                    <p className="text-xs text-gray-400 uppercase tracking-widest">Current Antardasha</p>
-                    <p className="text-sm font-medium text-gray-700">{VEDIC_PLANET_SYM[currentAdName]} {currentAdName} · within {currentMdName} Mahadasha</p>
+                  <div className="bg-white/60 border border-white/50 rounded-2xl p-4 space-y-2">
+                    <p className="text-xs text-gray-400 uppercase tracking-widest">Current Antardasha (sub-period)</p>
+                    <p className="text-sm font-medium text-gray-700">{VEDIC_PLANET_SYM[currentAdName]} {currentAdName} Antardasha</p>
                     <p className="text-xs text-gray-400">{currentAdData?.start} → {currentAdData?.end}</p>
+                    <p className="text-xs text-gray-500 leading-relaxed">The {currentAdName} sub-period within your {currentMdName} Mahadasha brings {currentAdName === currentMdName ? 'the pure, undiluted expression of this period\'s themes' : `the qualities of ${currentAdName} into the broader themes of the ${currentMdName} period — coloring the texture of this specific window of time with ${currentAdName}'s particular energy and domain`}.</p>
+                  </div>
+                )}
+
+                {currentPtName && (
+                  <div className="bg-white/40 border border-white/30 rounded-2xl p-3 space-y-1">
+                    <p className="text-xs text-gray-400 uppercase tracking-widest">Pratyantardasha (sub-sub-period)</p>
+                    <p className="text-xs font-medium text-gray-600">{VEDIC_PLANET_SYM[currentPtName]} {currentPtName} · {currentPtData?.start} → {currentPtData?.end}</p>
                   </div>
                 )}
               </div>
             )}
+
+            {/* Full timeline */}
             <div className="glass-card rounded-3xl p-6 space-y-3">
-              <h2 className="font-playfair text-xl text-gray-700">Vimshottari Dasha Timeline</h2>
-              <p className="text-xs text-gray-400">120-year planetary period cycle. Tap any period to learn more.</p>
+              <h2 className="font-playfair text-xl text-gray-700">Your Full Dasha Timeline</h2>
               <div className="space-y-2">
-                {Object.entries(mahadashas).map(([lord, md]) => {
+                {Object.entries(allMd).map(([lord, md]) => {
                   const isCurrent = lord === currentMdName;
-                  const isPast    = md.end < today2;
+                  const isPast    = (md.end ?? '') < today;
+                  const isFuture  = (md.start ?? '') > today;
                   return (
                     <button key={lord}
-                      onClick={() => setDetail({ title:`${lord} Mahadasha`, subtitle:`${md.start} → ${md.end}`, body:DASHA_DESC[lord] ?? '' })}
-                      className={`w-full flex items-center gap-3 p-3 rounded-2xl border text-left transition-colors ${isCurrent ? 'bg-rose-50/60 border-rose-200/50 hover:bg-rose-50/80' : isPast ? 'bg-gray-50/40 border-gray-200/30 opacity-50' : 'bg-white/40 border-white/40 hover:bg-white/60'}`}>
-                      <span className="text-lg w-7 text-center shrink-0">{VEDIC_PLANET_SYM[lord]}</span>
+                      onClick={() => setDetail({ title:`${VEDIC_PLANET_SYM[lord]} ${lord} Mahadasha`, subtitle:`${md.start} → ${md.end}`, body: DASHA_DESC[lord] ?? '' })}
+                      className={`w-full flex items-center gap-3 p-3 rounded-2xl border text-left transition-colors ${isCurrent ? 'bg-rose-50/60 border-rose-200/50 hover:bg-rose-50/80' : isPast ? 'bg-gray-50/40 border-gray-200/30 opacity-50 hover:opacity-75' : 'bg-white/40 border-white/40 hover:bg-white/60'}`}>
+                      <span className="text-xl w-8 text-center shrink-0">{VEDIC_PLANET_SYM[lord]}</span>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-700">{lord}</p>
+                        <p className="text-sm font-medium text-gray-700">{lord} Mahadasha</p>
                         <p className="text-xs text-gray-400">{md.start} → {md.end}</p>
                       </div>
                       {isCurrent && <span className="text-xs px-2 py-0.5 rounded-full bg-rose-100 text-rose-500 shrink-0">now</span>}
+                      {isFuture && <span className="text-xs text-gray-300 shrink-0">upcoming</span>}
                     </button>
                   );
                 })}
               </div>
             </div>
+
+            {/* Antardasha breakdown */}
             {currentMdName && Object.keys(antardashas).length > 0 && (
               <div className="glass-card rounded-3xl p-6 space-y-3">
                 <h2 className="font-playfair text-xl text-gray-700">{currentMdName} Antardasha Periods</h2>
+                <p className="text-xs text-gray-400">Sub-periods within your current {currentMdName} Mahadasha. Each brings a distinct planetary flavor into the overarching theme.</p>
                 <div className="space-y-1.5">
                   {Object.entries(antardashas).map(([alord, ad]) => {
                     const isCur  = alord === currentAdName;
-                    const isPast = ad.end < today2;
+                    const isPast = (ad.end ?? '') < today;
                     return (
-                      <div key={alord} className={`flex items-center gap-3 px-3 py-2 rounded-xl border text-sm ${isCur ? 'bg-rose-50/60 border-rose-200/40' : isPast ? 'opacity-40 border-white/10' : 'border-white/20'}`}>
+                      <button key={alord}
+                        onClick={() => setDetail({ title:`${alord} Antardasha within ${currentMdName} Mahadasha`, subtitle:`${ad.start} → ${ad.end}`, body:`The ${alord} sub-period within the ${currentMdName} Mahadasha ${alord === currentMdName ? 'expresses the pure, undiluted themes of this period at their most concentrated' : `brings ${alord}\'s energy — ${DASHA_DESC[alord]?.split('.')[0] ?? ''} — into the context of the ${currentMdName} major period`}.` })}
+                        className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl border text-left hover:bg-white/50 transition-colors ${isCur ? 'bg-rose-50/60 border-rose-200/40' : isPast ? 'opacity-40 border-white/10' : 'border-white/20'}`}>
                         <span className="w-5 text-center text-gray-400 shrink-0">{VEDIC_PLANET_SYM[alord]}</span>
-                        <span className={`flex-1 ${isCur ? 'text-gray-700 font-medium' : 'text-gray-500'}`}>{alord}</span>
-                        <span className="text-xs text-gray-400">{ad.start} → {ad.end}</span>
-                        {isCur && <span className="text-xs px-1.5 py-0.5 rounded-full bg-rose-100 text-rose-400">now</span>}
-                      </div>
+                        <div className="flex-1">
+                          <p className={`text-sm ${isCur ? 'text-gray-700 font-medium' : 'text-gray-500'}`}>{alord}</p>
+                          <p className="text-xs text-gray-400">{ad.start} → {ad.end}</p>
+                        </div>
+                        {isCur && <span className="text-xs px-1.5 py-0.5 rounded-full bg-rose-100 text-rose-400 shrink-0">now</span>}
+                      </button>
                     );
                   })}
                 </div>
@@ -2543,15 +2647,22 @@ export default function CosmicPage() {
           </div>
         );
 
+        // ── VARGA TAB ──────────────────────────────────────────────────────────
         if (vedicTab === 'varga') {
-          const divCharts  = vedicData?.divisional_charts ?? {};
           const showVargas = ['d9','d10','d3','d7','d12'].filter(k => divCharts[k]);
           const vargaLabel = { d9:'D9 · Navamsa', d10:'D10 · Dasamsa', d3:'D3 · Drekkana', d7:'D7 · Saptamsa', d12:'D12 · Dwadasamsa' };
+          const vargaDesc  = {
+            d9: 'The Navamsa is considered the most important divisional chart after D1. It reveals the deeper soul purpose behind this incarnation, the nature of your spouse and marriage, and the spiritual potential that underlies the surface of your natal chart. A planet that is strong in D1 but weak in D9 will deliver less of its promise; a planet weak in D1 but strong in D9 often rises to deliver surprising grace.',
+            d10:'The Dasamsa governs career, profession, and your contribution to the world. It reveals the domain and manner in which you are meant to create impact, build your professional reputation, and fulfill your dharma in the public sphere. A strong D10 chart indicates significant professional achievement.',
+            d3: 'The Drekkana governs courage, siblings, and your capacity for sustained personal effort. It reveals the quality of your relationship with siblings, your stamina and willpower, and the domain where your independent initiative is most potent.',
+            d7: 'The Saptamsa governs children, creativity, and the legacy you leave behind. It reveals your relationship with children, your creative output, and the ways your life force continues beyond your individual existence through what you create and who you nurture.',
+            d12:'The Dwadasamsa governs parents, ancestors, and the karmic inheritance of your lineage. It reveals the nature of your relationships with your mother and father, the ancestral patterns you carry, and the blessings and burdens inherited from your lineage.',
+          };
           return (
             <div className="space-y-4">
               <div className="glass-card rounded-3xl p-6 space-y-2">
-                <h2 className="font-playfair text-xl text-gray-700">Divisional Charts</h2>
-                <p className="text-xs text-gray-400">Each varga reveals a different domain of your life — a harmonic lens applied to the birth chart.</p>
+                <h2 className="font-playfair text-xl text-gray-700">Varga Charts · Divisional Charts</h2>
+                <p className="text-sm text-gray-500 leading-relaxed">The Varga charts are harmonic divisions of the birth chart, each one a lens that illuminates a specific domain of life with greater precision. Where the D1 (Rasi) chart shows the overall landscape of your karma, the divisional charts reveal the terrain of each specific area — marriage, career, children, parents, and more.</p>
               </div>
               {showVargas.length === 0 && (
                 <div className="glass-card rounded-3xl p-8 text-center">
@@ -2560,23 +2671,28 @@ export default function CosmicPage() {
               )}
               {showVargas.map(key => {
                 const vc      = divCharts[key];
-                const vPlanets= vc?.planets ?? vc?.houses?.flatMap(h => (h.occupants ?? []).map(o => ({ ...o, house: h.house_number }))) ?? [];
+                const vHouses = vc?.houses ?? [];
+                const vPlanets= vHouses.flatMap(h => (h.occupants ?? []).map(o => ({ ...o, hNum: h.number, hSign: h.sign })));
                 return (
                   <div key={key} className="glass-card rounded-3xl p-6 space-y-3">
                     <div>
                       <h3 className="font-playfair text-lg text-gray-700">{vargaLabel[key]}</h3>
-                      {VARGA_PURPOSE[key] && <p className="text-xs text-gray-400 mt-0.5">{VARGA_PURPOSE[key]}</p>}
+                      <p className="text-xs text-gray-500 mt-1 leading-relaxed">{vargaDesc[key] ?? VARGA_PURPOSE[key]}</p>
                     </div>
-                    <div className="divide-y divide-white/30">
-                      {vPlanets.map((p, i) => (
-                        <div key={i} className="py-2 flex items-center gap-2 text-sm">
-                          <span className="w-5 text-center text-gray-400 shrink-0">{VEDIC_PLANET_SYM[p.celestial_body] ?? '•'}</span>
-                          <span className="text-xs text-gray-500 w-20 shrink-0">{p.celestial_body}</span>
-                          <span className="text-gray-700 font-medium">{p.sign}</span>
-                          {p.house && <span className="text-xs text-gray-400 ml-auto">H{p.house}</span>}
-                        </div>
-                      ))}
-                    </div>
+                    {vPlanets.length > 0 ? (
+                      <div className="divide-y divide-white/30">
+                        {vPlanets.map((p, i) => (
+                          <div key={i} className="py-2.5 flex items-center gap-2 text-sm">
+                            <span className="w-6 text-center text-gray-400 shrink-0">{VEDIC_PLANET_SYM[p.celestialBody] ?? '•'}</span>
+                            <span className="text-xs text-gray-500 w-20 shrink-0">{p.celestialBody}</span>
+                            <span className="text-gray-700 font-medium flex-1">{p.sign ?? p.hSign}</span>
+                            <span className="text-xs text-gray-400">H{p.hNum}</span>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-xs text-gray-400 text-center py-2">No planets in occupied houses.</p>
+                    )}
                   </div>
                 );
               })}
@@ -2584,66 +2700,71 @@ export default function CosmicPage() {
           );
         }
 
+        // ── STRENGTH TAB ───────────────────────────────────────────────────────
         if (vedicTab === 'strength') {
-          const savEntries = SIGN_ORDER.map(s => ({ sign:s, pts: sav[s] ?? 0 }));
-          const maxSav     = Math.max(...savEntries.map(e => e.pts), 1);
-          const SHADBALA_MIN = { Sun:390, Moon:360, Mars:300, Mercury:420, Jupiter:390, Venus:330, Saturn:300 };
+          const savEntries  = SIGN_ORDER.map(s => ({ sign:s, pts: sav[s] ?? 0 }));
+          const maxSav      = Math.max(...savEntries.map(e => e.pts), 1);
+          const shadbalas   = planets.filter(p => p.shadbala?.Shadbala);
           return (
             <div className="space-y-4">
-              <div className="glass-card rounded-3xl p-6 space-y-4">
+              {/* Shadbala intro */}
+              <div className="glass-card rounded-3xl p-6 space-y-3">
                 <div>
-                  <h2 className="font-playfair text-xl text-gray-700">Shadbala · Six-Fold Strength</h2>
-                  <p className="text-xs text-gray-400 mt-1">Tap any planet for a full breakdown.</p>
+                  <h2 className="font-playfair text-xl text-gray-700">Shadbala · Six-Fold Planetary Strength</h2>
+                  <p className="text-sm text-gray-500 mt-1 leading-relaxed">Shadbala is the traditional Vedic system for measuring planetary strength across six distinct dimensions: positional (Sthanabala), directional (Digbala), temporal (Kaalabala), motional (Cheshtabala), natural (Naisargikabala), and aspectual (Drikbala). A planet meeting its minimum required Rupas is considered fully functional and able to deliver its significations completely. Tap any planet for the full breakdown.</p>
                 </div>
                 <div className="space-y-2">
-                  {planets.filter(p => p.shadbala?.Shadbala).map(p => {
-                    const sb     = p.shadbala.Shadbala;
-                    const rupas  = sb.Rupas ?? 0;
-                    const req    = SHADBALA_MIN[p.celestial_body];
-                    const pct    = req ? Math.min(rupas / req * 100, 100) : 50;
-                    const strong = req ? rupas >= req : true;
+                  {shadbalas.map(p => {
+                    const sb      = p.shadbala.Shadbala;
+                    const rupas   = sb.Rupas ?? 0;
+                    const minReq  = sb.MinRequired ?? 0;
+                    const strong  = sb.MeetsRequirement === 'Yes';
+                    const pct     = minReq ? Math.min(rupas / minReq * 100, 120) : 50;
                     return (
-                      <button key={p.celestial_body}
+                      <button key={p.celestialBody}
                         onClick={() => setDetail({
-                          title:`${p.celestial_body} Shadbala`,
-                          subtitle:`${rupas.toFixed(2)} Rupas · ${(sb.Total ?? 0).toFixed(0)} total`,
+                          title:`${VEDIC_PLANET_SYM[p.celestialBody]} ${p.celestialBody} · Shadbala`,
+                          subtitle:`${rupas.toFixed(2)} Rupas · minimum required: ${minReq}`,
+                          tags: [strong ? '✓ Meets requirement' : '✗ Below minimum', p.sign],
                           body:[
-                            `Positional (Sthanabala): ${sb.Sthanabala?.toFixed(1) ?? '—'}`,
-                            `Temporal (Kaalabala): ${sb.Kaalabala?.toFixed(1) ?? '—'}`,
-                            `Directional (Digbala): ${sb.Digbala?.toFixed(1) ?? '—'}`,
-                            `Motional (Cheshtabala): ${sb.Cheshtabala?.toFixed(1) ?? '—'}`,
-                            `Natural (Naisargikabala): ${sb.Naisargikabala?.toFixed(1) ?? '—'}`,
-                            `Aspectual (Drikbala): ${sb.Drikbala?.toFixed(1) ?? '—'}`,
+                            `Total Shadbala: ${(sb.Total ?? 0).toFixed(2)}`,
+                            `Rupas: ${rupas.toFixed(2)} (minimum: ${minReq})`,
+                            ``,
+                            `Sthanabala (Positional): ${p.shadbala.Sthanabala?.Total?.toFixed(1) ?? p.shadbala.Sthanabala?.toFixed?.(1) ?? '—'}`,
+                            `Digbala (Directional): ${p.shadbala.Digbala?.toFixed?.(1) ?? '—'}`,
+                            `Kaalabala (Temporal): ${p.shadbala.Kaalabala?.Total?.toFixed(1) ?? '—'}`,
+                            `Cheshtabala (Motional): ${p.shadbala.Cheshtabala?.toFixed?.(1) ?? '—'}`,
+                            `Naisargikabala (Natural): ${p.shadbala.Naisargikabala?.toFixed?.(1) ?? '—'}`,
+                            `Drikbala (Aspectual): ${p.shadbala.Drikbala?.toFixed?.(1) ?? '—'}`,
                           ].join('\n'),
                         })}
                         className="w-full flex items-center gap-3 bg-white/50 border border-white/40 rounded-2xl p-3 hover:bg-white/70 transition-colors text-left">
-                        <span className="text-sm w-5 text-center shrink-0">{VEDIC_PLANET_SYM[p.celestial_body]}</span>
-                        <span className="text-xs text-gray-500 w-16 shrink-0">{p.celestial_body}</span>
+                        <span className="text-sm w-6 text-center shrink-0">{VEDIC_PLANET_SYM[p.celestialBody]}</span>
+                        <span className="text-xs text-gray-500 w-16 shrink-0">{p.celestialBody}</span>
                         <div className="flex-1">
                           <div className="flex items-center justify-between mb-1">
-                            <span className="text-xs text-gray-600">{rupas.toFixed(2)} rupas</span>
-                            {req && <span className={`text-xs ${strong ? 'text-green-500' : 'text-orange-400'}`}>{strong ? '✓ strong' : `min ${req}`}</span>}
+                            <span className="text-xs text-gray-600">{rupas.toFixed(2)} / {minReq} rupas</span>
+                            <span className={`text-xs ${strong ? 'text-green-500' : 'text-orange-400'}`}>{strong ? '✓ strong' : '✗ weak'}</span>
                           </div>
                           <div className="h-1.5 rounded-full bg-white/60 overflow-hidden">
-                            <div className={`h-full rounded-full ${strong ? 'bg-green-400' : 'bg-orange-300'}`} style={{ width:`${pct}%` }} />
+                            <div className={`h-full rounded-full transition-all ${strong ? 'bg-green-400' : 'bg-orange-300'}`} style={{ width:`${Math.min(pct,100)}%` }} />
                           </div>
                         </div>
                       </button>
                     );
                   })}
-                  {planets.filter(p => p.shadbala?.Shadbala).length === 0 && (
-                    <p className="text-sm text-gray-400 text-center py-4">Shadbala data not available.</p>
-                  )}
+                  {shadbalas.length === 0 && <p className="text-sm text-gray-400 text-center py-4">Shadbala data not available.</p>}
                 </div>
               </div>
 
+              {/* Ashtakavarga */}
               <div className="glass-card rounded-3xl p-6 space-y-4">
                 <div>
                   <h2 className="font-playfair text-xl text-gray-700">Sarvashtakavarga</h2>
-                  <p className="text-xs text-gray-400 mt-1">Total benefic points per sign (out of 56). 28+ = strong · below 25 = needs attention.</p>
+                  <p className="text-sm text-gray-500 mt-1 leading-relaxed">The Ashtakavarga system assigns benefic points to each sign from the perspective of each of the 7 classical planets plus the Lagna. The Sarvashtakavarga (SAV) is the total of all contributions — a maximum of 56 points per sign. Signs with 28 or more points are considered strong and productive for transits and periods; signs with fewer than 25 points indicate areas of the chart requiring more careful navigation.</p>
                 </div>
                 {savEntries.some(e => e.pts > 0) ? (
-                  <div className="space-y-1.5">
+                  <div className="space-y-2">
                     {savEntries.map(({ sign, pts }) => (
                       <div key={sign} className="flex items-center gap-2">
                         <span className="text-xs text-gray-500 w-24 shrink-0">{sign}</span>
@@ -2657,21 +2778,25 @@ export default function CosmicPage() {
                 ) : <p className="text-sm text-gray-400 text-center py-4">Ashtakavarga data not available.</p>}
               </div>
 
-              {Object.keys(bhav).length > 0 && (
-                <div className="glass-card rounded-3xl p-6 space-y-3">
-                  <h2 className="font-playfair text-xl text-gray-700">Bhinnashtakavarga</h2>
-                  <p className="text-xs text-gray-400">Each planet's contribution across the 12 signs.</p>
+              {/* Bhinnashtakavarga */}
+              {Object.values(bhavMap).some(b => Object.keys(b).length > 0) && (
+                <div className="glass-card rounded-3xl p-6 space-y-4">
+                  <div>
+                    <h2 className="font-playfair text-xl text-gray-700">Bhinnashtakavarga</h2>
+                    <p className="text-xs text-gray-400 mt-1">Each planet's individual contribution of benefic points across the 12 signs. Green (4+) = strong · Amber (3) = moderate · Rose (0-2) = weak.</p>
+                  </div>
                   <div className="space-y-3">
-                    {Object.entries(bhav).map(([planet, signPts]) => (
+                    {Object.entries(bhavMap).filter(([,b]) => Object.keys(b).length > 0).map(([planet, signPts]) => (
                       <div key={planet}>
-                        <p className="text-xs font-medium text-gray-500 mb-1">{VEDIC_PLANET_SYM[planet]} {planet}</p>
+                        <p className="text-xs font-medium text-gray-500 mb-1.5">{VEDIC_PLANET_SYM[planet]} {planet}</p>
                         <div className="flex gap-1">
                           {SIGN_ORDER.map(s => {
                             const pts = signPts[s] ?? 0;
                             return (
                               <div key={s} className="flex-1 text-center">
-                                <div className={`h-4 rounded-sm mx-0.5 ${pts >= 4 ? 'bg-green-300' : pts === 3 ? 'bg-amber-200' : 'bg-rose-100'}`} />
-                                <p className="text-[9px] text-gray-400 mt-0.5">{pts}</p>
+                                <div className={`h-5 rounded-sm mx-0.5 flex items-center justify-center ${pts >= 4 ? 'bg-green-200' : pts === 3 ? 'bg-amber-100' : 'bg-rose-100'}`}>
+                                  <span className="text-[9px] font-medium text-gray-600">{pts}</span>
+                                </div>
                               </div>
                             );
                           })}
