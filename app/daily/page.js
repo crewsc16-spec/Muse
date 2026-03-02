@@ -5,7 +5,7 @@ import { createClient } from '@/app/lib/supabase/client';
 import { getDailyContent, TAROT_IMAGES, ANIMAL_IMAGE_QUERIES } from '@/app/lib/daily-content';
 import { computeChart, getLunarPhase, gateLineToLon, computeCrossAspects, getPersonalYear, computePanchanga } from '@/app/lib/astrology';
 import { calculateHDChart } from '@/app/lib/hd-chart';
-import { saveVisionItem, getJournalEntries, createJournalEntry, updateJournalEntry } from '@/app/lib/storage';
+import { saveVisionItem, getJournalEntries, createJournalEntry, updateJournalEntry, getCycleEntries } from '@/app/lib/storage';
 import VibeCardModal from '@/app/components/VibeCardModal';
 
 const VIBE_DATA = {
@@ -50,7 +50,26 @@ const PHASE_TO_IDX = {
   release: 3, surrender: 3,
 };
 
-function TodaysVibe({ chartData, dateStr }) {
+function getTodayCyclePhase(cycleEntries, todayStr) {
+  const periodDates = cycleEntries.filter(e => e.flow != null).map(e => e.date).sort();
+  if (!periodDates.length) return null;
+  const pStarts = [];
+  periodDates.forEach((d, i) => {
+    if (i === 0 || (new Date(d + 'T00:00:00') - new Date(periodDates[i - 1] + 'T00:00:00')) / 86400000 > 2)
+      pStarts.push(d);
+  });
+  const lastStart = pStarts.filter(s => s <= todayStr).pop();
+  if (!lastStart) return null;
+  const day = Math.round((new Date(todayStr + 'T00:00:00') - new Date(lastStart + 'T00:00:00')) / 86400000) + 1;
+  const gaps = pStarts.slice(1).map((s, i) =>
+    Math.round((new Date(s + 'T00:00:00') - new Date(pStarts[i] + 'T00:00:00')) / 86400000));
+  const avgLen = gaps.length ? Math.round(gaps.reduce((a, b) => a + b, 0) / gaps.length) : 28;
+  const cd = ((day - 1) % avgLen) + 1;
+  const phase = cd <= 5 ? 'Menstrual 🌑' : cd <= 13 ? 'Follicular 🌱' : cd <= 17 ? 'Ovulatory 🌕' : 'Luteal 🌙';
+  return { phase, day: cd };
+}
+
+function TodaysVibe({ chartData, dateStr, cyclePhaseInfo }) {
   const lunarPhase = chartData?.lunarPhase ?? getLunarPhase(dateStr);
   const element    = chartData?.dailyBlend?.[0] ?? lunarPhase?.element ?? 'water';
   const vibe       = VIBE_DATA[element] ?? VIBE_DATA.water;
@@ -72,7 +91,10 @@ function TodaysVibe({ chartData, dateStr }) {
       <h2 className="font-playfair text-xl text-gray-800 mb-1">{tagline}</h2>
 
       {moonSign && (
-        <p className="text-xs text-gray-400 mb-3">Moon in {moonSign}{lunarPhase ? ` · ${lunarPhase.name}` : ''}</p>
+        <p className="text-xs text-gray-400 mb-3">
+          Moon in {moonSign}{lunarPhase ? ` · ${lunarPhase.name}` : ''}
+          {cyclePhaseInfo ? ` · Day ${cyclePhaseInfo.day} · ${cyclePhaseInfo.phase}` : ''}
+        </p>
       )}
 
       <p className="text-gray-600 text-sm leading-relaxed mb-3">{vibe.description}</p>
@@ -124,6 +146,7 @@ export default function DailyPage() {
   const [journalEntryId, setJournalEntryId] = useState(null);
   const [goodNews, setGoodNews] = useState([]);
   const [vibeModalOpen, setVibeModalOpen] = useState(false);
+  const [cyclePhaseInfo, setCyclePhaseInfo] = useState(null);
   const journalSaveTimer = useRef(null);
 
   const dateStr = getTodayStr();
@@ -224,6 +247,15 @@ export default function DailyPage() {
           }
         } catch (e) {
           console.error('[daily] load journal', e);
+        }
+
+        // Load cycle entries to show today's phase in TodaysVibe
+        try {
+          const cycleData = await getCycleEntries(supabase);
+          const info = getTodayCyclePhase(cycleData, dateStr);
+          if (info) setCyclePhaseInfo(info);
+        } catch (e) {
+          console.error('[daily] load cycle', e);
         }
 
         // Spirit animal image — cached by date so it stays consistent all day
@@ -400,7 +432,7 @@ export default function DailyPage() {
         </div>
 
         {/* Today's Vibe */}
-        <TodaysVibe chartData={content.chartData} dateStr={getTodayStr()} />
+        <TodaysVibe chartData={content.chartData} dateStr={getTodayStr()} cyclePhaseInfo={cyclePhaseInfo} />
 
         {/* Share Vibe Check */}
         <button

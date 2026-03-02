@@ -266,6 +266,20 @@ function InlineQuoteSearch({ onSelect }) {
   );
 }
 
+// ── Cycle phase colors ──
+const CYCLE_PHASE_COLORS = {
+  menstrual:  '#fecdd3',
+  follicular: '#bbf7d0',
+  ovulatory:  '#fef9c3',
+  luteal:     '#ede9fe',
+};
+const CYCLE_PHASE_OPACITIES = {
+  menstrual:  0.22,
+  follicular: 0.18,
+  ovulatory:  0.20,
+  luteal:     0.18,
+};
+
 // ── Mood Trend Chart ──
 function MoodTrendChart({ entries, cycleEntries = [] }) {
   const [range, setRange] = useState('30');
@@ -341,6 +355,42 @@ function MoodTrendChart({ entries, cycleEntries = [] }) {
     moon: getLunarPhase(e.date),
   }));
 
+  // Cycle phase background bands
+  const cyclePhaseBands = useMemo(() => {
+    if (!hasPeriodData || filtered.length < 2) return [];
+    const sortedP = [...periodDates].sort();
+    const pStarts = [];
+    sortedP.forEach((d, i) => {
+      if (i === 0 || (new Date(d + 'T00:00:00') - new Date(sortedP[i - 1] + 'T00:00:00')) / 86400000 > 2)
+        pStarts.push(d);
+    });
+    if (!pStarts.length) return [];
+    const gaps = pStarts.slice(1).map((s, i) =>
+      Math.round((new Date(s + 'T00:00:00') - new Date(pStarts[i] + 'T00:00:00')) / 86400000));
+    const avgLen = gaps.length ? Math.round(gaps.reduce((a, b) => a + b, 0) / gaps.length) : 28;
+    const bands = [];
+    let cur = null;
+    const t0 = new Date(filtered[0].date + 'T00:00:00');
+    const t1 = new Date(filtered[filtered.length - 1].date + 'T00:00:00');
+    for (let d = new Date(t0); d <= t1; d.setDate(d.getDate() + 1)) {
+      const ds = d.toISOString().split('T')[0];
+      const lastStart = pStarts.filter(s => s <= ds).pop();
+      if (!lastStart) continue;
+      const day = Math.round((d - new Date(lastStart + 'T00:00:00')) / 86400000) + 1;
+      const cd = ((day - 1) % avgLen) + 1;
+      const phase = cd <= 5 ? 'menstrual' : cd <= 13 ? 'follicular' : cd <= 17 ? 'ovulatory' : 'luteal';
+      const x = dateToX(ds);
+      if (x === null) continue;
+      if (!cur || cur.phase !== phase) {
+        if (cur) bands.push({ ...cur, x2: x });
+        cur = { phase, x1: x };
+      } else { cur.x2 = x; }
+    }
+    if (cur) bands.push({ ...cur, x2: cW });
+    return bands;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filtered, periodDates, hasPeriodData, cW]);
+
   const linePath = pts.length < 2 ? '' : pts.reduce((acc, pt, i) => {
     if (i === 0) return `M ${pt.x.toFixed(1)} ${pt.y.toFixed(1)}`;
     const prev = pts[i - 1];
@@ -365,6 +415,27 @@ function MoodTrendChart({ entries, cycleEntries = [] }) {
     return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   }
 
+  // Compute cycle phase info for a date string (for hover tooltip)
+  function getDateCycleInfo(ds) {
+    if (!hasPeriodData) return null;
+    const sortedP = [...periodDates].sort();
+    const pStarts = [];
+    sortedP.forEach((d, i) => {
+      if (i === 0 || (new Date(d + 'T00:00:00') - new Date(sortedP[i - 1] + 'T00:00:00')) / 86400000 > 2)
+        pStarts.push(d);
+    });
+    const lastStart = pStarts.filter(s => s <= ds).pop();
+    if (!lastStart) return null;
+    const day = Math.round((new Date(ds + 'T00:00:00') - new Date(lastStart + 'T00:00:00')) / 86400000) + 1;
+    const gaps = pStarts.slice(1).map((s, i) =>
+      Math.round((new Date(s + 'T00:00:00') - new Date(pStarts[i] + 'T00:00:00')) / 86400000));
+    const avgLen = gaps.length ? Math.round(gaps.reduce((a, b) => a + b, 0) / gaps.length) : 28;
+    const cd = ((day - 1) % avgLen) + 1;
+    const PHASE_LABELS = { menstrual: 'Menstrual 🌑', follicular: 'Follicular 🌱', ovulatory: 'Ovulatory 🌕', luteal: 'Luteal 🌙' };
+    const phase = cd <= 5 ? 'menstrual' : cd <= 13 ? 'follicular' : cd <= 17 ? 'ovulatory' : 'luteal';
+    return { label: PHASE_LABELS[phase], day: cd };
+  }
+
   return (
     <div className="glass-card rounded-3xl p-6">
       <div className="flex items-center justify-between mb-3">
@@ -382,9 +453,10 @@ function MoodTrendChart({ entries, cycleEntries = [] }) {
       </div>
 
       {/* Hover tooltip row */}
-      <div className="min-h-[22px] mb-2 flex items-center gap-2">
+      <div className="min-h-[22px] mb-2 flex items-center gap-2 flex-wrap">
         {hovered !== null && pts[hovered] && (() => {
           const pt = pts[hovered];
+          const cycleInfo = getDateCycleInfo(pt.entry.date);
           return (
             <>
               <MoodFace mood={pt.entry.mood} size={16} />
@@ -394,6 +466,12 @@ function MoodTrendChart({ entries, cycleEntries = [] }) {
               <span className="text-xs text-gray-300">·</span>
               <MoonPhaseIcon dateStr={pt.entry.date} size={14} />
               <span className="text-xs text-gray-400">{pt.moon.name}</span>
+              {cycleInfo && (
+                <>
+                  <span className="text-xs text-gray-300">·</span>
+                  <span className="text-xs text-gray-400">{cycleInfo.label} · Day {cycleInfo.day}</span>
+                </>
+              )}
               <span className="text-xs text-gray-300">·</span>
               <span className="text-xs text-gray-400">
                 {new Date(pt.entry.date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
@@ -423,6 +501,15 @@ function MoodTrendChart({ entries, cycleEntries = [] }) {
             {[1, 2, 3, 4, 5].map(v => (
               <line key={v} x1={0} y1={yScale(v)} x2={cW} y2={yScale(v)}
                 stroke="#ecdde2" strokeWidth="0.5" strokeDasharray="3,3" />
+            ))}
+            {/* Cycle phase background bands */}
+            {cyclePhaseBands.map((b, i) => (
+              <rect key={`cp-${i}`}
+                x={b.x1} y={0}
+                width={Math.max(1, b.x2 - b.x1)} height={cH}
+                fill={CYCLE_PHASE_COLORS[b.phase]}
+                fillOpacity={CYCLE_PHASE_OPACITIES[b.phase]}
+                rx={0} />
             ))}
             {/* Prediction band */}
             {nextPeriodBand && (
@@ -697,7 +784,31 @@ export default function Home() {
     const avgOn  = moodOnPeriod.length  > 0 ? moodOnPeriod.reduce((s, e)  => s + e.mood, 0) / moodOnPeriod.length  : null;
     const avgOff = moodOffPeriod.length > 0 ? moodOffPeriod.reduce((s, e) => s + e.mood, 0) / moodOffPeriod.length : null;
     const daysUntilNext = Math.round((nextPeriod - new Date(today + 'T00:00:00')) / 86400000);
-    return { phase, dayOfCycle, avgCycleLength, cycleCount: Math.max(0, pStarts.length - 1), nextPeriodDate, daysUntilNext, avgOn, avgOff };
+
+    // Moon correlation: avg mood by moon quartet
+    const moonGroups = { '🌑 New': [], '🌒 Waxing': [], '🌕 Full': [], '🌖 Waning': [] };
+    for (const e of entries) {
+      const n = getLunarPhase(e.date).name;
+      const k = n.includes('New') ? '🌑 New' : n.includes('Full') ? '🌕 Full'
+              : n.includes('Waxing') ? '🌒 Waxing' : '🌖 Waning';
+      moonGroups[k].push(e.mood);
+    }
+    const moodByMoon = Object.fromEntries(
+      Object.entries(moonGroups).map(([k, v]) => [k, v.length >= 2
+        ? (v.reduce((a, b) => a + b, 0) / v.length) : null])
+    );
+
+    // Which moon phase do periods most often start on?
+    const startPhases = pStarts.map(d => {
+      const n = getLunarPhase(d).name;
+      return n.includes('New') ? '🌑 New Moon' : n.includes('Full') ? '🌕 Full Moon'
+           : n.includes('Waxing') ? '🌒 Waxing Moon' : '🌖 Waning Moon';
+    });
+    const phaseCounts = startPhases.reduce((acc, p) => ({ ...acc, [p]: (acc[p] || 0) + 1 }), {});
+    const [topPhase, topCount] = Object.entries(phaseCounts).sort((a, b) => b[1] - a[1])[0] ?? [null, 0];
+    const periodStartPhase = (pStarts.length >= 2 && topCount / pStarts.length >= 0.5) ? topPhase : null;
+
+    return { phase, dayOfCycle, avgCycleLength, cycleCount: Math.max(0, pStarts.length - 1), nextPeriodDate, daysUntilNext, avgOn, avgOff, moodByMoon, periodStartPhase };
   }, [cycleEntries, entries, today]);
 
   // Board: vision items (some linked to mood entries) + pure mood entries
@@ -1044,6 +1155,35 @@ export default function Home() {
               </p>
             </div>
           )}
+          {/* Mood & Moon correlation */}
+          {(() => {
+            const mbm = cycleStats.moodByMoon;
+            const buckets = Object.entries(mbm).filter(([, v]) => v !== null);
+            if (buckets.length < 2) return null;
+            const top = buckets.reduce((a, b) => b[1] > a[1] ? b : a);
+            const insightMap = {
+              '🌑 New': 'Your mood tends to be quieter around the New Moon — a natural time to turn inward.',
+              '🌒 Waxing': 'Your mood tends to lift as the moon grows — ride that rising energy.',
+              '🌕 Full': 'Your mood tends to peak around the Full Moon — lean into that luminous energy.',
+              '🌖 Waning': 'Your mood tends to be most grounded during the Waning Moon — a time for reflection.',
+            };
+            return (
+              <div className="pt-3 border-t border-white/40 space-y-2">
+                <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Mood &amp; Moon</p>
+                <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-gray-500">
+                  {Object.entries(mbm).map(([label, avg]) => (
+                    <span key={label}>
+                      {label} <strong>{avg !== null ? avg.toFixed(1) : '—'}</strong>
+                    </span>
+                  ))}
+                </div>
+                <p className="text-sm text-gray-500 italic">{insightMap[top[0]]}</p>
+                {cycleStats.periodStartPhase && (
+                  <p className="text-xs text-gray-400">Your period tends to start around the {cycleStats.periodStartPhase}.</p>
+                )}
+              </div>
+            );
+          })()}
         </div>
       )}
 
