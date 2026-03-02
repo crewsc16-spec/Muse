@@ -5,6 +5,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { createClient } from '@/app/lib/supabase/client';
 import { applyScheme } from '@/app/lib/color-schemes';
+import FeedbackModal from './FeedbackModal';
 
 const USER_LS_KEYS = ['displayName', 'profilePhotoUrl', 'birthData', 'milestones', 'colorScheme', 'boardSizes', 'quiz-embeds'];
 
@@ -127,6 +128,7 @@ export default function Navbar() {
   const pathname = usePathname();
   const [user, setUser] = useState(null);
   const [ready, setReady] = useState(false);
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
 
   useEffect(() => {
     const supabase = createClient();
@@ -187,6 +189,15 @@ export default function Navbar() {
                   </a>
                 ))}
                 <button
+                  onClick={() => setFeedbackOpen(true)}
+                  title="Send feedback"
+                  className="text-gray-400 hover:text-[#b88a92] transition-colors border border-gray-200 rounded-full p-1.5 hover:border-[#d4adb6]"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                  </svg>
+                </button>
+                <button
                   onClick={handleLogout}
                   className="text-xs text-gray-400 hover:text-[#b88a92] transition-colors border border-gray-200 rounded-full px-3 py-1.5 hover:border-[#d4adb6]"
                 >
@@ -194,13 +205,24 @@ export default function Navbar() {
                 </button>
               </div>
 
-              {/* Mobile top-right: log out only */}
-              <button
-                onClick={handleLogout}
-                className="md:hidden text-xs text-gray-400 hover:text-[#b88a92] transition-colors border border-gray-200 rounded-full px-3 py-1.5"
-              >
-                Log out
-              </button>
+              {/* Mobile top-right */}
+              <div className="md:hidden flex items-center gap-2">
+                <button
+                  onClick={() => setFeedbackOpen(true)}
+                  title="Send feedback"
+                  className="text-gray-400 hover:text-[#b88a92] transition-colors border border-gray-200 rounded-full p-1.5"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                  </svg>
+                </button>
+                <button
+                  onClick={handleLogout}
+                  className="text-xs text-gray-400 hover:text-[#b88a92] transition-colors border border-gray-200 rounded-full px-3 py-1.5"
+                >
+                  Log out
+                </button>
+              </div>
             </>
           ) : ready ? (
             <div className="flex items-center gap-2">
@@ -214,6 +236,8 @@ export default function Navbar() {
           ) : null}
         </div>
       </nav>
+
+      {feedbackOpen && <FeedbackModal onClose={() => setFeedbackOpen(false)} />}
 
       {/* ── Mobile bottom tab bar ── */}
       {user && (
