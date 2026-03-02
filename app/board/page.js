@@ -483,7 +483,7 @@ export default function Home() {
   // Today's entry form
   const [selectedMood, setSelectedMood] = useState(null);
   const [notes, setNotes]               = useState('');
-  const [showBoardPiece, setShowBoardPiece] = useState(false);
+  const [entryOpen, setEntryOpen] = useState(true);
   const [type, setType]       = useState('image');
   const [category, setCategory] = useState('personal');
   const [content, setContent] = useState('');
@@ -563,6 +563,7 @@ export default function Home() {
       if (todayEntry) {
         setSelectedMood(todayEntry.mood);
         setNotes(todayEntry.notes || '');
+        setEntryOpen(false);
       }
       const todayCycle = cycleData.find(e => e.date === today);
       if (todayCycle) {
@@ -588,7 +589,7 @@ export default function Home() {
 
       // 2. Save linked board piece if one was added
       const hasContent = type === 'image' ? imageUrl.trim() : content.trim();
-      if (showBoardPiece && hasContent && moodEntryId) {
+      if (hasContent && moodEntryId) {
         const item = await saveVisionItem(sb, {
           type, category,
           content: content.trim() || null,
@@ -607,9 +608,10 @@ export default function Home() {
         await deleteCycleEntry(sb, today);
       }
 
-      setContent(''); setImageUrl(''); setShowBoardPiece(false);
+      setContent(''); setImageUrl(''); setType('image'); setCategory('personal');
       setNotes(''); setSelectedMood(null);
       setFlow(null); setSymptoms([]); setCycleOpen(false);
+      setEntryOpen(false);
       setMoodSaved(true);
       setTimeout(() => setMoodSaved(false), 2500);
     } finally {
@@ -789,20 +791,33 @@ export default function Home() {
       )}
 
       {/* ── Today's Entry — combined mood + board piece ── */}
-      <div className="glass-card rounded-3xl p-6 space-y-5">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xs font-medium text-gray-400 uppercase tracking-widest">Today&apos;s Entry</h2>
-          {(() => {
-            const phase = getLunarPhase(today);
-            return (
-              <div className="flex items-center gap-1.5">
-                <MoonPhaseIcon dateStr={today} size={18} />
-                <span className="text-xs text-gray-400">{phase.name}</span>
-              </div>
-            );
-          })()}
-        </div>
+      <div className="glass-card rounded-3xl p-6">
+        <button
+          onClick={() => setEntryOpen(!entryOpen)}
+          className="flex items-center justify-between w-full text-left"
+        >
+          <div className="flex items-center gap-2">
+            <h2 className="text-xs font-medium text-gray-400 uppercase tracking-widest">Today&apos;s Entry</h2>
+            {!entryOpen && entries.some(e => e.date === today) && (
+              <span className="text-xs text-[#b88a92] font-medium">✓</span>
+            )}
+          </div>
+          <div className="flex items-center gap-3">
+            {(() => {
+              const phase = getLunarPhase(today);
+              return (
+                <div className="flex items-center gap-1.5">
+                  <MoonPhaseIcon dateStr={today} size={18} />
+                  <span className="text-xs text-gray-400">{phase.name}</span>
+                </div>
+              );
+            })()}
+            <span className={`text-sm text-gray-300 transition-transform duration-200 ${entryOpen ? 'rotate-180' : ''}`}>▼</span>
+          </div>
+        </button>
 
+        {entryOpen && (
+        <div className="space-y-5 mt-5">
         {/* Mood faces */}
         <div className="flex gap-2">
           {MOODS.map(mood => (
@@ -872,17 +887,9 @@ export default function Home() {
           )}
         </div>
 
-        {/* Board piece toggle — just a divider + caret */}
-        <button
-          onClick={() => setShowBoardPiece(!showBoardPiece)}
-          className="flex items-center justify-center w-full border-t border-white/40 pt-3 text-gray-300 hover:text-[#b88a92] transition-colors"
-        >
-          <span className="text-sm leading-none">{showBoardPiece ? '▲' : '▼'}</span>
-        </button>
-
-        {/* Board piece form — shown inline when toggled */}
-        {showBoardPiece && (
-          <div className="space-y-4 pt-1">
+        {/* Board piece form */}
+        <div className="space-y-4 border-t border-white/40 pt-4">
+          <p className="text-xs text-gray-400">Add to your vision board</p>
             {/* Type */}
             <div className="flex gap-2">
               {TYPES.map(t => (
@@ -944,7 +951,6 @@ export default function Home() {
               />
             )}
           </div>
-        )}
 
         <button onClick={handleSaveEntry} disabled={!selectedMood || saving}
           className={`w-full py-3 rounded-full font-medium text-sm transition-all ${
@@ -952,6 +958,8 @@ export default function Home() {
           }`}>
           {moodSaved ? '✓ Saved' : saving ? 'Saving…' : 'Save Entry'}
         </button>
+        </div>
+        )}
       </div>
 
       {/* ── Daily Goals ── */}
