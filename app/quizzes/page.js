@@ -1886,6 +1886,837 @@ const QUIZZES = [
       },
     },
   },
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  {
+    id: 'tarot',
+    emoji: '🃏',
+    title: 'Which Tarot Card Are You?',
+    description: 'Five major arcana archetypes. One reflects you more than the others.',
+    questions: [
+      {
+        text: "You're about to make a significant decision with incomplete information. Your body's first response is…",
+        options: [
+          { label: "A pull forward — the uncertainty is kind of the point", value: 'fool' },
+          { label: "A pause — something in you is already processing what your mind hasn't caught up to yet", value: 'priestess' },
+          { label: "A checking-in with your senses — does this feel nourishing or depleting?", value: 'empress' },
+          { label: "A retreat — you need to be alone with it before you can know anything", value: 'hermit' },
+          { label: "A quiet settling — you trust that the right answer will make itself clear", value: 'star' },
+        ],
+      },
+      {
+        text: "The criticism that stings because you secretly think it might be true is…",
+        options: [
+          { label: "\"You don't think things through\" or \"You're too impulsive\"", value: 'fool' },
+          { label: "\"You're withholding\" or \"You never really let people in\"", value: 'priestess' },
+          { label: "\"You give too much\" or \"You need everyone to be okay all the time\"", value: 'empress' },
+          { label: "\"You disappear\" or \"You're impossible to reach when you pull back\"", value: 'hermit' },
+          { label: "\"You're too passive\" or \"You keep waiting for things to work out instead of making them\"", value: 'star' },
+        ],
+      },
+      {
+        text: "You walk into a party where you know almost no one. What actually happens — not what you wish would happen?",
+        options: [
+          { label: "I introduce myself to someone interesting within the first few minutes", value: 'fool' },
+          { label: "I observe for a while first — I'm reading the room before I engage", value: 'priestess' },
+          { label: "I find the host and make sure they feel taken care of, then settle in", value: 'empress' },
+          { label: "I find one person for a real conversation, or I leave earlier than planned", value: 'hermit' },
+          { label: "I'm fine — I let things unfold and trust I'll end up where I'm supposed to", value: 'star' },
+        ],
+      },
+      {
+        text: "A close friend tells you they made a choice you think is a mistake. You…",
+        options: [
+          { label: "Share your honest take — you'd want the same — but then support them fully", value: 'fool' },
+          { label: "Ask questions more than give opinions — you're more interested in what they know than what you think", value: 'priestess' },
+          { label: "Make sure they feel loved and not judged, even if you're worried", value: 'empress' },
+          { label: "Share the hard truth once, clearly, then step back — you've said what you have to say", value: 'hermit' },
+          { label: "Trust that it'll work out somehow — you've seen people surprise themselves before", value: 'star' },
+        ],
+      },
+      {
+        text: "When you're in a period of real difficulty, what do you actually do — not what you aspire to do?",
+        options: [
+          { label: "Keep moving — doing something, anything, feels better than staying still", value: 'fool' },
+          { label: "Go quiet and inward — I process in private before I can speak it", value: 'priestess' },
+          { label: "Tend to the people around me and my space — I nest when I'm hurting", value: 'empress' },
+          { label: "Withdraw until I've figured out the shape of what happened", value: 'hermit' },
+          { label: "Let myself feel it and try to find the thread of faith in it", value: 'star' },
+        ],
+      },
+      {
+        text: "What do you notice first when you walk into a space you've never been in before?",
+        options: [
+          { label: "What's possible here — what could I do, explore, try?", value: 'fool' },
+          { label: "The energy of it — something you can't quite name but you immediately sense", value: 'priestess' },
+          { label: "Whether it feels alive and beautiful or neglected", value: 'empress' },
+          { label: "Whether it's quiet enough — whether you'd be able to think here", value: 'hermit' },
+          { label: "The light — where it's coming from, what it's doing to the room", value: 'star' },
+        ],
+      },
+      {
+        text: "The recurring pattern in your life that you've finally started to recognize is…",
+        options: [
+          { label: "Jumping into things with full trust and then having to adapt when it gets hard", value: 'fool' },
+          { label: "Knowing things before there's any evidence for them and not always knowing what to do with that", value: 'priestess' },
+          { label: "Taking on other people's emotional weight as if it were naturally mine to carry", value: 'empress' },
+          { label: "Needing to withdraw to understand myself and sometimes staying withdrawn too long", value: 'hermit' },
+          { label: "Believing things will work out and somehow — even when it doesn't look like it — they usually do", value: 'star' },
+        ],
+      },
+      {
+        text: "Someone describes you to a mutual friend who hasn't met you yet. What do you think they actually say?",
+        options: [
+          { label: "\"You'll like them — they're up for anything and weirdly fun to be around\"", value: 'fool' },
+          { label: "\"She's hard to describe — there's something about her. She just knows things.\"", value: 'priestess' },
+          { label: "\"She'll take such good care of you — you'll leave feeling completely nourished\"", value: 'empress' },
+          { label: "\"He's intense in a good way — a little hard to reach, but worth it\"", value: 'hermit' },
+          { label: "\"There's something so calm about her. She just makes everything feel okay.\"", value: 'star' },
+        ],
+      },
+      {
+        text: "Your idea of a truly good day involves…",
+        options: [
+          { label: "Something unplanned that turns into a story", value: 'fool' },
+          { label: "Long uninterrupted stretches of reading, thinking, or listening to something rich", value: 'priestess' },
+          { label: "Creating something beautiful, feeding people, making a space feel like itself", value: 'empress' },
+          { label: "Solitude in the morning and one real conversation that goes somewhere", value: 'hermit' },
+          { label: "Gentle movement, something beautiful, nowhere to be — time that doesn't demand anything", value: 'star' },
+        ],
+      },
+      {
+        text: "When plans fall apart at the last minute, your honest reaction is…",
+        options: [
+          { label: "A flicker of disappointment, then genuine curiosity about what opens up instead", value: 'fool' },
+          { label: "Relief, maybe — you weren't fully sure you wanted to go anyway", value: 'priestess' },
+          { label: "Frustration, especially if you'd prepared something for others", value: 'empress' },
+          { label: "Fine, honestly — unexpected solitude is rarely unwelcome", value: 'hermit' },
+          { label: "A shrug — something else will come together, it always does", value: 'star' },
+        ],
+      },
+    ],
+    results: {
+      fool: {
+        title: 'The Fool',
+        emoji: '🌀',
+        tagline: "You leap before you look — and somehow land exactly where you need to.",
+        description: "The Fool energy is not naivety — it's radical trust. You carry an unshakeable belief that the universe has your back, that beginnings are always worth the risk, and that life is meant to be met with open arms. You've probably terrified people with your willingness to start over. But you've also inspired them. You are the embodiment of possibility — the divine that moves through courage. The Fool doesn't know the path, but walks anyway. That is the whole point.",
+        keywords: ['Beginnings', 'Trust', 'Courage', 'Spontaneity', 'Freedom'],
+      },
+      priestess: {
+        title: 'The High Priestess',
+        emoji: '🌙',
+        tagline: "You hold more than you say, and know more than you let on.",
+        description: "The High Priestess keeps secrets — not because she withholds, but because she understands that some truths have to be felt, not told. Your intuition is your primary organ. You live at the threshold between the seen and unseen, the said and the known. People sense something ancient and deep in you. Your gift is receptivity — you don't seek truth, you let it find you. The shadow work is learning to speak what you know into the world, not just hold it.",
+        keywords: ['Intuition', 'Mystery', 'Depth', 'Wisdom', 'Inner Knowing'],
+      },
+      empress: {
+        title: 'The Empress',
+        emoji: '🌸',
+        tagline: "You are abundance made flesh — and everything you touch blooms.",
+        description: "The Empress is lush, embodied, and deeply creative. You move through the world as a force of nature — nurturing, sensual, generative. You create beauty instinctively: in your home, your relationships, your work. You understand that care is not weakness, that softness requires real strength. Your gift is your capacity to make others feel truly nourished. The shadow work is learning to receive as fully as you give.",
+        keywords: ['Abundance', 'Creativity', 'Nurturing', 'Sensuality', 'Growth'],
+      },
+      hermit: {
+        title: 'The Hermit',
+        emoji: '🕯️',
+        tagline: "You carry a lantern — and you know how to use it.",
+        description: "The Hermit is not lonely. He is alone by choice, in service of something larger. You need depth in order to function — small talk tires you, noise tires you. Your best thinking comes in solitude, and your most important insights arrive when you stop looking for them. People come to you for perspective they can't find anywhere else, because you've gone somewhere internally that most haven't. Your light is real. The invitation is to share it.",
+        keywords: ['Solitude', 'Wisdom', 'Introspection', 'Discernment', 'Inner Light'],
+      },
+      star: {
+        title: 'The Star',
+        emoji: '⭐',
+        tagline: "Even in the dark you point the way — without trying to.",
+        description: "The Star comes after The Tower — after collapse, loss, the night that seemed endless. It is the card of quiet faith restored. If this is your card, you carry a deep and often tested belief that things will work out. Not naively — you've been through enough to know trust is a practice. But you keep the faith anyway, and that softly persistent hope is your gift to every room you enter. You don't need to announce it. People feel it.",
+        keywords: ['Hope', 'Healing', 'Faith', 'Serenity', 'Restoration'],
+      },
+    },
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  {
+    id: 'creature',
+    emoji: '🐉',
+    title: 'What Mythological Creature Are You?',
+    description: 'Four archetypes from the realm of myth. One is unmistakably yours.',
+    questions: [
+      {
+        text: "When you walk into a room full of people you don't know, what actually happens in your body first?",
+        options: [
+          { label: "A scan — assessing, not anxious, just aware of who and what is in the room", value: 'dragon' },
+          { label: "A slight heightening — like the possibility of something interesting is in the air", value: 'phoenix' },
+          { label: "A pulling-under — you're more aware of the emotional current than the people themselves", value: 'mermaid' },
+          { label: "A reading — within minutes you've quietly figured out who everyone is and what they need", value: 'shapeshifter' },
+        ],
+      },
+      {
+        text: "Your best friend, being entirely honest, would say the hardest thing about loving you is…",
+        options: [
+          { label: "Getting past the walls — once you're in, it's total, but getting in takes time and trust", value: 'dragon' },
+          { label: "Keeping up — you're not the same person you were two years ago, and sometimes that's disorienting", value: 'phoenix' },
+          { label: "Never knowing if they're really reaching you — you're deep in ways that are hard to follow", value: 'mermaid' },
+          { label: "Not always knowing which version of you they're getting today", value: 'shapeshifter' },
+        ],
+      },
+      {
+        text: "When a situation becomes unfair or someone you love is being threatened, you…",
+        options: [
+          { label: "Become absolutely immovable — there's a line and it has been crossed", value: 'dragon' },
+          { label: "Catch fire — you didn't know you had that in you until it was needed", value: 'phoenix' },
+          { label: "Feel it in your whole body before you can articulate it — and then you say something real", value: 'mermaid' },
+          { label: "Read the situation and step into whatever role will actually help", value: 'shapeshifter' },
+        ],
+      },
+      {
+        text: "The habit or pattern you keep returning to despite knowing better is…",
+        options: [
+          { label: "Holding on too long — to places, people, positions, once I've claimed them as mine", value: 'dragon' },
+          { label: "Burning it down when I could have just renovated", value: 'phoenix' },
+          { label: "Disappearing into the deep when the surface gets too chaotic", value: 'mermaid' },
+          { label: "Becoming whoever the room seems to need, then not recognizing myself later", value: 'shapeshifter' },
+        ],
+      },
+      {
+        text: "Your most recent major life transition felt like…",
+        options: [
+          { label: "A necessary defense — protecting something I'd built or loved", value: 'dragon' },
+          { label: "A death and a rebirth — there was a before and an after and they don't look alike", value: 'phoenix' },
+          { label: "A tide shift — deep, slow, felt before it was visible on the surface", value: 'mermaid' },
+          { label: "A shape change — I stepped out of one form and into another, sometimes without knowing I was doing it", value: 'shapeshifter' },
+        ],
+      },
+      {
+        text: "What do you collect? (Physically, energetically, mentally — anything.)",
+        options: [
+          { label: "Meaningful objects with history — things worth guarding", value: 'dragon' },
+          { label: "Lessons — everything that's happened to me becomes material I use later", value: 'phoenix' },
+          { label: "Emotional depth — the feelings and undercurrents others miss", value: 'mermaid' },
+          { label: "Perspectives — I've been enough different people to hold a lot of viewpoints simultaneously", value: 'shapeshifter' },
+        ],
+      },
+      {
+        text: "When you imagine yourself in a mythology, the role that fits is…",
+        options: [
+          { label: "The one the hero must face — not a villain, but a force that demands proof of worthiness", value: 'dragon' },
+          { label: "The one who returns from the underworld carrying fire", value: 'phoenix' },
+          { label: "The one who lives in two worlds and belongs entirely to neither", value: 'mermaid' },
+          { label: "The one who appears differently to every person who tells the story", value: 'shapeshifter' },
+        ],
+      },
+      {
+        text: "When everything is fine — no drama, no crisis, just ordinary life — you tend to feel…",
+        options: [
+          { label: "Good, as long as my territory is in order and my people are safe", value: 'dragon' },
+          { label: "Vaguely restless — calm is fine but something in me needs a purpose bigger than ordinary", value: 'phoenix' },
+          { label: "Like the world is a little too shallow — I drift toward the deeper end", value: 'mermaid' },
+          { label: "Curious about who else I could be or what else I could do", value: 'shapeshifter' },
+        ],
+      },
+      {
+        text: "The compliment that makes you most uncomfortable because it touches something real is…",
+        options: [
+          { label: "\"You're so loyal — I've never felt so protected\"", value: 'dragon' },
+          { label: "\"I don't know how you keep going — most people wouldn't have survived that\"", value: 'phoenix' },
+          { label: "\"You feel things so deeply — it's almost like you know things before they happen\"", value: 'mermaid' },
+          { label: "\"You're somehow exactly what everyone needs — how do you do that?\"", value: 'shapeshifter' },
+        ],
+      },
+      {
+        text: "What is the thing about yourself that took you the longest to stop apologizing for?",
+        options: [
+          { label: "My intensity — how seriously I take things, how fiercely I guard what's mine", value: 'dragon' },
+          { label: "How many times I've changed — the discontinuity between my chapters", value: 'phoenix' },
+          { label: "How much I feel and how far down I go — that it makes me hard to reach sometimes", value: 'mermaid' },
+          { label: "That I'm hard to pin down — that even I don't always know which version is \"the real me\"", value: 'shapeshifter' },
+        ],
+      },
+    ],
+    results: {
+      dragon: {
+        title: 'The Dragon',
+        emoji: '🐉',
+        tagline: "You are ancient, powerful, and you protect what is sacred.",
+        description: "Dragons don't belong to anyone. They are sovereign, fierce, and live by their own code. You carry an intensity that most people feel from across the room — a power that some find magnetic and others find intimidating. You love hard and guard harder. Betrayal is the one wound you don't easily recover from, because you only open the gate for those you truly trust. The invitation of Dragon energy is learning that your power doesn't require walls. The strongest version of you can be open and fierce at the same time.",
+        keywords: ['Power', 'Protection', 'Sovereignty', 'Intensity', 'Loyalty'],
+      },
+      phoenix: {
+        title: 'The Phoenix',
+        emoji: '🔥',
+        tagline: "You have died and been reborn more times than most people can count.",
+        description: "Phoenix people live in cycles of transformation. Your life reads like a series of complete chapters — each ending in some kind of fire, each followed by something that couldn't have existed without the burning. You are not defined by your breakdowns. You are defined by the fact that you always rise. The gift of Phoenix energy is resilience so deep it becomes wisdom. The shadow is burning things down before their time, or mistaking chaos for growth. Not everything needs to end for you to change.",
+        keywords: ['Transformation', 'Resilience', 'Rebirth', 'Intensity', 'Courage'],
+      },
+      mermaid: {
+        title: 'The Mermaid',
+        emoji: '🧜',
+        tagline: "You live between worlds — and you wouldn't have it any other way.",
+        description: "Mermaids exist at the threshold — neither fully of one world nor another. You feel things at a depth others can't access. You carry mystery, fluidity, and an emotional range that is genuinely oceanic. People are drawn to you but can rarely fully reach you, because you exist at a depth they can only visit. Your gift is profundity — your shadow is the longing to be truly seen, which requires letting someone follow you all the way down. You can be known. But you have to be willing to be found.",
+        keywords: ['Mystery', 'Depth', 'Fluidity', 'Sensitivity', 'Threshold'],
+      },
+      shapeshifter: {
+        title: 'The Shapeshifter',
+        emoji: '🌀',
+        tagline: "You are everyone and no one — and your real power is knowing the difference.",
+        description: "Shapeshifters are the great adapters — gifted at reading environments and becoming what each moment requires. You are deeply charismatic in a quiet way: you know how to make anyone feel met. The shadow of this gift is losing track of your own shape underneath all the shifting. The work of Shapeshifter energy is not to stop changing — it's to find the unchangeable self at the center of all your forms. You are not what you adapt to. You are the one who chooses to adapt. That distinction is everything.",
+        keywords: ['Adaptability', 'Charisma', 'Fluidity', 'Identity', 'Magic'],
+      },
+    },
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  {
+    id: 'witch',
+    emoji: '🧙',
+    title: 'Which Witch Are You?',
+    description: 'Five distinct witch archetypes. Which one is already living in you?',
+    questions: [
+      {
+        text: 'Your ideal altar would feature…',
+        options: [
+          { label: "Fresh herbs, dried flowers, soil, something alive and growing", value: 'green' },
+          { label: "Shells, sea glass, salt water, driftwood", value: 'sea' },
+          { label: "Books, dried botanicals, bone, objects from threshold spaces", value: 'hedge' },
+          { label: "Star maps, crystals, moon phase charts, things that glow", value: 'cosmic' },
+          { label: "Candles, spices, handmade things, something warm and edible", value: 'kitchen' },
+        ],
+      },
+      {
+        text: 'Your magic is most alive when you\'re…',
+        options: [
+          { label: "Outside, hands in earth, tending something growing", value: 'green' },
+          { label: "Near water — ocean, river, rain — something vast and moving", value: 'sea' },
+          { label: "Alone at the threshold — dusk, doorways, in-between places", value: 'hedge' },
+          { label: "Under the open sky at night", value: 'cosmic' },
+          { label: "In your kitchen or home, creating something for someone you love", value: 'kitchen' },
+        ],
+      },
+      {
+        text: 'When something in your life feels off-balance, your instinct is to…',
+        options: [
+          { label: "Get outside and work with your hands — the earth sorts things out", value: 'green' },
+          { label: "Sit near water or take a long bath and let it move through you", value: 'sea' },
+          { label: "Go somewhere liminal and wait for something to come across", value: 'hedge' },
+          { label: "Check the transits — timing is usually the thing", value: 'cosmic' },
+          { label: "Clean, reorganize, or make something — the home reflects the inner state", value: 'kitchen' },
+        ],
+      },
+      {
+        text: 'The phase of the day that feels most like yours is…',
+        options: [
+          { label: "Dawn — dew on everything, things waking up", value: 'green' },
+          { label: "Dusk — the tide shifting, everything going quiet", value: 'sea' },
+          { label: "Midnight — the space between one day and the next", value: 'hedge' },
+          { label: "Deep night — stars out, everything dark and vast", value: 'cosmic' },
+          { label: "Late afternoon — golden light, something simmering", value: 'kitchen' },
+        ],
+      },
+      {
+        text: 'Your Book of Shadows would mostly contain…',
+        options: [
+          { label: "Herbal lore, seasonal recipes, observations from the garden", value: 'green' },
+          { label: "Dreams, emotional tides, water rituals", value: 'sea' },
+          { label: "Journeys, symbols, transmissions from the in-between", value: 'hedge' },
+          { label: "Transits, charts, moon cycles, celestial events", value: 'cosmic' },
+          { label: "Recipes woven with intention, household rituals, hearth magic", value: 'kitchen' },
+        ],
+      },
+      {
+        text: 'If you had a familiar, it would be…',
+        options: [
+          { label: "A cat who loves the garden or something small and woodland", value: 'green' },
+          { label: "Something oceanic — an otter, a crow, something between worlds", value: 'sea' },
+          { label: "An owl — something that bridges the seen and unseen", value: 'hedge' },
+          { label: "A sleek black cat who watches the sky at night", value: 'cosmic' },
+          { label: "A fat, happy cat who sleeps near the stove", value: 'kitchen' },
+        ],
+      },
+      {
+        text: 'When a friend asks for help with something heavy, you…',
+        options: [
+          { label: "Make them something — tea, tincture, food — and let the conversation grow from there", value: 'green' },
+          { label: "Sit with them in the feeling before you try to move it — you know how to be in deep water", value: 'sea' },
+          { label: "Say the thing no one else will say — you can carry what comes back", value: 'hedge' },
+          { label: "Ask what the timing looks like — what's happening in their chart, what phase are they in", value: 'cosmic' },
+          { label: "Bring them into your space, feed them, make them feel held", value: 'kitchen' },
+        ],
+      },
+      {
+        text: 'The place that genuinely restores you is…',
+        options: [
+          { label: "A garden, forest, or any living, growing place", value: 'green' },
+          { label: "Near water — the bigger and more wild, the better", value: 'sea' },
+          { label: "Somewhere ancient, strange, or at the edge of something", value: 'hedge' },
+          { label: "Outside at night, with a clear sky and no light pollution", value: 'cosmic' },
+          { label: "Home — specifically your home, the way you've made it", value: 'kitchen' },
+        ],
+      },
+      {
+        text: 'When you sense that something is about to change — before there\'s any evidence — you…',
+        options: [
+          { label: "Feel it in the plants and animals first — nature always knows", value: 'green' },
+          { label: "Feel it in your body as a tide shift — something pulling or releasing", value: 'sea' },
+          { label: "Get a message from the in-between — a dream, a symbol, something at the edge of sight", value: 'hedge' },
+          { label: "Notice it in the sky — a conjunction, a void moon, a planet shifting sign", value: 'cosmic' },
+          { label: "Feel it in the rhythm of your home — something in the air, a restlessness in your hands", value: 'kitchen' },
+        ],
+      },
+      {
+        text: 'The season you feel most like yourself in is…',
+        options: [
+          { label: "Spring — planting season, the earth waking up, everything beginning", value: 'green' },
+          { label: "Autumn — the tides shifting, things releasing, something melancholy and beautiful", value: 'sea' },
+          { label: "The turn between seasons — Samhain, Imbolc, the moments of crossing", value: 'hedge' },
+          { label: "Winter — the long dark, star-watching season, when the sky is clear and close", value: 'cosmic' },
+          { label: "The whole wheel of it — the rituals and rhythms of each season as it comes", value: 'kitchen' },
+        ],
+      },
+    ],
+    results: {
+      green: {
+        title: 'The Green Witch',
+        emoji: '🌿',
+        tagline: "Your magic lives in the living world — in roots, in growth, in earth.",
+        description: "The Green Witch's power comes from her relationship with the natural world. You are fluent in the language of plants, seasons, and cycles. Your healing comes from the earth — literal and metaphorical. You know which herb to reach for, you feel the turning of seasons in your body, and your garden is tended with genuine reverence. Your magic is slow, patient, deeply rooted. It doesn't announce itself. It grows.",
+        keywords: ['Nature', 'Herbalism', 'Healing', 'Earth', 'Growth'],
+      },
+      sea: {
+        title: 'The Sea Witch',
+        emoji: '🌊',
+        tagline: "Your magic moves like water — deep, powerful, and always shifting.",
+        description: "The Sea Witch is the most emotionally fluid of all the archetypes. Your power lives in your capacity to feel, to dive, to navigate currents that others can't access. You are drawn to water — not just physically but symbolically. Dreams, mirrors, the unconscious — these are your territories. Your magic is not about force; it's about flow. The ocean doesn't push the tide. It simply moves, and everything else adjusts.",
+        keywords: ['Intuition', 'Depth', 'Flow', 'Dreams', 'Emotion'],
+      },
+      hedge: {
+        title: 'The Hedge Witch',
+        emoji: '🦉',
+        tagline: "You walk between worlds — and you've always known the way back.",
+        description: "The Hedge Witch lives at the threshold — between the wild and the domestic, the seen and the unseen. Your magic is liminal: it works best in the in-between spaces, at dusk, in doorways, in the moment just before sleep. People sometimes find you uncanny, because you see and know things that don't come from ordinary observation. That's because they don't.",
+        keywords: ['Liminality', 'Vision', 'Thresholds', 'Wisdom', 'The Between'],
+      },
+      cosmic: {
+        title: 'The Cosmic Witch',
+        emoji: '✨',
+        tagline: "You read the sky like a language — and it always has something to say.",
+        description: "The Cosmic Witch's magic is celestial. You are attuned to the movements of planets, the phases of the moon, the quality of light at different times of year. You know that timing is not superstition — it's alignment. Your practice is deeply connected to astrology, to ritual at sacred times, to doing things when the sky supports them. You don't fight the current. You learn to read it, and move accordingly.",
+        keywords: ['Astrology', 'Timing', 'Cycles', 'Celestial', 'Attunement'],
+      },
+      kitchen: {
+        title: 'The Kitchen Witch',
+        emoji: '🕯️',
+        tagline: "You make magic in the everyday — and everything you touch becomes an act of love.",
+        description: "The Kitchen Witch understands something that gets forgotten in more dramatic spiritual traditions: the sacred lives in the ordinary. Every meal you make with intention is a spell. Every cup of tea, every tended home, every candle lit with care is an act of magic. Your power is the power of hearth and hospitality — creating spaces where people feel genuinely held. Don't let anyone tell you this is a lesser magic. It is the oldest kind there is.",
+        keywords: ['Hearth', 'Nourishment', 'Intention', 'Everyday Magic', 'Love'],
+      },
+    },
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  {
+    id: 'healing-stage',
+    emoji: '🌱',
+    title: 'What Stage of Healing Are You In?',
+    description: 'Honest, specific, and surprisingly clarifying. Five stages of the journey.',
+    questions: [
+      {
+        text: 'When you look at your life honestly right now, it feels like…',
+        options: [
+          { label: "Something has cracked open and I can't go back to pretending it didn't", value: 'awakening' },
+          { label: "Things I built for a long time don't hold anymore — and I don't know what comes next", value: 'unraveling' },
+          { label: "I'm connecting dots I couldn't see before — making sense of what happened", value: 'integrating' },
+          { label: "I'm actively building something new, even if it's still fragile", value: 'rebuilding' },
+          { label: "I feel more like myself than I ever have — like something is finally settling", value: 'becoming' },
+        ],
+      },
+      {
+        text: 'Your relationship with your past right now is…',
+        options: [
+          { label: "I'm just starting to see it clearly — the patterns, the costs, the stories I believed", value: 'awakening' },
+          { label: "It's flooding in — old grief, old wounds, things I thought I'd processed", value: 'unraveling' },
+          { label: "I'm learning to hold it without being held by it", value: 'integrating' },
+          { label: "I've metabolized most of it — I'm more interested in what I'm building now", value: 'rebuilding' },
+          { label: "The past feels like it belongs to an older version of me — real, but no longer defining", value: 'becoming' },
+        ],
+      },
+      {
+        text: 'Right now, rest feels like…',
+        options: [
+          { label: "Uncomfortable — I feel like I should be figuring things out, not pausing", value: 'awakening' },
+          { label: "Necessary but hard to access — the inner noise makes it difficult", value: 'unraveling' },
+          { label: "An important part of the process — not lazy, actually required", value: 'integrating' },
+          { label: "Recharging — I rest so I can come back stronger", value: 'rebuilding' },
+          { label: "Something I've finally learned to give myself without guilt", value: 'becoming' },
+        ],
+      },
+      {
+        text: 'The biggest thing you\'re learning about yourself right now is…',
+        options: [
+          { label: "Some of the beliefs I've held about myself were never actually mine", value: 'awakening' },
+          { label: "I'm more fragile and more strong than I thought", value: 'unraveling' },
+          { label: "Everything — even the painful parts — was shaping something real", value: 'integrating' },
+          { label: "I'm capable of more than my old story allowed for", value: 'rebuilding' },
+          { label: "I genuinely like who I am — maybe for the first time", value: 'becoming' },
+        ],
+      },
+      {
+        text: 'When people ask how you are, you…',
+        options: [
+          { label: "Say \"fine\" — but there's a whole other layer underneath that's harder to name", value: 'awakening' },
+          { label: "Give the honest answer and hope they can handle it — or stay quiet because it's too much", value: 'unraveling' },
+          { label: "Have a more nuanced answer than you used to — it's complicated, and that's okay", value: 'integrating' },
+          { label: "Are genuinely doing better, even if there's still work to do", value: 'rebuilding' },
+          { label: "Can answer from a place of real groundedness, not performance", value: 'becoming' },
+        ],
+      },
+      {
+        text: 'Your support network right now is…',
+        options: [
+          { label: "Incomplete — I'm realizing some relationships can't hold what I'm going through", value: 'awakening' },
+          { label: "Strained — the people who knew the old me don't always know what to do with this version", value: 'unraveling' },
+          { label: "More intentional — I've learned to choose who I let in", value: 'integrating' },
+          { label: "Being actively built — I'm cultivating the connections that match where I'm going", value: 'rebuilding' },
+          { label: "Solid — and different from what it used to be in the best possible way", value: 'becoming' },
+        ],
+      },
+      {
+        text: 'When you scroll social media or look at other people\'s lives right now, you mostly feel…',
+        options: [
+          { label: "Alienated — like everyone else is operating on rules I'm just starting to question", value: 'awakening' },
+          { label: "Hollow — nothing lands, nothing resonates, you feel removed from the whole thing", value: 'unraveling' },
+          { label: "Selective — some of it speaks to you and some of it makes no sense anymore", value: 'integrating' },
+          { label: "Inspired occasionally — you're looking for models of what you're building toward", value: 'rebuilding' },
+          { label: "Mostly fine — you know yourself well enough that it doesn't land the way it used to", value: 'becoming' },
+        ],
+      },
+      {
+        text: 'Your relationship with your own emotions right now is…',
+        options: [
+          { label: "Newly complex — feelings are surfacing that I didn't know were there", value: 'awakening' },
+          { label: "Overwhelming at times — the volume is loud and there's no obvious off switch", value: 'unraveling' },
+          { label: "More spacious than before — I can feel something without immediately needing to fix it", value: 'integrating' },
+          { label: "Mostly workable — I know how to move through things now, even when it's hard", value: 'rebuilding' },
+          { label: "Trustworthy — I've learned to listen to myself and actually follow through", value: 'becoming' },
+        ],
+      },
+      {
+        text: 'When you think about the next 12 months, you feel…',
+        options: [
+          { label: "Uncertain — the picture I had doesn't fit anymore but I don't have a new one yet", value: 'awakening' },
+          { label: "Like I can't quite see it — the fog is real and the future feels inaccessible right now", value: 'unraveling' },
+          { label: "Curious — things are clarifying, though slowly", value: 'integrating' },
+          { label: "Motivated — I have a direction and I'm moving toward it", value: 'rebuilding' },
+          { label: "Open and ready — more able to receive what's coming than I've ever been", value: 'becoming' },
+        ],
+      },
+      {
+        text: 'The thing you\'re most protective of right now is…',
+        options: [
+          { label: "The new awareness I've found — I'm careful who I let challenge it while it's still forming", value: 'awakening' },
+          { label: "My energy — I have so little of it and the wrong people drain what's left", value: 'unraveling' },
+          { label: "My process — healing isn't linear and I don't need anyone rushing me", value: 'integrating' },
+          { label: "What I'm building — it's still early and I'm not ready for everyone's opinion", value: 'rebuilding' },
+          { label: "My peace — I've worked too hard for it to give it back carelessly", value: 'becoming' },
+        ],
+      },
+    ],
+    results: {
+      awakening: {
+        title: 'The Awakening',
+        emoji: '🌅',
+        tagline: "Something has cracked open — and you can't go back.",
+        description: "Awakening is the most disorienting stage of healing, because it involves seeing clearly for the first time — and clarity, when it first arrives, doesn't feel like a gift. It feels like a loss. The stories you believed about yourself, your relationships, or the world are shifting, and that shift is real and valid and often lonely. You're not broken. You're becoming honest. This stage requires more gentleness than any other. Be patient with yourself. The seeing is the beginning.",
+        keywords: ['Clarity', 'Honesty', 'Courage', 'Disorientation', 'Beginning'],
+      },
+      unraveling: {
+        title: 'The Unraveling',
+        emoji: '🌊',
+        tagline: "The old structure is coming down — and that is exactly what's supposed to happen.",
+        description: "The Unraveling is the hardest stage to be in, because it looks and often feels like collapse. But it's not collapse — it's deconstruction. The things that are falling apart were built on ground that couldn't hold them. The grief is real. The disorientation is real. And so is the fact that you cannot build what you're meant to build without clearing this space first. You don't need to figure it out yet. You need to let it finish. The unraveling has intelligence. Trust the process even — especially — when you can't see the plan.",
+        keywords: ['Release', 'Grief', 'Transition', 'Surrender', 'Courage'],
+      },
+      integrating: {
+        title: 'The Integration',
+        emoji: '🧩',
+        tagline: "You're making meaning — and that is its own kind of alchemy.",
+        description: "Integration is the quiet miracle stage. The chaos has settled enough for you to start seeing the shape of what happened — to connect what it meant, to metabolize what used to be wound into something like wisdom. This stage requires patience because understanding comes in waves. You'll think you've processed something and then a new layer surfaces. That's not regression; that's depth. You are not going backwards. You are going inward — and that is the only direction that leads somewhere real.",
+        keywords: ['Understanding', 'Meaning-making', 'Wisdom', 'Patience', 'Depth'],
+      },
+      rebuilding: {
+        title: 'The Rebuilding',
+        emoji: '🌱',
+        tagline: "You're planting things — and they are beginning to take root.",
+        description: "Rebuilding is the stage where effort starts to feel generative again. You're not just surviving — you're constructing. New patterns, new relationships, new ways of showing up that actually fit who you've become. This stage is tender because what you're building is still fragile, still needs protection. Be careful not to rush to completion. Everything you build now is being built by someone wiser and more honest than the version of you who built before. That makes all the difference.",
+        keywords: ['Growth', 'Creation', 'Hope', 'Momentum', 'Foundation'],
+      },
+      becoming: {
+        title: 'The Becoming',
+        emoji: '🦋',
+        tagline: "You are arriving at yourself — and it was worth every bit of the journey.",
+        description: "Becoming is not a destination you stay in forever — it's a threshold you cross and then expand from. If you're here, something fundamental has shifted: you trust yourself more than you used to. You know yourself more honestly. You've learned that you can survive hard things and that surviving them made you more — not less — of who you are. You have a center now. The work continues, but from here, it's different.",
+        keywords: ['Wholeness', 'Authenticity', 'Groundedness', 'Expansion', 'Self-trust'],
+      },
+    },
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  {
+    id: 'money-story',
+    emoji: '💸',
+    title: "What's Your Money Story?",
+    description: 'Your relationship with money started long before your first paycheck. This is the deeper pattern.',
+    questions: [
+      {
+        text: 'When you think about money, the first emotion that arises is…',
+        options: [
+          { label: "A low-grade anxiety that doesn't fully go away, even when things are fine", value: 'survivor' },
+          { label: "Excitement — it's just energy, and energy can be called in", value: 'manifestor' },
+          { label: "Something close to distaste — it feels beneath the real things in life", value: 'avoider' },
+          { label: "Motivation — money is a measure and I like measuring", value: 'builder' },
+        ],
+      },
+      {
+        text: 'Your earliest memory of money in your family was…',
+        options: [
+          { label: "Tension — it was scarce or the subject of stress", value: 'survivor' },
+          { label: "Fluid — it came and went but there was a general sense of trust", value: 'manifestor' },
+          { label: "Avoided — it wasn't talked about or was treated as unimportant", value: 'avoider' },
+          { label: "A goal — working for it, earning it, the pride of having your own", value: 'builder' },
+        ],
+      },
+      {
+        text: 'When you get an unexpected windfall, you…',
+        options: [
+          { label: "Feel relieved briefly, then anxious about losing it — save it immediately", value: 'survivor' },
+          { label: "Feel like the universe is confirming something — spend or reinvest easily", value: 'manifestor' },
+          { label: "Almost don't know what to do with it — it doesn't register as meaningful", value: 'avoider' },
+          { label: "Allocate it strategically — where can this grow or do the most good?", value: 'builder' },
+        ],
+      },
+      {
+        text: 'The phrase that triggers you most is…',
+        options: [
+          { label: "\"You just need to believe you deserve it\"", value: 'survivor' },
+          { label: "\"Be realistic about what's actually possible\"", value: 'manifestor' },
+          { label: "\"Money is just a tool — it's neutral\"", value: 'avoider' },
+          { label: "\"Not everything has to be productive\"", value: 'builder' },
+        ],
+      },
+      {
+        text: 'When it comes to investing in yourself — therapy, courses, coaching — you…',
+        options: [
+          { label: "Hesitate even when you can afford it — what if I need that money later?", value: 'survivor' },
+          { label: "Do it before you feel \"ready\" — you trust the return", value: 'manifestor' },
+          { label: "Would rather invest in experiences than things that feel like self-improvement", value: 'avoider' },
+          { label: "Calculate the ROI — is this the best use of these resources?", value: 'builder' },
+        ],
+      },
+      {
+        text: 'When you see someone living in obvious wealth, you feel…',
+        options: [
+          { label: "A mix of longing and resignation — that feels far from here", value: 'survivor' },
+          { label: "Inspired — a reminder that it's possible", value: 'manifestor' },
+          { label: "Vaguely uncomfortable — wondering what it cost them", value: 'avoider' },
+          { label: "Curious — what did they do, what can I learn?", value: 'builder' },
+        ],
+      },
+      {
+        text: 'When you have more money than usual this month, your first move is…',
+        options: [
+          { label: "Park it somewhere safe immediately — having a buffer is the whole point", value: 'survivor' },
+          { label: "Let it flow — something interesting always shows up when there's more to work with", value: 'manifestor' },
+          { label: "Honestly, not much changes — the number in the account doesn't affect my daily life that much", value: 'avoider' },
+          { label: "Move it into the category where it's most needed — debt, investment, next goal", value: 'builder' },
+        ],
+      },
+      {
+        text: 'When you think about charging more for your work, or asking for more money, you…',
+        options: [
+          { label: "Feel the familiar shrinking — what if they say no, what if they think I'm too much?", value: 'survivor' },
+          { label: "Feel it before you've rationalized it — you just know when the energy says yes", value: 'manifestor' },
+          { label: "Find it genuinely uncomfortable — money talk around your own worth feels crass", value: 'avoider' },
+          { label: "Do the math first — what's the market rate, what's defensible, what's the ask?", value: 'builder' },
+        ],
+      },
+      {
+        text: 'The thing you spend money on most easily — without guilt — is…',
+        options: [
+          { label: "Safety nets: insurance, emergency funds, things that reduce risk", value: 'survivor' },
+          { label: "Experiences, beautiful things, opportunities that feel aligned", value: 'manifestor' },
+          { label: "Things for others — gifts, shared meals, experiences with people you love", value: 'avoider' },
+          { label: "Tools or investments that compound over time", value: 'builder' },
+        ],
+      },
+      {
+        text: 'Checking your bank account or looking at your finances feels like…',
+        options: [
+          { label: "Something you do with a held breath — even when you know it should be fine", value: 'survivor' },
+          { label: "A quick scan more than a detailed review — you trust the overall direction", value: 'manifestor' },
+          { label: "Something you put off longer than you should — it's not interesting to you until it becomes urgent", value: 'avoider' },
+          { label: "A regular habit you don't dread — you like knowing exactly where you stand", value: 'builder' },
+        ],
+      },
+    ],
+    results: {
+      survivor: {
+        title: 'The Survivor',
+        emoji: '🛡️',
+        tagline: "Safety is everything — because it wasn't always there.",
+        description: "Your money story was written in survival. Somewhere along the way — often in childhood — money was synonymous with stress, scarcity, or instability. You became excellent at protecting yourself. You save. You worry. You feel that low hum of anxiety that doesn't fully quiet even when the numbers are fine. This is not a character flaw — it's an intelligent adaptation. The work now is distinguishing between the past that shaped this pattern and the present, which may actually be safe. Healing the belief that security is always about to be taken away is the next level.",
+        keywords: ['Security', 'Protection', 'Resilience', 'Vigilance', 'Healing'],
+      },
+      manifestor: {
+        title: 'The Manifestor',
+        emoji: '✨',
+        tagline: "You understand money as energy — and you're learning to work with it.",
+        description: "You genuinely believe in abundance, and that belief is a real and powerful asset. You don't hoard, you don't panic, you trust the flow. The shadow side is that trust can sometimes become a bypass — a way of not looking at the practical mechanics that make abundance sustainable. The most magnetic version of your money story is when spiritual fluency meets financial literacy. You don't have to choose between believing in the universe and having a solid budget. Both are true, and together they're formidable.",
+        keywords: ['Abundance', 'Flow', 'Trust', 'Manifestation', 'Generosity'],
+      },
+      avoider: {
+        title: 'The Mystic',
+        emoji: '🌿',
+        tagline: "You've decided meaning matters more than money — but that's worth examining.",
+        description: "You've built an identity — often partly spiritual — around not being someone who cares about money. And there's real wisdom in that. But avoidance and non-attachment are different things. If money talk makes you uncomfortable, if you deflect financial planning, if you'd rather not look at the numbers — that's not transcendence. That's avoidance wearing spiritual clothing. The invitation is to get genuinely at peace with money, not distant from it. You can care about meaning AND handle your finances with clarity. Both are true.",
+        keywords: ['Meaning', 'Simplicity', 'Values', 'Non-attachment', 'Integration'],
+      },
+      builder: {
+        title: 'The Builder',
+        emoji: '🏗️',
+        tagline: "You know money is built, not wished for — and you build well.",
+        description: "Your money story is largely healthy and functional. You understand that money responds to discipline, strategy, and attention — and you bring all three. The shadow is that achievement can become its own trap: the goal post moves, enough is never quite enough, and rest starts to feel like falling behind. The richest version of your story includes knowing what the money is for — not just the accumulation, but the life it's meant to make possible. You're excellent at building. Make sure you occasionally stop to live in what you've built.",
+        keywords: ['Discipline', 'Strategy', 'Growth', 'Ambition', 'Mastery'],
+      },
+    },
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  {
+    id: 'energy-radiate',
+    emoji: '🌟',
+    title: 'What Energy Do You Radiate Without Trying?',
+    description: 'Not what you perform — what you actually emit. Four distinct energetic signatures.',
+    questions: [
+      {
+        text: 'After spending time with you, most people feel…',
+        options: [
+          { label: "Seen — like you actually noticed them in a way others don't", value: 'magnetic' },
+          { label: "Steadier than they did before", value: 'grounding' },
+          { label: "Sparked — more excited, more possibility-oriented", value: 'electric' },
+          { label: "Lighter — like something that was heavy has shifted", value: 'healing' },
+        ],
+      },
+      {
+        text: 'The compliment you receive most often is…',
+        options: [
+          { label: "\"There's just something about you\"", value: 'magnetic' },
+          { label: "\"I always feel so calm around you\"", value: 'grounding' },
+          { label: "\"You always make me think differently\"", value: 'electric' },
+          { label: "\"I can always talk to you about anything\"", value: 'healing' },
+        ],
+      },
+      {
+        text: 'When something difficult is happening in a group, you…',
+        options: [
+          { label: "Draw people's attention and somehow redirect the energy", value: 'magnetic' },
+          { label: "Become steadier — you're actually better in difficulty than in ease", value: 'grounding' },
+          { label: "Find the angle no one has seen — move through it differently", value: 'electric' },
+          { label: "Move toward the most affected person and quietly attend to them", value: 'healing' },
+        ],
+      },
+      {
+        text: 'When you\'re tired and just existing in a space without trying to do anything, people still…',
+        options: [
+          { label: "Drift toward you — there's a pull that doesn't turn off", value: 'magnetic' },
+          { label: "Settle — something about your presence reduces the ambient tension", value: 'grounding' },
+          { label: "Start talking more than they planned — something opens up", value: 'electric' },
+          { label: "Open up — they say they don't know why, but it feels safe", value: 'healing' },
+        ],
+      },
+      {
+        text: 'The thing you\'ve had to actively learn to manage because it\'s so automatic is…',
+        options: [
+          { label: "Not absorbing everyone's attention and expectation — being seen is tiring when you didn't choose it", value: 'magnetic' },
+          { label: "Not becoming everyone's anchor — sometimes you need to not be the steady one", value: 'grounding' },
+          { label: "Not overloading people — your pace and intensity aren't always welcome", value: 'electric' },
+          { label: "Not carrying what other people release onto you — your openness has a cost", value: 'healing' },
+        ],
+      },
+      {
+        text: 'A stranger tells you something personal within twenty minutes of meeting you. This happens to you…',
+        options: [
+          { label: "Regularly — something about you makes people feel like they've always known you", value: 'magnetic' },
+          { label: "Often — they seem to feel safe, like you can be trusted with it", value: 'grounding' },
+          { label: "Sometimes — usually after something you said opened a door they didn't expect", value: 'electric' },
+          { label: "A lot — people seem to sense they can be honest around you without it being used against them", value: 'healing' },
+        ],
+      },
+      {
+        text: 'At a gathering where you don\'t know many people, by the end of the night you\'ve usually…',
+        options: [
+          { label: "Talked to most people, and several have said they want to stay in touch", value: 'magnetic' },
+          { label: "Found a spot, stayed fairly anchored in it, and made one or two people feel genuinely at ease", value: 'grounding' },
+          { label: "Said something that derailed — in a good way — at least one conversation", value: 'electric' },
+          { label: "Had one really real conversation with someone who needed it", value: 'healing' },
+        ],
+      },
+      {
+        text: 'When you replay a social interaction later, you\'re most likely to notice…',
+        options: [
+          { label: "Whether people were really with you, or just performing connection", value: 'magnetic' },
+          { label: "Whether anyone left feeling worse than when they arrived", value: 'grounding' },
+          { label: "Whether the conversation actually went somewhere or just circled", value: 'electric' },
+          { label: "Whether there was something unsaid that you should have made room for", value: 'healing' },
+        ],
+      },
+      {
+        text: 'The role you end up in — even when you didn\'t plan on it — is…',
+        options: [
+          { label: "The one everyone looks at when the energy in the room needs to shift", value: 'magnetic' },
+          { label: "The one who keeps things from flying apart when they get volatile", value: 'grounding' },
+          { label: "The one who names the uncomfortable thing and makes it suddenly workable", value: 'electric' },
+          { label: "The one who finds the person most affected and quietly shows up for them", value: 'healing' },
+        ],
+      },
+      {
+        text: 'The thing people thank you for — long after the fact, sometimes years later — is usually…',
+        options: [
+          { label: "Making them feel like they mattered at a moment when they needed it", value: 'magnetic' },
+          { label: "Being steady when everything else was moving — that they could count on you", value: 'grounding' },
+          { label: "Saying something that changed how they thought about a problem they'd been stuck in", value: 'electric' },
+          { label: "Just being there when it was hard and not trying to fix it — just being present", value: 'healing' },
+        ],
+      },
+    ],
+    results: {
+      magnetic: {
+        title: 'Magnetic Energy',
+        emoji: '🌟',
+        tagline: "People feel it when you walk in — and remember it when you leave.",
+        description: "Magnetic people don't command attention by trying — they simply have a quality of presence that draws others in. It's not performance. It's genuine depth and an energy that makes people feel like they matter to you. The gift is that you can light up almost any room. The shadow is that it can be exhausting to always be the one people orient toward, and it can be hard to know who's drawn to you versus drawn to what they project onto you. The work is learning to use your magnetism intentionally — and to protect your own energy in return.",
+        keywords: ['Presence', 'Charisma', 'Depth', 'Connection', 'Visibility'],
+      },
+      grounding: {
+        title: 'Grounding Energy',
+        emoji: '🌍',
+        tagline: "You are the stillness people find when everything is moving too fast.",
+        description: "Grounding energy is one of the rarest and most needed gifts. You bring stability without demanding it. You're the reason the room doesn't spin out during a crisis. Something in your nervous system communicates safety, and people find it without being able to explain why. The shadow is that you can prioritize others' steadiness over your own need to fall apart sometimes. You are allowed to be ungrounded. The most sustainable version of this gift comes from tending your own roots first.",
+        keywords: ['Stability', 'Safety', 'Calm', 'Presence', 'Reliability'],
+      },
+      electric: {
+        title: 'Electric Energy',
+        emoji: '⚡',
+        tagline: "You don't walk into rooms — you activate them.",
+        description: "Electric people are catalysts. You see the angle others miss, you ask the question that shifts the conversation, you introduce possibility where there was stagnation. You don't mean to disrupt — you genuinely just see more directions than most people do. The gift is your capacity to spark growth, movement, and new thinking in everyone around you. The shadow is that electric energy can be overwhelming for others and for yourself. Learning to channel it rather than scatter it is the ongoing work.",
+        keywords: ['Catalysis', 'Insight', 'Innovation', 'Spark', 'Movement'],
+      },
+      healing: {
+        title: 'Healing Energy',
+        emoji: '🌿',
+        tagline: "People exhale when they're around you — whether they know why or not.",
+        description: "Healing energy is quiet and profound. It's not about having answers — it's about creating a quality of presence in which people feel safe enough to be honest about where they actually are. You are the person people call when things are hard, not because you fix things but because your presence makes hardship more bearable. The shadow is compassion fatigue — you absorb what others release, and that has a cost. Learning to discharge what you take on is not selfish. It's what makes your gift sustainable.",
+        keywords: ['Compassion', 'Presence', 'Safety', 'Restoration', 'Empathy'],
+      },
+    },
+  },
 ];
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
