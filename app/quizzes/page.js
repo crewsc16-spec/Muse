@@ -826,12 +826,12 @@ const QUIZZES = [
     description: 'Ayurveda describes three fundamental constitutions — Vata, Pitta, and Kapha — that shape body, mind, and spirit.',
     questions: [
       {
-        text: 'Your body type and build tends to be…',
+        text: 'When you have a completely unstructured day with no plans or obligations, you feel…',
         options: [
-          { label: 'Slender and light, with a tendency to forget to eat when busy', value: 'vata' },
-          { label: 'Variable — my weight and appetite shift noticeably with the seasons', value: 'vata' },
-          { label: 'Medium and muscular, with a strong metabolism and reliable hunger', value: 'pitta' },
-          { label: 'Solid and sturdy, with a tendency to retain weight easily', value: 'kapha' },
+          { label: 'Initially excited, then restless and scattered — I need more structure than I expected', value: 'vata' },
+          { label: 'Energized for a few hours, then unmoored — too much freedom destabilizes me', value: 'vata' },
+          { label: 'Productive — I fill it strategically and feel satisfied with how much I accomplished', value: 'pitta' },
+          { label: 'Blissfully settled — I can stay in that slowness all day without any guilt', value: 'kapha' },
         ],
       },
       {
@@ -862,12 +862,12 @@ const QUIZZES = [
         ],
       },
       {
-        text: 'Your digestion tends to be…',
+        text: 'When plans fall apart or you\'re unexpectedly delayed, your default reaction is…',
         options: [
-          { label: 'Strong and urgent — I get very hungry and irritable if I miss meals', value: 'pitta' },
-          { label: 'Heat-sensitive — prone to acid, inflammation, or loose stools', value: 'pitta' },
-          { label: 'Irregular and uncomfortable — I bloat easily and often feel constipated', value: 'vata' },
-          { label: 'Slow but steady — I can go a long time without eating and feel fine', value: 'kapha' },
+          { label: 'Irritation that sharpens fast — I need things to go according to plan', value: 'pitta' },
+          { label: 'A spike of frustration, then an immediate pivot to fixing it — I can\'t rest in chaos', value: 'pitta' },
+          { label: 'Anxiety and disorganization — I lose my thread and it takes time to get it back', value: 'vata' },
+          { label: 'Acceptance — I adjust, let go of the original plan, and move on without much charge', value: 'kapha' },
         ],
       },
       {
@@ -880,12 +880,12 @@ const QUIZZES = [
         ],
       },
       {
-        text: 'The climate you feel best in is…',
+        text: 'Your body\'s response to the cold, grey, wet months of the year is…',
         options: [
-          { label: 'Warm and humid — cold wind completely drains and depletes me', value: 'vata' },
-          { label: 'Sunny and gentle — I wilt in cold, dry, or harsh weather', value: 'vata' },
-          { label: 'Cool and temperate — I overheat and become uncomfortable easily', value: 'pitta' },
-          { label: 'Warm and dry — damp, cold weather makes me heavy and unmotivated', value: 'kapha' },
+          { label: 'Dysregulation — cold and wind dry me out and make my nervous system erratic', value: 'vata' },
+          { label: 'Restlessness — the stillness of winter makes me heavy in a way I resist', value: 'vata' },
+          { label: 'Welcome relief — cool, temperate climates suit me more than heat ever has', value: 'pitta' },
+          { label: 'Sinking — damp and cold pulls me into lethargy and makes it hard to start anything', value: 'kapha' },
         ],
       },
       {
@@ -895,6 +895,24 @@ const QUIZZES = [
           { label: 'Direct and concise — I dislike vagueness or wasted words', value: 'pitta' },
           { label: 'Thoughtful and devoted — I learn slowly but retain almost everything', value: 'kapha' },
           { label: 'Enthusiastic but scattered — I grasp ideas fast and forget them just as fast', value: 'vata' },
+        ],
+      },
+      {
+        text: 'When you\'re working on something that matters to you, the people around you would notice that you…',
+        options: [
+          { label: 'Work in inspired bursts and need frequent change of scene to stay engaged', value: 'vata' },
+          { label: 'Drive toward completion with single-minded focus and don\'t stop until it\'s done', value: 'pitta' },
+          { label: 'Are methodical and reliable — steady and thorough, if not always fast', value: 'kapha' },
+          { label: 'Can focus intensely but need variety — sameness drains your momentum quickly', value: 'vata' },
+        ],
+      },
+      {
+        text: 'Your relationship with change — particularly change you didn\'t choose — is…',
+        options: [
+          { label: 'Complicated — change excites me in theory but destabilizes me in practice', value: 'vata' },
+          { label: 'Resistant at first, then adaptive — I need to direct it before I can accept it', value: 'pitta' },
+          { label: 'Challenging — I would genuinely rather things stay the same and evolve slowly', value: 'kapha' },
+          { label: 'Draining — I have real difficulty letting go, even when the change is clearly right', value: 'kapha' },
         ],
       },
     ],
@@ -947,12 +965,12 @@ const QUIZZES = [
         ],
       },
       {
-        text: 'When you look at the night sky, you feel most drawn to…',
+        text: 'When you have to make a significant decision right now, your honest relationship to clarity is…',
         options: [
-          { label: 'The dark sky — the vast, quiet promise of what is invisible but coming', value: 'new' },
-          { label: 'The crescent — potential made visible, growing a little more each night', value: 'waxing' },
-          { label: 'The full moon — pure luminous presence and bold, radiant completion', value: 'full' },
-          { label: 'The waning light — beauty in the graceful process of letting go', value: 'waning' },
+          { label: "I genuinely don't know yet — I'm in the dark and trying not to force it", value: 'new' },
+          { label: "Coming — I have a direction but the details are still forming", value: 'waxing' },
+          { label: "Clear enough to act — I'm not waiting for more information", value: 'full' },
+          { label: "Clearest about what I'm done with — less certain about what comes next", value: 'waning' },
         ],
       },
       {
@@ -965,12 +983,12 @@ const QUIZZES = [
         ],
       },
       {
-        text: 'The spiritual theme of your current season is…',
+        text: 'The last time someone asked what you needed, your honest answer was…',
         options: [
-          { label: 'Seeds, fertile emptiness, and the courage to not know yet', value: 'new' },
-          { label: 'Effort, faith, and showing up for the growing thing', value: 'waxing' },
-          { label: 'Gratitude, illumination, and the full-bodied presence of now', value: 'full' },
-          { label: 'Surrender, wisdom, and the grace of sacred release', value: 'waning' },
+          { label: "Space — to not know yet, to not be expected to have answers", value: 'new' },
+          { label: "Support — someone in my corner while I figure this out", value: 'waxing' },
+          { label: "An audience — I want to share what I've been building", value: 'full' },
+          { label: "Permission — to let things go without having to justify them", value: 'waning' },
         ],
       },
       {
@@ -998,6 +1016,24 @@ const QUIZZES = [
           { label: 'Turning vision into action with growing, joyful clarity', value: 'waxing' },
           { label: 'Illuminating others with your full presence and generosity', value: 'full' },
           { label: 'Distilling the wisdom of what has passed and releasing with grace', value: 'waning' },
+        ],
+      },
+      {
+        text: 'The last time your life felt fully aligned with who you actually are was…',
+        options: [
+          { label: "Not yet — something just shifted and I'm still finding my footing", value: 'new' },
+          { label: "Getting there — I can feel it assembling itself around me", value: 'waxing' },
+          { label: "Right now — this is the most me I've been in a long time", value: 'full' },
+          { label: "Recently, but that version is already beginning to transform", value: 'waning' },
+        ],
+      },
+      {
+        text: 'Your relationship to other people\'s attention and expectations right now is…',
+        options: [
+          { label: "Not available — I'm too deep in the forming to be seen yet", value: 'new' },
+          { label: "Welcome — feedback and encouragement help me move faster", value: 'waxing' },
+          { label: "Comfortable — I can receive attention without needing it to define me", value: 'full' },
+          { label: "Deliberately reduced — I'm turning the volume down to hear myself", value: 'waning' },
         ],
       },
     ],
@@ -1039,12 +1075,12 @@ const QUIZZES = [
     description: 'Six goddess archetypes from Greek mythology offer a map of feminine power — discover which one lives most vividly within you.',
     questions: [
       {
-        text: 'Your deepest core need in life is…',
+        text: 'The thing people most consistently come to you for — whether you asked for this role or not — is…',
         options: [
-          { label: 'Freedom, wild spaces, and the sovereignty of my own path', value: 'artemis' },
-          { label: 'Love, beauty, and the full experience of sensory pleasure', value: 'aphrodite' },
-          { label: 'Knowledge, strategy, and the satisfaction of hard problems', value: 'athena' },
-          { label: 'Depth, transformation, and the courage to face what lives in the dark', value: 'persephone' },
+          { label: 'To be left alone to figure something out — you give them space without crowding or fixing', value: 'artemis' },
+          { label: 'To feel alive again — your presence makes ordinary moments feel charged and electric', value: 'aphrodite' },
+          { label: 'Your mind — you see clearly when others can\'t, and your counsel is almost always right', value: 'athena' },
+          { label: 'To be seen in their pain — you go to the dark places without flinching', value: 'persephone' },
         ],
       },
       {
@@ -1075,12 +1111,12 @@ const QUIZZES = [
         ],
       },
       {
-        text: 'Your sacred space in nature is…',
+        text: 'When you feel most like yourself — truest, most alive, most at ease — you\'re usually…',
         options: [
-          { label: 'A fertile garden, orchard, or wild field overflowing with abundance', value: 'demeter' },
-          { label: 'A warm fireside or a still, candlelit room at the heart of a home', value: 'hestia' },
-          { label: 'A moonlit forest, a mountain trail, or the open wilderness at night', value: 'artemis' },
-          { label: 'The sea at sunset, a rose garden, anywhere achingly beautiful', value: 'aphrodite' },
+          { label: 'Alone in motion — walking, running, or pursuing something with no one to answer to', value: 'artemis' },
+          { label: 'Somewhere beautiful or near someone magnetic — aliveness calls to you', value: 'aphrodite' },
+          { label: 'Solving something hard with someone equally sharp — in real intellectual current', value: 'athena' },
+          { label: 'In depth — in a conversation that went somewhere real, or after a ritual that cost something', value: 'persephone' },
         ],
       },
       {
@@ -1117,6 +1153,15 @@ const QUIZZES = [
           { label: 'Centred — your presence creates a stillness that makes everything manageable', value: 'hestia' },
           { label: 'Sharper — like the whole conversation has been elevated and they can think more clearly', value: 'athena' },
           { label: 'Truly understood — like their pain has been witnessed without judgment or rush', value: 'persephone' },
+        ],
+      },
+      {
+        text: 'The thing that would genuinely devastate you — not inconvenience you, genuinely break you — is…',
+        options: [
+          { label: 'Being permanently caged — no movement, no freedom, obligated to belong and stay put', value: 'artemis' },
+          { label: 'Living without aliveness — a grey, joyless, sensory-dead existence with no beauty left', value: 'aphrodite' },
+          { label: 'Losing your clarity — the ability to think your way through things, to see what others miss', value: 'athena' },
+          { label: 'Forced into permanent surface — never allowed to acknowledge the dark or go deep again', value: 'persephone' },
         ],
       },
     ],
@@ -1172,21 +1217,21 @@ const QUIZZES = [
     description: 'Spiritual practice takes as many forms as there are practitioners — discover the style that resonates most deeply with you.',
     questions: [
       {
-        text: 'Your ideal ritual setting is…',
+        text: 'When something significant happens — a loss, a shift, a realization — your first instinct is to…',
         options: [
-          { label: 'Alone at my altar, in silence with candlelight and incense', value: 'solitary' },
-          { label: 'Outside — barefoot in a forest, by water, or under an open sky', value: 'nature' },
-          { label: 'In a circle with others who share my path and intentions', value: 'community' },
-          { label: 'At my desk or studio, surrounded by art supplies and beautiful materials', value: 'creative' },
+          { label: 'Find quiet private space to sit with what I\'m feeling, completely alone', value: 'solitary' },
+          { label: 'Go outside — movement or the living world moves things through me', value: 'nature' },
+          { label: 'Reach for the people I trust — I need to say it out loud to someone', value: 'community' },
+          { label: 'Make something — writing, drawing, or creating helps me find where I am', value: 'creative' },
         ],
       },
       {
-        text: 'Your ritual most often includes…',
+        text: 'When you want to mark something that matters — a threshold, an ending, a beginning — you feel most satisfied when it\'s…',
         options: [
-          { label: 'Journaling, oracle cards, and deep private reflection', value: 'solitary' },
-          { label: 'Herbs, stones, the moon, and natural materials gathered on walks', value: 'nature' },
-          { label: 'Shared prayer, ceremony, or collective energy work', value: 'community' },
-          { label: 'Art-making, collage, music, or writing as a devotional offering', value: 'creative' },
+          { label: 'Private and personal — designed for no one\'s eyes or ears but my own', value: 'solitary' },
+          { label: 'Held outdoors, in a place in the natural world that holds meaning for me', value: 'nature' },
+          { label: 'Witnessed — a ceremony only feels complete when people I love are present', value: 'community' },
+          { label: 'Made — a poem, a piece of art, something tangible as tribute', value: 'creative' },
         ],
       },
       {
@@ -1208,21 +1253,21 @@ const QUIZZES = [
         ],
       },
       {
-        text: 'If you could add one thing to your practice, it would be…',
+        text: 'The thing that makes a space or experience feel genuinely sacred to you is…',
         options: [
-          { label: 'More uninterrupted time alone to go deep without interruption', value: 'solitary' },
-          { label: 'More time in wild, green places or near moving water', value: 'nature' },
-          { label: 'A soul circle, coven, or spiritual community to share my path with', value: 'community' },
-          { label: 'Permission to make my practice messier, weirder, and more artistic', value: 'creative' },
+          { label: 'Silence and privacy — the complete absence of the outside world', value: 'solitary' },
+          { label: 'The presence of something alive and wild — plants, water, sky, the living earth', value: 'nature' },
+          { label: 'Being witnessed — something held in shared presence with people who mean it', value: 'community' },
+          { label: 'The act of making — when my hands are engaged in creating something intentional', value: 'creative' },
         ],
       },
       {
-        text: 'Your altar or ritual space probably contains…',
+        text: 'After a difficult or overwhelming week, what genuinely resets you is…',
         options: [
-          { label: 'Candles, incense, oracle cards, and a cherished journal', value: 'solitary' },
-          { label: 'Crystals, feathers, dried flowers, and things gathered on walks', value: 'nature' },
-          { label: 'Shared objects, group photos, and a calendar full of ceremony dates', value: 'community' },
-          { label: 'Paints, collage paper, poetry books, and coloured pens', value: 'creative' },
+          { label: 'Deep solitude — no one\'s energy, no demands, just my own silence and space', value: 'solitary' },
+          { label: 'Being in nature — water, soil, open sky — until I feel like myself again', value: 'nature' },
+          { label: 'Gathering — a meal, a conversation, a circle of people whose presence fills me', value: 'community' },
+          { label: 'Creating something — whatever the medium, the making restores what the week took', value: 'creative' },
         ],
       },
       {
@@ -1235,12 +1280,30 @@ const QUIZZES = [
         ],
       },
       {
-        text: 'The phrase that best describes your spiritual life is…',
+        text: 'How meaning tends to arrive for you is through…',
         options: [
-          { label: '"Between me and the divine — no intermediary needed"', value: 'solitary' },
-          { label: '"The earth is my temple"', value: 'nature' },
-          { label: '"Where two or more are gathered, there is magic"', value: 'community' },
-          { label: '"To create is to pray"', value: 'creative' },
+          { label: 'Inner work — quiet, private reflection is where your deepest truths emerge', value: 'solitary' },
+          { label: 'The living world — nature, seasons, and the rhythms of the earth speak to you', value: 'nature' },
+          { label: 'Other people — your most profound insights come in relationship and shared experience', value: 'community' },
+          { label: 'The creative act — you find out what you believe by making something', value: 'creative' },
+        ],
+      },
+      {
+        text: 'Your most natural form of prayer — even if you wouldn\'t call it that — is…',
+        options: [
+          { label: 'Sitting alone in stillness and going inward', value: 'solitary' },
+          { label: 'Being outside, present and unhurried, in the natural world', value: 'nature' },
+          { label: 'Gathering with people who hold the same things sacred', value: 'community' },
+          { label: 'Creating — when you make something with full presence and care', value: 'creative' },
+        ],
+      },
+      {
+        text: 'The spiritual experience that has most genuinely shaped you happened…',
+        options: [
+          { label: 'Alone — in private contemplation, a dream, or a moment of pure inner knowing', value: 'solitary' },
+          { label: 'In the natural world — a moment in a forest, by water, or under the open sky', value: 'nature' },
+          { label: 'With others — in ceremony, community, or a moment of profound shared understanding', value: 'community' },
+          { label: 'While making something — you crossed into something larger through the act of creating', value: 'creative' },
         ],
       },
     ],
@@ -1783,12 +1846,12 @@ const QUIZZES = [
     description: 'Discover the daily spiritual practice that genuinely fits your nature — the one you\'ll actually want to return to.',
     questions: [
       {
-        text: 'Your ideal first 20 minutes of the morning looks like…',
+        text: 'When you have something heavy to process — grief, confusion, a big decision — you most naturally…',
         options: [
-          { label: 'Writing — morning pages, gratitude, or stream-of-consciousness journaling', value: 'journaling' },
-          { label: 'Drawing a card and sitting quietly with its message for the day ahead', value: 'oracle' },
-          { label: 'Sitting in stillness — breathing, just being, before the day begins', value: 'meditation' },
-          { label: 'Moving my body — stretching, yoga, or a walk outside to wake up', value: 'movement' },
+          { label: 'Write it out — the page is where you find out what you actually think', value: 'journaling' },
+          { label: 'Work with something symbolic — you think better in archetype than in analysis', value: 'oracle' },
+          { label: 'Sit with it in stillness — you process better in silence than in language', value: 'meditation' },
+          { label: 'Move through it — walk, run, practice — your body processes what your mind can\'t', value: 'movement' },
         ],
       },
       {
@@ -1810,12 +1873,12 @@ const QUIZZES = [
         ],
       },
       {
-        text: 'If stranded on a desert island, the tool you\'d want is…',
+        text: 'A reliable sign that you\'ve been neglecting your practice is…',
         options: [
-          { label: 'My favourite journal and a good pen', value: 'journaling' },
-          { label: 'A deck of oracle or tarot cards', value: 'oracle' },
-          { label: 'A meditation cushion and unbroken silence', value: 'meditation' },
-          { label: 'My running shoes or a yoga mat', value: 'movement' },
+          { label: 'Your inner voice goes quiet — you lose contact with your own clarity', value: 'journaling' },
+          { label: 'Everything feels opaque — you can\'t read the signals you normally trust', value: 'oracle' },
+          { label: 'Your mind gets loud — the noise of it follows you everywhere and won\'t stop', value: 'meditation' },
+          { label: 'Your body tightens — you feel stiff, contracted, and cut off from yourself', value: 'movement' },
         ],
       },
       {
@@ -1828,12 +1891,12 @@ const QUIZZES = [
         ],
       },
       {
-        text: 'The spiritual teachers or tools that call to you most are…',
+        text: 'The periods of your life where you felt most clear, grounded, and aligned, your practice was…',
         options: [
-          { label: 'Julia Cameron, Anaïs Nin, or anyone who champions the written self', value: 'journaling' },
-          { label: 'Pam Colman Smith, Kim Krans, or any visionary oracle creator', value: 'oracle' },
-          { label: 'Thich Nhat Hanh, Tara Brach, or any true mindfulness teacher', value: 'meditation' },
-          { label: 'Somatic therapists, embodiment teachers, or movement healers', value: 'movement' },
+          { label: 'Writing consistently — there were pages, there was reflection, there was a record of yourself', value: 'journaling' },
+          { label: 'Working with cards or symbols regularly — you were in dialogue with something deeper', value: 'oracle' },
+          { label: 'Sitting daily — even a few minutes made the whole day more spacious', value: 'meditation' },
+          { label: 'Moving your body every day — the physical practice anchored everything else', value: 'movement' },
         ],
       },
       {
@@ -1852,6 +1915,24 @@ const QUIZZES = [
           { label: 'A daily conversation with your higher self through symbol and image', value: 'oracle' },
           { label: 'The peace that passes understanding, returned to again and again', value: 'meditation' },
           { label: 'A body that genuinely feels like home, every single day', value: 'movement' },
+        ],
+      },
+      {
+        text: 'When you hear someone say a single practice changed their life, the one that makes you feel a real pull is…',
+        options: [
+          { label: 'Journaling — a long record of your own becoming sounds genuinely moving', value: 'journaling' },
+          { label: 'Oracle work — a daily conversation with something wiser than your thinking mind', value: 'oracle' },
+          { label: 'Meditation — real inner quiet, real relief from your own mental noise', value: 'meditation' },
+          { label: 'Movement — a body that actually feels like home, every single day', value: 'movement' },
+        ],
+      },
+      {
+        text: 'The thing that most reliably gets between you and your practice is…',
+        options: [
+          { label: 'Running out of things to say — though you always find more once you start', value: 'journaling' },
+          { label: 'Not trusting what comes — doubt about whether you\'re reading the symbols right', value: 'oracle' },
+          { label: 'Your inability to sit still — your mind insists on being somewhere more useful', value: 'meditation' },
+          { label: 'The gap between knowing you need to move and actually getting yourself to do it', value: 'movement' },
         ],
       },
     ],
@@ -2719,6 +2800,35 @@ const QUIZZES = [
   },
 ];
 
+// ─── Quiz Groups ──────────────────────────────────────────────────────────────
+
+const QUIZ_GROUPS = [
+  {
+    label: 'Self & Psychology',
+    emoji: '🔍',
+    description: 'Patterns, wounds, and the architecture of your inner world.',
+    ids: ['enneagram', 'attachment', 'wound', 'shadow', 'healing-stage', 'money-story'],
+  },
+  {
+    label: 'Spiritual & Cosmic',
+    emoji: '🌙',
+    description: 'Your relationship to the metaphysical, the mystical, and the cosmos.',
+    ids: ['element', 'chakra', 'moon', 'dosha', 'intuition', 'seeker'],
+  },
+  {
+    label: 'Archetypes',
+    emoji: '✨',
+    description: 'The mythic, the symbolic, and the timeless figures that live in you.',
+    ids: ['goddess', 'witch', 'tarot', 'creature', 'energy-radiate'],
+  },
+  {
+    label: 'Wellness & Practice',
+    emoji: '🌿',
+    description: 'How you nourish yourself and show up in the living, daily world.',
+    ids: ['love', 'nervous', 'ritual', 'practice'],
+  },
+];
+
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 export default function QuizzesPage() {
@@ -2816,24 +2926,38 @@ export default function QuizzesPage() {
           {!activeQuiz && (
             <>
               <h1 className="font-playfair text-3xl mb-1" style={{ color: '#b88a92' }}>Quizzes</h1>
-              <p className="text-sm text-gray-500 mb-6">Explore yourself through thoughtful personality quizzes.</p>
+              <p className="text-sm text-gray-500 mb-8">Explore yourself through thoughtful personality quizzes.</p>
 
-              <div className="grid sm:grid-cols-2 gap-4">
-                {QUIZZES.map(quiz => (
-                  <div key={quiz.id} className="bg-white/60 border border-white/50 rounded-2xl p-5 flex flex-col gap-3">
-                    <div className="text-3xl">{quiz.emoji}</div>
-                    <div>
-                      <h2 className="font-playfair text-lg leading-snug text-gray-800">{quiz.title}</h2>
-                      <p className="text-xs text-gray-500 mt-1 leading-relaxed">{quiz.description}</p>
+              <div className="space-y-10">
+                {QUIZ_GROUPS.map(group => {
+                  const groupQuizzes = group.ids.map(id => QUIZZES.find(q => q.id === id)).filter(Boolean);
+                  return (
+                    <div key={group.label}>
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <span className="text-base">{group.emoji}</span>
+                        <h2 className="font-playfair text-lg text-gray-700">{group.label}</h2>
+                      </div>
+                      <p className="text-xs text-gray-400 mb-4">{group.description}</p>
+                      <div className="grid sm:grid-cols-2 gap-4">
+                        {groupQuizzes.map(quiz => (
+                          <div key={quiz.id} className="bg-white/60 border border-white/50 rounded-2xl p-5 flex flex-col gap-3">
+                            <div className="text-3xl">{quiz.emoji}</div>
+                            <div>
+                              <h3 className="font-playfair text-lg leading-snug text-gray-800">{quiz.title}</h3>
+                              <p className="text-xs text-gray-500 mt-1 leading-relaxed">{quiz.description}</p>
+                            </div>
+                            <button
+                              onClick={() => startQuiz(quiz)}
+                              className="btn-gradient text-white text-sm font-medium px-5 py-2 rounded-full self-start mt-auto"
+                            >
+                              Take Quiz
+                            </button>
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                    <button
-                      onClick={() => startQuiz(quiz)}
-                      className="btn-gradient text-white text-sm font-medium px-5 py-2 rounded-full self-start mt-auto"
-                    >
-                      Take Quiz
-                    </button>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </>
           )}
